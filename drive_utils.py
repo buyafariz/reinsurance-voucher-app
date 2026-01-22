@@ -6,40 +6,27 @@ from googleapiclient.http import MediaFileUpload
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 def get_drive_service():
-    # 🔥 secrets SUDAH berupa dict
-    service_account_info = dict(st.secrets["gcp_service_account"])
-
     credentials = service_account.Credentials.from_service_account_info(
-        service_account_info,
+        st.secrets["gcp_service_account"],
         scopes=SCOPES
     )
-
     return build("drive", "v3", credentials=credentials)
 
-
 def upload_to_drive(file_path, filename, folder_id):
-    try:
-        service = get_drive_service()
+    service = get_drive_service()
 
-        file_metadata = {
-            "name": filename,
-            "parents": [folder_id]
-        }
+    file_metadata = {
+        "name": filename,
+        "parents": [folder_id]
+    }
 
-        media = MediaFileUpload(
-            file_path,
-            resumable=True
-        )
+    media = MediaFileUpload(file_path, resumable=True)
 
-        uploaded_file = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields="id"
-        ).execute()
+    uploaded_file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id",
+        supportsAllDrives=True
+    ).execute()
 
-        return uploaded_file.get("id")
-
-    except Exception as e:
-        st.error("❌ Gagal upload ke Google Drive")
-        st.exception(e)
-        return None
+    return uploaded_file["id"]
