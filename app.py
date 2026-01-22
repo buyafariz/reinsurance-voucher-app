@@ -75,10 +75,10 @@ year, month = today.year, today.month
 
 log_path = get_log_path(BASE_PATH, year, month)
 
-if not os.path.exists(log_path):
-    log_df = pd.DataFrame()
-else:
+if os.path.exists(log_path):
     log_df = pd.read_excel(log_path)
+else:
+    log_df = pd.DataFrame()
 
 
 # ==========================
@@ -268,7 +268,7 @@ if st.button("❌ Batalkan Voucher"):
         st.error("Alasan pembatalan wajib diisi")
         st.stop()
 
-    log_df = pd.read_excel(log_path)
+    #log_df = pd.read_excel(log_path)
 
     original_row = log_df[
         log_df["VIN No"] == selected_vin
