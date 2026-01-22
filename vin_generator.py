@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from datetime import datetime
-import portalocker
 
 LOG_COLUMNS = [
     "Seq No",
@@ -24,12 +23,12 @@ LOG_COLUMNS = [
     "Balance",
     "REMARKS",
     "STATUS",
+    "ENTRY_TYPE",
     "CREATED_AT",
     "CREATED_BY",
     "CANCELLED_AT",
     "CANCELLED_BY",
     "CANCEL_REASON",
-    "ENTRY_TYPE",
     "CANCEL_OF_VIN",
 ]
 
@@ -41,32 +40,22 @@ def get_log_path(base_path, year, month):
     return os.path.join(period_path, "log_produksi.xlsx")
 
 
+def load_or_create_log(log_path):
+    if os.path.exists(log_path):
+        return pd.read_excel(log_path)
+    return pd.DataFrame(columns=LOG_COLUMNS)
+
+
 def generate_vin(base_path, year, month):
-    """
-    Generate VIN dengan file lock
-    Aman untuk multi-user (Streamlit Cloud)
-    """
     log_path = get_log_path(base_path, year, month)
+    log_df = load_or_create_log(log_path)
 
-    # pastikan file ada
-    if not os.path.exists(log_path):
-        pd.DataFrame(columns=LOG_COLUMNS).to_excel(log_path, index=False)
+    if log_df.empty:
+        next_seq = 1
+    else:
+        next_seq = int(log_df["Seq No"].max()) + 1
 
-    # 🔒 LOCK FILE
-    with open(log_path, "rb+") as f:
-        portalocker.lock(f, portalocker.LOCK_EX)
-
-        log_df = pd.read_excel(log_path)
-
-        if log_df.empty:
-            next_seq = 1
-        else:
-            next_seq = int(log_df["Seq No"].max()) + 1
-
-        vin = f"VIN{year}{month:02d}{next_seq:04d}"
-
-        portalocker.unlock(f)
-
+    vin = f"VIN{year}{month:02d}{next_seq:04d}"
     return vin, next_seq, log_path
 
 
