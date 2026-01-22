@@ -4,12 +4,8 @@ from datetime import datetime
 import os
 
 from validator import validate_voucher
-from vin_generator import (
-    generate_vin,
-    create_cancel_row,
-    get_log_path
-)
-from drive_utils import upload_to_drive
+from vin_generator import generate_vin, create_cancel_row, get_log_path
+from drive_utils import upload_or_update_drive_file
 
 
 # ==========================
@@ -24,7 +20,7 @@ BASE_PATH = "data"
 DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 
 st.title("📄 Reinsurance Voucher System")
-st.write("Upload voucher Excel untuk divalidasi dan diposting")
+st.write("Upload voucher Excel untuk divalidasi, diposting, dan dicancel")
 
 
 # ==========================
@@ -68,7 +64,7 @@ with st.expander("📊 Preview Data Voucher"):
 
 
 # ==========================
-# PERIOD & LOG PATH
+# PERIOD & LOG
 # ==========================
 today = datetime.today()
 year, month = today.year, today.month
@@ -175,7 +171,7 @@ st.dataframe(
 
 
 # ==========================
-# SAVE VOUCHER (POST)
+# POST VOUCHER
 # ==========================
 if st.button("💾 Simpan Voucher"):
 
@@ -188,11 +184,12 @@ if st.button("💾 Simpan Voucher"):
     folder = f"{year}_{month:02d}/vouchers"
     os.makedirs(os.path.join(BASE_PATH, folder), exist_ok=True)
 
-    file_path = os.path.join(BASE_PATH, folder, f"{vin}.xlsx")
-    df.to_excel(file_path, index=False)
+    voucher_path = os.path.join(BASE_PATH, folder, f"{vin}.xlsx")
+    df.to_excel(voucher_path, index=False)
 
-    upload_to_drive(
-        file_path=file_path,
+    # Upload voucher (SELALU CREATE)
+    upload_or_update_drive_file(
+        file_path=voucher_path,
         filename=f"{vin}.xlsx",
         folder_id=DRIVE_FOLDER_ID
     )
@@ -226,11 +223,20 @@ if st.button("💾 Simpan Voucher"):
     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
     log_df.to_excel(log_path, index=False)
 
-    upload_to_drive(
-        file_path=log_path,
-        filename="log_produksi.xlsx",
-        folder_id=DRIVE_FOLDER_ID
-    )
+    # Upload / update log (SATU FILE)
+    if "log_drive_id" not in st.session_state:
+        st.session_state["log_drive_id"] = upload_or_update_drive_file(
+            file_path=log_path,
+            filename="log_produksi.xlsx",
+            folder_id=DRIVE_FOLDER_ID
+        )
+    else:
+        upload_or_update_drive_file(
+            file_path=log_path,
+            filename="log_produksi.xlsx",
+            folder_id=DRIVE_FOLDER_ID,
+            file_id=st.session_state["log_drive_id"]
+        )
 
     st.success(f"✅ Voucher berhasil diposting: {vin}")
     st.code(vin)
@@ -268,8 +274,6 @@ if st.button("❌ Batalkan Voucher"):
         st.error("Alasan pembatalan wajib diisi")
         st.stop()
 
-    #log_df = pd.read_excel(log_path)
-
     original_row = log_df[
         log_df["VIN No"] == selected_vin
     ].iloc[0]
@@ -296,10 +300,11 @@ if st.button("❌ Batalkan Voucher"):
 
     log_df.to_excel(log_path, index=False)
 
-    upload_to_drive(
+    upload_or_update_drive_file(
         file_path=log_path,
         filename="log_produksi.xlsx",
-        folder_id=DRIVE_FOLDER_ID
+        folder_id=DRIVE_FOLDER_ID,
+        file_id=st.session_state["log_drive_id"]
     )
 
     st.success(
