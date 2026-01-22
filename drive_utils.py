@@ -1,14 +1,15 @@
+import json
+import streamlit as st
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-import streamlit as st
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
-
 def get_drive_service():
-    # ⬇️ INI SUDAH DI-PARSE OLEH STREAMLIT
-    service_account_info = dict(st.secrets["gcp_service_account"])
+    service_account_info = json.loads(
+        st.secrets["gcp_service_account"]
+    )
 
     credentials = service_account.Credentials.from_service_account_info(
         service_account_info,
@@ -29,13 +30,14 @@ def upload_to_drive(file_path, filename, folder_id):
 
         media = MediaFileUpload(file_path, resumable=True)
 
-        uploaded = service.files().create(
+        uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,
-            fields="id"
+            fields="id",
+            supportsAllDrives=True   # 🔥 WAJIB UNTUK SHARED DRIVE
         ).execute()
 
-        return uploaded.get("id")
+        return uploaded_file.get("id")
 
     except Exception as e:
         st.error("❌ Gagal upload ke Google Drive")
