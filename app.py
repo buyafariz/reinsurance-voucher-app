@@ -4,7 +4,11 @@ from datetime import datetime
 import os
 
 from validator import validate_voucher
-from vin_generator import generate_vin, create_cancel_row
+from vin_generator import (
+    generate_vin,
+    create_cancel_row,
+    get_log_path
+)
 from drive_utils import upload_to_drive
 
 
@@ -64,26 +68,17 @@ with st.expander("📊 Preview Data Voucher"):
 
 
 # ==========================
-# VIN & SESSION
+# PERIOD & LOG PATH
 # ==========================
 today = datetime.today()
 year, month = today.year, today.month
 
-if "vin" not in st.session_state:
-    vin, seq_no, log_path = generate_vin(BASE_PATH, year, month)
-    st.session_state.update({
-        "vin": vin,
-        "seq_no": seq_no,
-        "log_path": log_path,
-        "saved": False
-    })
+log_path = get_log_path(BASE_PATH, year, month)
 
-vin = st.session_state.vin
-seq_no = st.session_state.seq_no
-log_path = st.session_state.log_path
-
-st.subheader("🔐 Voucher Information")
-st.code(vin)
+if not os.path.exists(log_path):
+    log_df = pd.DataFrame()
+else:
+    log_df = pd.read_excel(log_path)
 
 
 # ==========================
@@ -180,13 +175,15 @@ st.dataframe(
 
 
 # ==========================
-# SAVE VOUCHER
+# SAVE VOUCHER (POST)
 # ==========================
-if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
+if st.button("💾 Simpan Voucher"):
 
     if not product.strip() or not remarks.strip():
         st.error("Product dan Remarks wajib diisi")
         st.stop()
+
+    vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
     folder = f"{year}_{month:02d}/vouchers"
     os.makedirs(os.path.join(BASE_PATH, folder), exist_ok=True)
@@ -194,19 +191,11 @@ if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
     file_path = os.path.join(BASE_PATH, folder, f"{vin}.xlsx")
     df.to_excel(file_path, index=False)
 
-    st.info("📤 Uploading file ke Google Drive...")
-
-    file_id = upload_to_drive(
+    upload_to_drive(
         file_path=file_path,
         filename=f"{vin}.xlsx",
         folder_id=DRIVE_FOLDER_ID
     )
-
-    if not file_id:
-        st.stop()
-
-    st.success("📤 File berhasil di-upload ke Google Drive")
-    st.caption(f"Drive File ID: {file_id}")
 
     log_entry = {
         "Seq No": seq_no,
@@ -229,11 +218,11 @@ if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
         "Balance": df["reins nett premium"].sum(),
         "REMARKS": remarks,
         "STATUS": "POSTED",
+        "ENTRY_TYPE": "POST",
         "CREATED_AT": datetime.now(),
-        "CREATED_BY": pic
+        "CREATED_BY": pic,
     }
 
-    log_df = pd.read_excel(log_path)
     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
     log_df.to_excel(log_path, index=False)
 
@@ -243,8 +232,8 @@ if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
         folder_id=DRIVE_FOLDER_ID
     )
 
-    st.session_state.saved = True
-    st.success(f"✅ Voucher `{vin}` berhasil disimpan")
+    st.success(f"✅ Voucher berhasil diposting: {vin}")
+    st.code(vin)
 
 
 # ==========================
@@ -253,14 +242,24 @@ if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
 st.divider()
 st.subheader("🚫 Cancel Voucher")
 
-log_df = pd.read_excel(log_path)
-posted_df = log_df[log_df["STATUS"] == "POSTED"]
+if log_df.empty:
+    st.info("Belum ada voucher")
+    st.stop()
+
+posted_df = log_df[
+    (log_df["STATUS"] == "POSTED") &
+    (log_df["ENTRY_TYPE"] == "POST")
+]
 
 if posted_df.empty:
     st.info("Tidak ada voucher POSTED")
     st.stop()
 
-selected_vin = st.selectbox("Pilih VIN", posted_df["VIN No"])
+selected_vin = st.selectbox(
+    "Pilih VIN",
+    posted_df["VIN No"].tolist()
+)
+
 cancel_reason = st.text_area("Alasan Pembatalan (WAJIB)")
 
 if st.button("❌ Batalkan Voucher"):
@@ -269,7 +268,11 @@ if st.button("❌ Batalkan Voucher"):
         st.error("Alasan pembatalan wajib diisi")
         st.stop()
 
-    original_row = log_df[log_df["VIN No"] == selected_vin].iloc[0]
+    log_df = pd.read_excel(log_path)
+
+    original_row = log_df[
+        log_df["VIN No"] == selected_vin
+    ].iloc[0]
 
     cancel_vin, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
 
@@ -286,7 +289,11 @@ if st.button("❌ Batalkan Voucher"):
         ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
     ] = ["CANCELLED", datetime.now(), pic, cancel_reason]
 
-    log_df = pd.concat([log_df, pd.DataFrame([cancel_row])], ignore_index=True)
+    log_df = pd.concat(
+        [log_df, pd.DataFrame([cancel_row])],
+        ignore_index=True
+    )
+
     log_df.to_excel(log_path, index=False)
 
     upload_to_drive(
@@ -295,5 +302,7 @@ if st.button("❌ Batalkan Voucher"):
         folder_id=DRIVE_FOLDER_ID
     )
 
-    st.success(f"Voucher {selected_vin} dibatalkan → {cancel_vin}")
+    st.success(
+        f"Voucher {selected_vin} dibatalkan → VIN cancel {cancel_vin}"
+    )
     st.rerun()
