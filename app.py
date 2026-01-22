@@ -237,6 +237,12 @@ if st.button("💾 Simpan Voucher", disabled=st.session_state.saved):
     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
     log_df.to_excel(log_path, index=False)
 
+    upload_to_drive(
+        file_path=log_path,
+        filename="log_produksi.xlsx",
+        folder_id=DRIVE_FOLDER_ID
+    )
+
     st.session_state.saved = True
     st.success(f"✅ Voucher `{vin}` berhasil disimpan")
 
@@ -282,6 +288,12 @@ if st.button("❌ Batalkan Voucher"):
 
     log_df = pd.concat([log_df, pd.DataFrame([cancel_row])], ignore_index=True)
     log_df.to_excel(log_path, index=False)
+
+    upload_to_drive(
+        file_path=log_path,
+        filename="log_produksi.xlsx",
+        folder_id=DRIVE_FOLDER_ID
+    )
 
     st.success(f"Voucher {selected_vin} dibatalkan → {cancel_vin}")
     st.rerun()
