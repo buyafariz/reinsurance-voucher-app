@@ -122,35 +122,45 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
             if numeric_series.empty:
                 st.info(f"Kolom `{filter_col}` kosong")
+
             else:
-                # cek apakah integer murni
-                is_integer = pd.api.types.is_integer_dtype(numeric_series)
+                unique_vals = numeric_series.unique()
 
-                if is_integer:
-                    min_val = int(numeric_series.min())
-                    max_val = int(numeric_series.max())
-
-                    selected_range = st.slider(
-                        f"Range `{filter_col}`",
-                        min_value=min_val,
-                        max_value=max_val,
-                        value=(min_val, max_val),
-                        step=1
+                # 🚫 HANYA 1 NILAI UNIK → TIDAK BOLEH SLIDER
+                if len(unique_vals) == 1:
+                    st.info(
+                        f"Kolom `{filter_col}` hanya memiliki satu nilai: "
+                        f"**{unique_vals[0]}**"
                     )
+
                 else:
-                    min_val = float(numeric_series.min())
-                    max_val = float(numeric_series.max())
+                    is_integer = pd.api.types.is_integer_dtype(numeric_series)
 
-                    selected_range = st.slider(
-                        f"Range `{filter_col}`",
-                        min_value=min_val,
-                        max_value=max_val,
-                        value=(min_val, max_val)
-                    )
+                    if is_integer:
+                        min_val = int(numeric_series.min())
+                        max_val = int(numeric_series.max())
 
-                filtered_df = filtered_df[
-                    col_series.between(*selected_range)
-                ]
+                        selected_range = st.slider(
+                            f"Range `{filter_col}`",
+                            min_value=min_val,
+                            max_value=max_val,
+                            value=(min_val, max_val),
+                            step=1
+                        )
+                    else:
+                        min_val = float(numeric_series.min())
+                        max_val = float(numeric_series.max())
+
+                        selected_range = st.slider(
+                            f"Range `{filter_col}`",
+                            min_value=min_val,
+                            max_value=max_val,
+                            value=(min_val, max_val)
+                        )
+
+                    filtered_df = filtered_df[
+                        col_series.between(*selected_range)
+                    ]
 
 
         # DATETIME FILTER
