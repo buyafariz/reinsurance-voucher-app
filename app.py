@@ -91,26 +91,44 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
                 ]
 
         # NUMERIC FILTER
-        elif pd.api.types.is_numeric_dtype(col_series):
+        with st.expander("📊 Preview Data Voucher"):
 
-            numeric_series = col_series.dropna()
+            col1, col2 = st.columns([1, 2])
 
-            if numeric_series.empty:
-                st.warning(f"Kolom `{filter_col}` tidak memiliki nilai numerik")
-            else:
-                min_val = float(numeric_series.min())
-                max_val = float(numeric_series.max())
-
-                selected_range = st.slider(
-                    f"Range `{filter_col}`",
-                    min_value=min_val,
-                    max_value=max_val,
-                    value=(min_val, max_val)
+            with col1:
+                filter_col = st.selectbox(
+                    "Filter berdasarkan kolom",
+                    df.columns.tolist()
                 )
 
-                filtered_df = filtered_df[
-                    col_series.between(*selected_range)
-                ]
+            with col2:
+                col_series = df[filter_col]
+
+                if pd.api.types.is_numeric_dtype(col_series):
+                    numeric_series = col_series.dropna()
+
+                    if numeric_series.empty:
+                        st.warning(f"Kolom `{filter_col}` tidak dapat difilter")
+                    else:
+                        min_val = float(numeric_series.min())
+                        max_val = float(numeric_series.max())
+
+                        selected_range = st.slider(
+                            f"Range `{filter_col}`",
+                            min_value=min_val,
+                            max_value=max_val,
+                            value=(min_val, max_val)
+                        )
+
+                        filtered_df = df[
+                            col_series.between(*selected_range)
+                        ]
+
+                else:
+                    st.warning(f"Kolom `{filter_col}` tidak memiliki nilai numerik")
+
+            st.caption(f"Menampilkan {len(filtered_df)} baris")
+            st.dataframe(filtered_df, height=450)
 
 
         # DATETIME FILTER
