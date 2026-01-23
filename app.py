@@ -60,80 +60,73 @@ if errors:
 
 st.success("✅ Validasi berhasil")
 
-with st.expander("📊 Preview Data Voucher)", expanded=True):
-    st.data_editor(
-        df,
-        use_container_width=True,
-        height=500,
-        disabled=True,
-        hide_index=True
-    )
 
-filtered_df = df.copy()
+# ==========================
+# PREVIEW + FILTER (DINAMIS)
+# ==========================
+with st.expander("📊 Preview Data Voucher", expanded=True):
 
-st.markdown("### 🔍 Filter Data")
+    filtered_df = df.copy()
 
-col_filter, col_value = st.columns([2, 3])
+    col1, col2 = st.columns([2, 4])
 
-with col_filter:
-    filter_col = st.selectbox(
-        "Pilih kolom",
-        options=filtered_df.columns.tolist()
-    )
-
-with col_value:
-    series = filtered_df[filter_col]
-
-    # TEXT
-    if series.dtype == "object":
-        keyword = st.text_input(
-            f"Cari pada kolom `{filter_col}`"
+    with col1:
+        filter_col = st.selectbox(
+            "Filter berdasarkan kolom",
+            options=filtered_df.columns.tolist()
         )
-        if keyword:
+
+    with col2:
+        col_series = filtered_df[filter_col]
+
+        # TEXT FILTER
+        if col_series.dtype == "object":
+            keyword = st.text_input(
+                f"Cari pada kolom `{filter_col}`"
+            )
+            if keyword:
+                filtered_df = filtered_df[
+                    col_series.astype(str)
+                    .str.contains(keyword, case=False, na=False)
+                ]
+
+        # NUMERIC FILTER
+        elif pd.api.types.is_numeric_dtype(col_series):
+            min_val = float(col_series.min())
+            max_val = float(col_series.max())
+
+            selected_range = st.slider(
+                f"Range `{filter_col}`",
+                min_value=min_val,
+                max_value=max_val,
+                value=(min_val, max_val)
+            )
+
             filtered_df = filtered_df[
-                series.astype(str)
-                .str.contains(keyword, case=False, na=False)
+                col_series.between(*selected_range)
             ]
 
-    # NUMERIC
-    elif pd.api.types.is_numeric_dtype(series):
-        min_val = float(series.min())
-        max_val = float(series.max())
+        # DATETIME FILTER
+        elif pd.api.types.is_datetime64_any_dtype(col_series):
+            start_date, end_date = st.date_input(
+                f"Range tanggal `{filter_col}`",
+                value=(col_series.min(), col_series.max())
+            )
 
-        selected_range = st.slider(
-            f"Range `{filter_col}`",
-            min_value=min_val,
-            max_value=max_val,
-            value=(min_val, max_val)
-        )
-
-        filtered_df = filtered_df[
-            series.between(*selected_range)
-        ]
-
-    # DATETIME
-    elif pd.api.types.is_datetime64_any_dtype(series):
-        min_date = series.min()
-        max_date = series.max()
-
-        selected_dates = st.date_input(
-            f"Range tanggal `{filter_col}`",
-            value=(min_date, max_date)
-        )
-
-        if len(selected_dates) == 2:
             filtered_df = filtered_df[
-                series.between(
-                    pd.to_datetime(selected_dates[0]),
-                    pd.to_datetime(selected_dates[1])
+                col_series.between(
+                    pd.to_datetime(start_date),
+                    pd.to_datetime(end_date)
                 )
             ]
 
-st.dataframe(
-    filtered_df,
-    height=450,
-    use_container_width=True
-)
+    st.caption(f"Menampilkan {len(filtered_df):,} baris")
+
+    st.dataframe(
+        filtered_df,
+        height=450,
+        use_container_width=True
+    )
 
 
 
