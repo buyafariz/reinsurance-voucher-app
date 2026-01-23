@@ -6,6 +6,7 @@ import os
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path
 from drive_utils import upload_or_update_drive_file
+from lock_utils import acquire_lock, release_lock
 
 
 # ==========================
@@ -179,67 +180,79 @@ if st.button("💾 Simpan Voucher"):
         st.error("Product dan Remarks wajib diisi")
         st.stop()
 
-    vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
+    lock_path = log_path + ".lock"
 
-    folder = f"{year}_{month:02d}/vouchers"
-    os.makedirs(os.path.join(BASE_PATH, folder), exist_ok=True)
+    try:
+        acquire_lock(lock_path)
 
-    voucher_path = os.path.join(BASE_PATH, folder, f"{vin}.xlsx")
-    df.to_excel(voucher_path, index=False)
+        # 🔒 SELALU reload log TERBARU setelah lock
+        if os.path.exists(log_path):
+            log_df = pd.read_excel(log_path)
+        else:
+            log_df = pd.DataFrame()
 
-    # Upload voucher (SELALU CREATE)
-    upload_or_update_drive_file(
-        file_path=voucher_path,
-        filename=f"{vin}.xlsx",
-        folder_id=DRIVE_FOLDER_ID
-    )
+        vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
-    log_entry = {
-        "Seq No": seq_no,
-        "VIN No": vin,
-        "Account With": account_with,
-        "PIC": pic,
-        "Product": product,
-        "CBY": cby,
-        "CBM": cbm,
-        "OBY": year,
-        "OBM": month,
-        "COB": cob,
-        "MOP": mop,
-        "Total Contribution": df["reins total premium"].sum(),
-        "Commission": df["reins total comm"].sum(),
-        "Tabarru": df["reins tabarru"].sum(),
-        "Ujrah": df["reins ujrah"].sum(),
-        "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
-        "Claim": df["claim"].sum() if "claim" in df.columns else 0,
-        "Balance": df["reins nett premium"].sum(),
-        "REMARKS": remarks,
-        "STATUS": "POSTED",
-        "ENTRY_TYPE": "POST",
-        "CREATED_AT": datetime.now(),
-        "CREATED_BY": pic,
-    }
+        folder = f"{year}_{month:02d}/vouchers"
+        os.makedirs(os.path.join(BASE_PATH, folder), exist_ok=True)
 
-    log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
-    log_df.to_excel(log_path, index=False)
+        voucher_path = os.path.join(BASE_PATH, folder, f"{vin}.xlsx")
+        df.to_excel(voucher_path, index=False)
 
-    # Upload / update log (SATU FILE)
-    if "log_drive_id" not in st.session_state:
-        st.session_state["log_drive_id"] = upload_or_update_drive_file(
-            file_path=log_path,
-            filename="log_produksi.xlsx",
+        upload_or_update_drive_file(
+            file_path=voucher_path,
+            filename=f"{vin}.xlsx",
             folder_id=DRIVE_FOLDER_ID
         )
-    else:
-        upload_or_update_drive_file(
-            file_path=log_path,
-            filename="log_produksi.xlsx",
-            folder_id=DRIVE_FOLDER_ID,
-            file_id=st.session_state["log_drive_id"]
-        )
 
-    st.success(f"✅ Voucher berhasil diposting: {vin}")
-    st.code(vin)
+        log_entry = {
+            "Seq No": seq_no,
+            "VIN No": vin,
+            "Account With": account_with,
+            "PIC": pic,
+            "Product": product,
+            "CBY": cby,
+            "CBM": cbm,
+            "OBY": year,
+            "OBM": month,
+            "COB": cob,
+            "MOP": mop,
+            "Total Contribution": df["reins total premium"].sum(),
+            "Commission": df["reins total comm"].sum(),
+            "Tabarru": df["reins tabarru"].sum(),
+            "Ujrah": df["reins ujrah"].sum(),
+            "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
+            "Claim": df["claim"].sum() if "claim" in df.columns else 0,
+            "Balance": df["reins nett premium"].sum(),
+            "REMARKS": remarks,
+            "STATUS": "POSTED",
+            "ENTRY_TYPE": "POST",
+            "CREATED_AT": datetime.now(),
+            "CREATED_BY": pic,
+        }
+
+        log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
+        log_df.to_excel(log_path, index=False)
+
+        if "log_drive_id" not in st.session_state:
+            st.session_state["log_drive_id"] = upload_or_update_drive_file(
+                file_path=log_path,
+                filename="log_produksi.xlsx",
+                folder_id=DRIVE_FOLDER_ID
+            )
+        else:
+            upload_or_update_drive_file(
+                file_path=log_path,
+                filename="log_produksi.xlsx",
+                folder_id=DRIVE_FOLDER_ID,
+                file_id=st.session_state["log_drive_id"]
+            )
+
+        st.success(f"✅ Voucher berhasil diposting: {vin}")
+        st.code(vin)
+
+    finally:
+        release_lock(lock_path)
 
 
 # ==========================
