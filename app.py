@@ -69,6 +69,73 @@ with st.expander("📊 Preview Data Voucher)", expanded=True):
         hide_index=True
     )
 
+filtered_df = df.copy()
+
+st.markdown("### 🔍 Filter Data")
+
+col_filter, col_value = st.columns([2, 3])
+
+with col_filter:
+    filter_col = st.selectbox(
+        "Pilih kolom",
+        options=filtered_df.columns.tolist()
+    )
+
+with col_value:
+    series = filtered_df[filter_col]
+
+    # TEXT
+    if series.dtype == "object":
+        keyword = st.text_input(
+            f"Cari pada kolom `{filter_col}`"
+        )
+        if keyword:
+            filtered_df = filtered_df[
+                series.astype(str)
+                .str.contains(keyword, case=False, na=False)
+            ]
+
+    # NUMERIC
+    elif pd.api.types.is_numeric_dtype(series):
+        min_val = float(series.min())
+        max_val = float(series.max())
+
+        selected_range = st.slider(
+            f"Range `{filter_col}`",
+            min_value=min_val,
+            max_value=max_val,
+            value=(min_val, max_val)
+        )
+
+        filtered_df = filtered_df[
+            series.between(*selected_range)
+        ]
+
+    # DATETIME
+    elif pd.api.types.is_datetime64_any_dtype(series):
+        min_date = series.min()
+        max_date = series.max()
+
+        selected_dates = st.date_input(
+            f"Range tanggal `{filter_col}`",
+            value=(min_date, max_date)
+        )
+
+        if len(selected_dates) == 2:
+            filtered_df = filtered_df[
+                series.between(
+                    pd.to_datetime(selected_dates[0]),
+                    pd.to_datetime(selected_dates[1])
+                )
+            ]
+
+st.dataframe(
+    filtered_df,
+    height=450,
+    use_container_width=True
+)
+
+
 
 # ==========================
 # PERIOD & LOG
