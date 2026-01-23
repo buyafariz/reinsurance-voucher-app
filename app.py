@@ -92,19 +92,26 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
         # NUMERIC FILTER
         elif pd.api.types.is_numeric_dtype(col_series):
-            min_val = float(col_series.min())
-            max_val = float(col_series.max())
 
-            selected_range = st.slider(
-                f"Range `{filter_col}`",
-                min_value=min_val,
-                max_value=max_val,
-                value=(min_val, max_val)
-            )
+            numeric_series = col_series.dropna()
 
-            filtered_df = filtered_df[
-                col_series.between(*selected_range)
-            ]
+            if numeric_series.empty:
+                st.warning(f"Kolom `{filter_col}` tidak memiliki nilai numerik")
+            else:
+                min_val = float(numeric_series.min())
+                max_val = float(numeric_series.max())
+
+                selected_range = st.slider(
+                    f"Range `{filter_col}`",
+                    min_value=min_val,
+                    max_value=max_val,
+                    value=(min_val, max_val)
+                )
+
+                filtered_df = filtered_df[
+                    col_series.between(*selected_range)
+                ]
+
 
         # DATETIME FILTER
         elif pd.api.types.is_datetime64_any_dtype(col_series):
