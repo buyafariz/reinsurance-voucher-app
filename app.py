@@ -48,7 +48,7 @@ BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 
 st.title("📄 Reinsurance Voucher System")
-st.write("Upload voucher Excel")
+st.write("")
 
 tab_post, tab_cancel, tab_claim = st.tabs([
     "📥 Simpan VIN",
