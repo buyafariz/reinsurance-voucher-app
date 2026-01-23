@@ -445,10 +445,18 @@ with tab_post:
 
 
 with tab_cancel:
-    # ==========================
-    # CANCEL VOUCHER
-    # ==========================
     st.subheader("🚫 Cancel Voucher")
+
+    today = datetime.today()
+    year, month = today.year, today.month
+    log_path = get_log_path(BASE_PATH, year, month)
+
+    # 🔑 PASTIKAN log_df SELALU ADA
+    if not os.path.exists(log_path):
+        st.info("Belum ada voucher")
+        st.stop()
+
+    log_df = pd.read_excel(log_path)
 
     if log_df.empty:
         st.info("Belum ada voucher")
