@@ -69,17 +69,13 @@ def get_non_empty_columns(df: pd.DataFrame):
     valid_cols = []
     for col in df.columns:
         series = df[col]
-
-        # drop NaN
         non_na = series.dropna()
 
         if non_na.empty:
             continue
 
-        # untuk kolom object → pastikan tidak semuanya string kosong
         if series.dtype == "object":
-            non_empty_str = non_na.astype(str).str.strip()
-            if (non_empty_str != "").any():
+            if non_na.astype(str).str.strip().ne("").any():
                 valid_cols.append(col)
         else:
             valid_cols.append(col)
@@ -87,6 +83,9 @@ def get_non_empty_columns(df: pd.DataFrame):
     return valid_cols
 
 
+# ==========================
+# PREVIEW + FILTER
+# ==========================
 with st.expander("📊 Preview Data Voucher", expanded=True):
 
     filtered_df = df.copy()
@@ -98,18 +97,19 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
     with col1:
         filter_col = st.selectbox(
             "Filter berdasarkan kolom",
-            options=valid_columns()
+            options=valid_columns
         )
 
+    col_series = filtered_df[filter_col]
 
     with col2:
-        col_series = filtered_df[filter_col]
 
         # TEXT FILTER
         if col_series.dtype == "object":
             keyword = st.text_input(
                 f"Cari pada kolom `{filter_col}`"
             )
+
             if keyword:
                 filtered_df = filtered_df[
                     col_series.astype(str)
@@ -118,32 +118,29 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
         # NUMERIC FILTER
         elif pd.api.types.is_numeric_dtype(col_series):
-
             numeric_series = col_series.dropna()
 
-            if numeric_series.empty:
-                st.warning(f"Kolom `{filter_col}` kosong")
-            else:
-                min_val = float(numeric_series.min())
-                max_val = float(numeric_series.max())
+            min_val = float(numeric_series.min())
+            max_val = float(numeric_series.max())
 
-                selected_range = st.slider(
-                    f"Range `{filter_col}`",
-                    min_value=min_val,
-                    max_value=max_val,
-                    value=(min_val, max_val)
-                )
+            selected_range = st.slider(
+                f"Range `{filter_col}`",
+                min_value=min_val,
+                max_value=max_val,
+                value=(min_val, max_val)
+            )
 
-                filtered_df = filtered_df[
-                    col_series.between(*selected_range)
-                ]
-
+            filtered_df = filtered_df[
+                col_series.between(*selected_range)
+            ]
 
         # DATETIME FILTER
         elif pd.api.types.is_datetime64_any_dtype(col_series):
+            valid_dates = col_series.dropna()
+
             start_date, end_date = st.date_input(
                 f"Range tanggal `{filter_col}`",
-                value=(col_series.min(), col_series.max())
+                value=(valid_dates.min(), valid_dates.max())
             )
 
             filtered_df = filtered_df[
@@ -160,7 +157,6 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
         height=450,
         use_container_width=True
     )
-
 
 
 # ==========================
