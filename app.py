@@ -68,49 +68,35 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
     filtered_df = df.copy()
 
-    # --- Layout utama
-    col_left, col_right = st.columns([2, 4])
+    col1, col2 = st.columns([2, 4])
 
-    # ======================
-    # PILIH KOLOM FILTER
-    # ======================
-    with col_left:
-        st.markdown("**Filter berdasarkan kolom**")
+    with col1:
         filter_col = st.selectbox(
-            "",
-            options=filtered_df.columns.tolist(),
-            label_visibility="collapsed"
+            "Filter berdasarkan kolom",
+            options=filtered_df.columns.tolist()
         )
 
-    col_series = filtered_df[filter_col]
+    with col2:
+        col_series = filtered_df[filter_col]
 
-    # ======================
-    # AREA FILTER (KANAN)
-    # ======================
-    with col_right:
-        # spacer agar sejajar dengan selectbox
-        st.markdown("&nbsp;", unsafe_allow_html=True)
-
-        # -------- TEXT FILTER --------
+        # TEXT FILTER
         if col_series.dtype == "object":
             keyword = st.text_input(
                 f"Cari pada kolom `{filter_col}`"
             )
-
             if keyword:
                 filtered_df = filtered_df[
                     col_series.astype(str)
                     .str.contains(keyword, case=False, na=False)
                 ]
 
-        # -------- NUMERIC FILTER --------
+        # NUMERIC FILTER
         elif pd.api.types.is_numeric_dtype(col_series):
+
             numeric_series = col_series.dropna()
 
             if numeric_series.empty:
-                st.warning(
-                    f"Kolom `{filter_col}` tidak memiliki nilai numerik"
-                )
+                st.warning(f"Kolom `{filter_col}` kosong")
             else:
                 min_val = float(numeric_series.min())
                 max_val = float(numeric_series.max())
@@ -126,39 +112,21 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
                     col_series.between(*selected_range)
                 ]
 
-        # -------- DATETIME FILTER --------
+
+        # DATETIME FILTER
         elif pd.api.types.is_datetime64_any_dtype(col_series):
-            valid_dates = col_series.dropna()
-
-            if valid_dates.empty:
-                st.warning(
-                    f"Kolom `{filter_col}` tidak memiliki tanggal valid"
-                )
-            else:
-                min_date = valid_dates.min()
-                max_date = valid_dates.max()
-
-                start_date, end_date = st.date_input(
-                    f"Range tanggal `{filter_col}`",
-                    value=(min_date, max_date)
-                )
-
-                filtered_df = filtered_df[
-                    col_series.between(
-                        pd.to_datetime(start_date),
-                        pd.to_datetime(end_date)
-                    )
-                ]
-
-        # -------- FALLBACK --------
-        else:
-            st.info(
-                f"Kolom `{filter_col}` tidak dapat difilter"
+            start_date, end_date = st.date_input(
+                f"Range tanggal `{filter_col}`",
+                value=(col_series.min(), col_series.max())
             )
 
-    # ======================
-    # HASIL
-    # ======================
+            filtered_df = filtered_df[
+                col_series.between(
+                    pd.to_datetime(start_date),
+                    pd.to_datetime(end_date)
+                )
+            ]
+
     st.caption(f"Menampilkan {len(filtered_df):,} baris")
 
     st.dataframe(
@@ -166,19 +134,6 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
         height=450,
         use_container_width=True
     )
-
-
-    # ======================
-    # RESULT
-    # ======================
-    st.caption(f"Menampilkan {len(filtered_df):,} baris")
-
-    st.dataframe(
-        filtered_df,
-        height=450,
-        use_container_width=True
-    )
-
 
 
 
