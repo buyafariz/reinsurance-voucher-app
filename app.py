@@ -43,11 +43,6 @@ st.set_page_config(
     layout="centered"
 )
 
-tab_post, tab_cancel, tab_claim = st.tabs([
-    "📥 Simpan VIN",
-    "🚫 Cancel Voucher",
-    "📄 Klaim"
-])
 
 BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
@@ -55,6 +50,11 @@ ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 st.title("📄 Reinsurance Voucher System")
 st.write("Upload voucher Excel")
 
+tab_post, tab_cancel, tab_claim = st.tabs([
+    "📥 Simpan VIN",
+    "🚫 Cancel Voucher",
+    "📄 Klaim"
+])
 
 # ==========================
 # SIMPAN VOUCHER
