@@ -8,6 +8,32 @@ from vin_generator import generate_vin, create_cancel_row, get_log_path
 from drive_utils import upload_or_update_drive_file, get_period_drive_folders
 from lock_utils import acquire_lock, release_lock
 
+# ==========================
+# ACCOUNTING FORMAT CONFIG
+# ==========================
+ACCOUNTING_COLS = [
+    "sum insured",
+    "sum at risk",
+    "reins sum insured",
+    "reins sum at risk",
+    "reins total premium",
+    "reins total comm",
+    "reins tabarru",
+    "reins ujrah",
+    "reins nett premium",
+]
+
+def accounting_format(x):
+    if pd.isna(x):
+        return ""
+    x = float(x)
+    if x == 0:
+        return "–"
+    if x < 0:
+        return f"({abs(x):,.2f})"
+    return f"{x:,.2f}"
+
+
 
 # ==========================
 # CONFIG
@@ -181,11 +207,26 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
     st.caption(f"Menampilkan {len(filtered_df):,} baris")
 
+    # ==========================
+    # DISPLAY DF (ACCOUNTING VIEW)
+    # ==========================
+    display_df = filtered_df.copy()
+
+    for col in ACCOUNTING_COLS:
+        if col in display_df.columns:
+            display_df[col] = display_df[col].apply(accounting_format)
+
+    st.caption(f"Menampilkan {len(display_df):,} baris")
+
     st.dataframe(
-        filtered_df,
+        display_df.style.set_properties(
+            subset=[c for c in ACCOUNTING_COLS if c in display_df.columns],
+            **{"text-align": "right"}
+        ),
         height=450,
         use_container_width=True
     )
+
 
 
 # ==========================
