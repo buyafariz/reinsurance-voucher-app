@@ -91,7 +91,6 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
     filtered_df = df.copy()
 
-    # 🔹 hanya kolom yang punya isi
     valid_columns = get_non_empty_columns(filtered_df)
 
     col1, col2 = st.columns([2, 4])
@@ -99,13 +98,12 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
     with col1:
         filter_col = st.selectbox(
             "Filter berdasarkan kolom",
-            options=valid_columns
+            options=valid_columns()
         )
 
-    col_series = filtered_df[filter_col]
 
     with col2:
-        st.markdown("&nbsp;", unsafe_allow_html=True)
+        col_series = filtered_df[filter_col]
 
         # TEXT FILTER
         if col_series.dtype == "object":
@@ -120,29 +118,32 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
 
         # NUMERIC FILTER
         elif pd.api.types.is_numeric_dtype(col_series):
+
             numeric_series = col_series.dropna()
 
-            min_val = float(numeric_series.min())
-            max_val = float(numeric_series.max())
+            if numeric_series.empty:
+                st.warning(f"Kolom `{filter_col}` kosong")
+            else:
+                min_val = float(numeric_series.min())
+                max_val = float(numeric_series.max())
 
-            selected_range = st.slider(
-                f"Range `{filter_col}`",
-                min_value=min_val,
-                max_value=max_val,
-                value=(min_val, max_val)
-            )
+                selected_range = st.slider(
+                    f"Range `{filter_col}`",
+                    min_value=min_val,
+                    max_value=max_val,
+                    value=(min_val, max_val)
+                )
 
-            filtered_df = filtered_df[
-                col_series.between(*selected_range)
-            ]
+                filtered_df = filtered_df[
+                    col_series.between(*selected_range)
+                ]
+
 
         # DATETIME FILTER
         elif pd.api.types.is_datetime64_any_dtype(col_series):
-            valid_dates = col_series.dropna()
-
             start_date, end_date = st.date_input(
                 f"Range tanggal `{filter_col}`",
-                value=(valid_dates.min(), valid_dates.max())
+                value=(col_series.min(), col_series.max())
             )
 
             filtered_df = filtered_df[
