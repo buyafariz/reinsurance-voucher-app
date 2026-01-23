@@ -60,8 +60,18 @@ if errors:
 
 st.success("✅ Validasi berhasil")
 
-with st.expander("📊 Preview Data Voucher"):
-    st.dataframe(df, height=450)
+with st.expander("🔎 Filter Data"):
+    cert_filter = st.text_input("Certificate No contains")
+    filtered_df = df[
+        df["certificate no"].str.contains(cert_filter, case=False, na=False)
+        if cert_filter else df.index == df.index
+    ]
+
+st.data_editor(
+    filtered_df,
+    use_container_width=True,
+    disabled=True
+)
 
 
 # ==========================
