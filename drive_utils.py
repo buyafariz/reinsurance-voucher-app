@@ -56,30 +56,34 @@ def upload_or_update_drive_file(
 
 def get_or_create_folder(service, folder_name, parent_id):
     query = (
-        f"name='{folder_name}' and "
-        f"mimeType='application/vnd.google-apps.folder' and "
-        f"'{parent_id}' in parents and trashed=false"
+        f"name='{folder_name}' "
+        f"and mimeType='application/vnd.google-apps.folder' "
+        f"and '{parent_id}' in parents "
+        f"and trashed=false"
     )
 
     results = service.files().list(
         q=query,
-        fields="files(id, name)"
+        spaces="drive",
+        fields="files(id, name)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
     ).execute()
 
     files = results.get("files", [])
-
     if files:
         return files[0]["id"]
 
     folder_metadata = {
         "name": folder_name,
         "mimeType": "application/vnd.google-apps.folder",
-        "parents": [parent_id]
+        "parents": [parent_id],
     }
 
     folder = service.files().create(
         body=folder_metadata,
-        fields="id"
+        fields="id",
+        supportsAllDrives=True
     ).execute()
 
     return folder["id"]
