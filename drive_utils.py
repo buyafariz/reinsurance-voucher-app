@@ -52,3 +52,57 @@ def upload_or_update_drive_file(
     ).execute()
 
     return created["id"]
+
+
+def get_or_create_folder(service, folder_name, parent_id):
+    query = (
+        f"name='{folder_name}' and "
+        f"mimeType='application/vnd.google-apps.folder' and "
+        f"'{parent_id}' in parents and trashed=false"
+    )
+
+    results = service.files().list(
+        q=query,
+        fields="files(id, name)"
+    ).execute()
+
+    files = results.get("files", [])
+
+    if files:
+        return files[0]["id"]
+
+    folder_metadata = {
+        "name": folder_name,
+        "mimeType": "application/vnd.google-apps.folder",
+        "parents": [parent_id]
+    }
+
+    folder = service.files().create(
+        body=folder_metadata,
+        fields="id"
+    ).execute()
+
+    return folder["id"]
+
+
+def get_period_drive_folders(year, month, root_folder_id):
+    service = get_drive_service()
+
+    period_name = f"{year}_{month:02d}"
+
+    period_id = get_or_create_folder(
+        service,
+        folder_name=period_name,
+        parent_id=root_folder_id
+    )
+
+    voucher_folder_id = get_or_create_folder(
+        service,
+        folder_name="vouchers",
+        parent_id=period_id
+    )
+
+    return {
+        "period_id": period_id,
+        "voucher_folder_id": voucher_folder_id
+    }
