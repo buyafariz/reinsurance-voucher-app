@@ -60,18 +60,49 @@ if errors:
 
 st.success("✅ Validasi berhasil")
 
-with st.expander("🔎 Filter Data"):
-    cert_filter = st.text_input("Certificate No contains")
-    filtered_df = df[
-        df["certificate no"].str.contains(cert_filter, case=False, na=False)
-        if cert_filter else df.index == df.index
-    ]
 
-st.data_editor(
-    filtered_df,
-    use_container_width=True,
-    disabled=True
-)
+with st.expander("📊 Preview Data Voucher (Filterable)", expanded=True):
+
+    filtered_df = df.copy()
+
+    st.caption("🔎 Filter per kolom (mirip Excel)")
+
+    for col in filtered_df.columns:
+        with st.container():
+            if pd.api.types.is_numeric_dtype(filtered_df[col]):
+                min_val = float(filtered_df[col].min())
+                max_val = float(filtered_df[col].max())
+
+                selected_range = st.slider(
+                    f"{col}",
+                    min_value=min_val,
+                    max_value=max_val,
+                    value=(min_val, max_val),
+                    step=(max_val - min_val) / 100 if max_val != min_val else 1,
+                    key=f"filter_{col}"
+                )
+
+                filtered_df = filtered_df[
+                    filtered_df[col].between(*selected_range)
+                ]
+
+            else:
+                unique_vals = filtered_df[col].dropna().unique().tolist()
+
+                selected_vals = st.multiselect(
+                    f"{col}",
+                    options=unique_vals,
+                    default=unique_vals,
+                    key=f"filter_{col}"
+                )
+
+                filtered_df = filtered_df[
+                    filtered_df[col].isin(selected_vals)
+                ]
+
+    st.divider()
+    st.dataframe(filtered_df, height=500)
+
 
 
 # ==========================
