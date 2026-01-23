@@ -120,19 +120,38 @@ with st.expander("📊 Preview Data Voucher", expanded=True):
         elif pd.api.types.is_numeric_dtype(col_series):
             numeric_series = col_series.dropna()
 
-            min_val = float(numeric_series.min())
-            max_val = float(numeric_series.max())
+            if numeric_series.empty:
+                st.info(f"Kolom `{filter_col}` kosong")
+            else:
+                # cek apakah integer murni
+                is_integer = pd.api.types.is_integer_dtype(numeric_series)
 
-            selected_range = st.slider(
-                f"Range `{filter_col}`",
-                min_value=min_val,
-                max_value=max_val,
-                value=(min_val, max_val)
-            )
+                if is_integer:
+                    min_val = int(numeric_series.min())
+                    max_val = int(numeric_series.max())
 
-            filtered_df = filtered_df[
-                col_series.between(*selected_range)
-            ]
+                    selected_range = st.slider(
+                        f"Range `{filter_col}`",
+                        min_value=min_val,
+                        max_value=max_val,
+                        value=(min_val, max_val),
+                        step=1
+                    )
+                else:
+                    min_val = float(numeric_series.min())
+                    max_val = float(numeric_series.max())
+
+                    selected_range = st.slider(
+                        f"Range `{filter_col}`",
+                        min_value=min_val,
+                        max_value=max_val,
+                        value=(min_val, max_val)
+                    )
+
+                filtered_df = filtered_df[
+                    col_series.between(*selected_range)
+                ]
+
 
         # DATETIME FILTER
         elif pd.api.types.is_datetime64_any_dtype(col_series):
