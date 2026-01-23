@@ -532,6 +532,10 @@ with tab_claim:
         key="upload_claim"
     )
 
-    if uploaded_claim:
+    if uploaded_claim is None:
+        st.info("Silakan upload file klaim")
+    else:
         df_claim = pd.read_excel(uploaded_claim)
-        st.dataframe(df_claim)
+        st.success("File klaim berhasil dibaca")
+        st.dataframe(df_claim, use_container_width=True)
+
