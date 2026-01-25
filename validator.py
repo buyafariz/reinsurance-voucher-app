@@ -56,7 +56,7 @@ INTEGER_COLUMNS = [
 ]
 
 
-def validate_voucher(df):
+def validate_voucher(df, business_event: str):
     errors = []
 
     # =========================
@@ -86,16 +86,33 @@ def validate_voucher(df):
             errors.append(f"Kolom {col} harus bertipe tanggal (date)")
         df[col] = converted
 
+
     # =========================
-    # 3. NUMERIC >= 0
+    # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
     for col in NUMERIC_COLUMNS:
         numeric = pd.to_numeric(df[col], errors="coerce")
+
         if numeric.isna().any():
             errors.append(f"Kolom {col} harus numerik")
-        elif (numeric < 0).any():
-            errors.append(f"Kolom {col} tidak boleh bernilai negatif")
+            continue
+
+        # 🔹 NEW BUSINESS → TIDAK BOLEH NEGATIF
+        if business_event == "NEW BUSINESS":
+            if (numeric < 0).any():
+                errors.append(
+                    f"Kolom {col} tidak boleh bernilai negatif untuk NEW BUSINESS"
+                )
+
+        # 🔹 TERMINATED → BOLEH NEGATIF (REFUND / SURRENDER)
+        elif business_event == "TERMINATED":
+            pass  # NEGATIF DIIZINKAN
+
+        else:
+            errors.append("BUSINESS EVENT tidak valid (NEW BUSINESS / TERMINATED)")
+
         df[col] = numeric
+
 
     # =========================
     # 4. GENDER

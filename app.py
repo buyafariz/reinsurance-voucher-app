@@ -103,10 +103,13 @@ with tab_post:
                 df[col] = df[col].astype(str).str.strip()
 
 
+        business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
+        business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
+
         # ==========================
         # VALIDATION
         # ==========================
-        errors = validate_voucher(df)
+        errors = validate_voucher(df, business_event_code)
 
         if errors:
             st.error("❌ VALIDASI GAGAL")
@@ -289,6 +292,7 @@ with tab_post:
         # ==========================
         # FORM INPUT
         # ==========================
+
         with st.expander("🧾 Informasi Voucher", expanded=True):
 
             col1, col2 = st.columns(2)
@@ -434,6 +438,7 @@ with tab_post:
                     "Claim": df["claim"].sum() if "claim" in df.columns else 0,
                     "Balance": df["reins nett premium"].sum(),
                     "REMARKS": remarks,
+                    "BUSINESS_EVENT": business_event_code,
                     "STATUS": "POSTED",
                     "ENTRY_TYPE": "POST",
                     "CREATED_AT": datetime.now(),
