@@ -90,6 +90,10 @@ def validate_voucher(df, business_event: str):
     # =========================
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
+    if business_event not in ["NEW", "TERMINATED"]:
+        errors.append("BUSINESS EVENT tidak valid (NEW / TERMINATED)")
+        return errors   # ⛔ stop sekali saja
+
     for col in NUMERIC_COLUMNS:
         numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -97,19 +101,15 @@ def validate_voucher(df, business_event: str):
             errors.append(f"Kolom {col} harus numerik")
             continue
 
-        # 🔹 NEW BUSINESS → TIDAK BOLEH NEGATIF
-        if business_event == "NEW BUSINESS":
+        # 🔹 NEW → tidak boleh negatif
+        if business_event == "NEW":
             if (numeric < 0).any():
                 errors.append(
                     f"Kolom {col} tidak boleh bernilai negatif untuk NEW BUSINESS"
                 )
 
-        # 🔹 TERMINATED → BOLEH NEGATIF (REFUND / SURRENDER)
-        elif business_event == "TERMINATED":
-            pass  # NEGATIF DIIZINKAN
-
-        else:
-            errors.append("BUSINESS EVENT tidak valid (NEW BUSINESS / TERMINATED)")
+        # 🔹 TERMINATED → negatif diizinkan
+        # tidak perlu apa-apa
 
         df[col] = numeric
 
