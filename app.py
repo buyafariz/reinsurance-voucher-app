@@ -7,6 +7,8 @@ from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path
 from drive_utils import upload_or_update_drive_file, get_period_drive_folders
 from lock_utils import acquire_lock, release_lock
+from zoneinfo import ZoneInfo
+
 
 # ==========================
 # ACCOUNTING FORMAT CONFIG
@@ -422,6 +424,8 @@ with tab_post:
                 elif business_event_code == "TERMINATED":
                     entry_type = "TERMINATE"
 
+                now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
+
                 log_entry = {
                     "Seq No": seq_no,
                     "VIN No": vin,
@@ -445,7 +449,7 @@ with tab_post:
                     "BUSINESS EVENT": business_event_code,
                     "STATUS": "POSTED",
                     "ENTRY_TYPE": entry_type,
-                    "CREATED_AT": datetime.now(),
+                    "CREATED_AT": now_wib,
                     "CREATED_BY": pic,
                 }
 
