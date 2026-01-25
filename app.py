@@ -57,6 +57,27 @@ tab_post, tab_cancel, tab_claim = st.tabs([
 ])
 
 # ==========================
+# CLAIM
+# ==========================
+
+with tab_claim:
+    st.subheader("📄 Klaim")
+
+    uploaded_claim = st.file_uploader(
+        "Upload File Klaim (.xlsx)",
+        type=["xlsx"],
+        key="upload_claim"
+    )
+
+    if uploaded_claim is None:
+        st.info("Silakan upload file klaim")
+    else:
+        df_claim = pd.read_excel(uploaded_claim)
+        st.success("File klaim berhasil dibaca")
+        st.dataframe(df_claim, use_container_width=True)
+
+
+# ==========================
 # SIMPAN VOUCHER
 # ==========================
 
@@ -520,20 +541,4 @@ else:
             )
             st.rerun()
 
-
-with tab_claim:
-    st.subheader("📄 Klaim")
-
-    uploaded_claim = st.file_uploader(
-        "Upload File Klaim (.xlsx)",
-        type=["xlsx"],
-        key="upload_claim"
-    )
-
-    if uploaded_claim is None:
-        st.info("Silakan upload file klaim")
-    else:
-        df_claim = pd.read_excel(uploaded_claim)
-        st.success("File klaim berhasil dibaca")
-        st.dataframe(df_claim, use_container_width=True)
 
