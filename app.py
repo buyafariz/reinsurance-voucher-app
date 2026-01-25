@@ -418,7 +418,7 @@ with tab_post:
                 )
 
                 if business_event_code == "NEW":
-                    entry_type = "NEW BUSINESS"
+                    entry_type = "POST"
                 elif business_event_code == "TERMINATED":
                     entry_type = "TERMINATE"
 
@@ -442,6 +442,7 @@ with tab_post:
                     "Claim": df["claim"].sum() if "claim" in df.columns else 0,
                     "Balance": df["reins nett premium"].sum(),
                     "REMARKS": remarks,
+                    "BUSINESS EVENT": business_event_code,
                     "STATUS": "POSTED",
                     "ENTRY_TYPE": entry_type,
                     "CREATED_AT": datetime.now(),
@@ -492,7 +493,7 @@ with tab_cancel:
     else:
         posted_df = log_df[
             (log_df["STATUS"] == "POSTED") &
-            (log_df["ENTRY_TYPE"] == "NEW BUSINESS")
+            (log_df["ENTRY_TYPE"] == "POST")
         ]
 
         if posted_df.empty:
