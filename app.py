@@ -84,6 +84,9 @@ with tab_claim:
 with tab_post:
     st.subheader("📥 Simpan VIN (Posting Voucher)")
 
+    business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
+    business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
+
     uploaded_file = st.file_uploader(
         "Upload Voucher (.xlsx)",
         type=["xlsx"],
@@ -101,10 +104,6 @@ with tab_post:
         for col in ["certificate no", "pol holder no"]:
             if col in df.columns:
                 df[col] = df[col].astype(str).str.strip()
-
-
-        business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
-        business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
 
         # ==========================
         # VALIDATION
