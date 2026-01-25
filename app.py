@@ -9,6 +9,9 @@ from drive_utils import upload_or_update_drive_file, get_period_drive_folders
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
+def now_wib_naive():
+    return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
+
 
 # ==========================
 # ACCOUNTING FORMAT CONFIG
@@ -424,9 +427,6 @@ with tab_post:
                 elif business_event_code == "TERMINATED":
                     entry_type = "TERMINATE"
 
-                now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
-                now_wib_naive = now_wib.replace(tzinfo=None)
-
 
                 log_entry = {
                     "Seq No": seq_no,
@@ -451,7 +451,7 @@ with tab_post:
                     "BUSINESS EVENT": business_event_code,
                     "STATUS": "POSTED",
                     "ENTRY_TYPE": entry_type,
-                    "CREATED_AT": now_wib_naive,
+                    "CREATED_AT": now_wib_naive(),
                     "CREATED_BY": pic,
                 }
 
@@ -535,7 +535,7 @@ with tab_cancel:
                 log_df.loc[
                     log_df["VIN No"] == selected_vin,
                     ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
-                ] = ["CANCELLED", now_wib_naive, pic, cancel_reason]
+                ] = ["CANCELLED", now_wib_naive(), pic, cancel_reason]
 
                 log_df = pd.concat(
                     [log_df, pd.DataFrame([cancel_row])],
