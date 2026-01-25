@@ -418,6 +418,11 @@ with tab_post:
                     folder_id=VOUCHER_DRIVE_ID
                 )
 
+                if business_event_code == "NEW":
+                    entry_type = "NEW BUSINESS"
+                elif business_event_code == "TERMINATED":
+                    entry_type = "TERMINATE"
+
                 log_entry = {
                     "Seq No": seq_no,
                     "VIN No": vin,
@@ -438,9 +443,8 @@ with tab_post:
                     "Claim": df["claim"].sum() if "claim" in df.columns else 0,
                     "Balance": df["reins nett premium"].sum(),
                     "REMARKS": remarks,
-                    "BUSINESS_EVENT": business_event_code,
                     "STATUS": "POSTED",
-                    "ENTRY_TYPE": "POST",
+                    "ENTRY_TYPE": entry_type,
                     "CREATED_AT": datetime.now(),
                     "CREATED_BY": pic,
                 }
@@ -484,66 +488,66 @@ with tab_cancel:
 
     log_df = pd.read_excel(log_path)
 
-if log_df.empty:
-    st.info("Belum ada voucher")
-else:
-    posted_df = log_df[
-        (log_df["STATUS"] == "POSTED") &
-        (log_df["ENTRY_TYPE"] == "POST")
-    ]
-
-    if posted_df.empty:
-        st.info("Tidak ada voucher POSTED")
+    if log_df.empty:
+        st.info("Belum ada voucher")
     else:
-        selected_vin = st.selectbox(
-            "Pilih VIN",
-            posted_df["VIN No"].tolist()
-        )
+        posted_df = log_df[
+            (log_df["STATUS"] == "POSTED") &
+            (log_df["ENTRY_TYPE"] == "NEW BUSINESS")
+        ]
 
-        cancel_reason = st.text_area("Alasan Pembatalan (WAJIB)")
-
-        if st.button("❌ Batalkan Voucher"):
-
-            if not cancel_reason.strip():
-                st.error("Alasan pembatalan wajib diisi")
-                st.stop()
-
-            original_row = log_df[
-                log_df["VIN No"] == selected_vin
-            ].iloc[0]
-
-            cancel_vin, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
-
-            cancel_row = create_cancel_row(
-                original_row=original_row,
-                new_vin=cancel_vin,
-                seq_no=cancel_seq,
-                user=pic,
-                reason=cancel_reason
+        if posted_df.empty:
+            st.info("Tidak ada voucher POSTED")
+        else:
+            selected_vin = st.selectbox(
+                "Pilih VIN",
+                posted_df["VIN No"].tolist()
             )
 
-            log_df.loc[
-                log_df["VIN No"] == selected_vin,
-                ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
-            ] = ["CANCELLED", datetime.now(), pic, cancel_reason]
+            cancel_reason = st.text_area("Alasan Pembatalan (WAJIB)")
 
-            log_df = pd.concat(
-                [log_df, pd.DataFrame([cancel_row])],
-                ignore_index=True
-            )
+            if st.button("❌ Batalkan Voucher"):
 
-            log_df.to_excel(log_path, index=False)
+                if not cancel_reason.strip():
+                    st.error("Alasan pembatalan wajib diisi")
+                    st.stop()
 
-            upload_or_update_drive_file(
-                file_path=log_path,
-                filename="log_produksi.xlsx",
-                folder_id=PERIOD_DRIVE_ID,
-                file_id=st.session_state["log_drive_id"]
-            )
+                original_row = log_df[
+                    log_df["VIN No"] == selected_vin
+                ].iloc[0]
 
-            st.success(
-                f"Voucher {selected_vin} dibatalkan → VIN cancel {cancel_vin}"
-            )
-            st.rerun()
+                cancel_vin, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
+
+                cancel_row = create_cancel_row(
+                    original_row=original_row,
+                    new_vin=cancel_vin,
+                    seq_no=cancel_seq,
+                    user=pic,
+                    reason=cancel_reason
+                )
+
+                log_df.loc[
+                    log_df["VIN No"] == selected_vin,
+                    ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
+                ] = ["CANCELLED", datetime.now(), pic, cancel_reason]
+
+                log_df = pd.concat(
+                    [log_df, pd.DataFrame([cancel_row])],
+                    ignore_index=True
+                )
+
+                log_df.to_excel(log_path, index=False)
+
+                upload_or_update_drive_file(
+                    file_path=log_path,
+                    filename="log_produksi.xlsx",
+                    folder_id=PERIOD_DRIVE_ID,
+                    file_id=st.session_state["log_drive_id"]
+                )
+
+                st.success(
+                    f"Voucher {selected_vin} dibatalkan → VIN cancel {cancel_vin}"
+                )
+                st.rerun()
 
 
