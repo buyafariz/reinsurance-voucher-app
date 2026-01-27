@@ -5,7 +5,7 @@ import os
 
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
@@ -493,18 +493,26 @@ with tab_post:
                 log_df.to_excel(log_path, index=False)
 
                 # Upload / update log (SATU FILE)
-                if "log_drive_id" not in st.session_state:
-                    st.session_state["log_drive_id"] = upload_or_update_drive_file(
+                service = get_drive_service()
+
+                log_drive_id = find_drive_file(
+                    service=service,
+                    filename="log_produksi.xlsx",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                if log_drive_id:
+                    upload_or_update_drive_file(
                         file_path=log_path,
                         filename="log_produksi.xlsx",
-                        folder_id=PERIOD_DRIVE_ID
+                        folder_id=PERIOD_DRIVE_ID,
+                        file_id=log_drive_id
                     )
                 else:
                     upload_or_update_drive_file(
                         file_path=log_path,
                         filename="log_produksi.xlsx",
-                        folder_id=PERIOD_DRIVE_ID,
-                        file_id=st.session_state["log_drive_id"]
+                        folder_id=PERIOD_DRIVE_ID
                     )
 
                 st.success(f"✅ Voucher berhasil diposting: {vin}")
@@ -578,12 +586,28 @@ with tab_cancel:
 
                 log_df.to_excel(log_path, index=False)
 
-                upload_or_update_drive_file(
-                    file_path=log_path,
+                service = get_drive_service()
+
+                log_drive_id = find_drive_file(
+                    service=service,
                     filename="log_produksi.xlsx",
-                    folder_id=PERIOD_DRIVE_ID,
-                    file_id=st.session_state["log_drive_id"]
+                    parent_id=PERIOD_DRIVE_ID
                 )
+
+                if log_drive_id:
+                    upload_or_update_drive_file(
+                        file_path=log_path,
+                        filename="log_produksi.xlsx",
+                        folder_id=PERIOD_DRIVE_ID,
+                        file_id=log_drive_id
+                    )
+                else:
+                    upload_or_update_drive_file(
+                        file_path=log_path,
+                        filename="log_produksi.xlsx",
+                        folder_id=PERIOD_DRIVE_ID
+                    )
+
 
                 st.success(
                     f"Voucher {selected_vin} dibatalkan → VIN cancel {cancel_vin}"

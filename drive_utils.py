@@ -126,3 +126,21 @@ def get_or_create_ceding_folders(
         "voucher_id": voucher_id
     }
 
+
+def find_drive_file(service, filename, parent_id):
+    query = (
+        f"name='{filename}' "
+        f"and '{parent_id}' in parents "
+        f"and trashed=false"
+    )
+
+    results = service.files().list(
+        q=query,
+        spaces="drive",
+        fields="files(id, name)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+    ).execute()
+
+    files = results.get("files", [])
+    return files[0]["id"] if files else None
