@@ -398,19 +398,6 @@ with tab_post:
         )
 
 
-        service = get_drive_service()
-
-        ceding_folder_name = normalize_folder_name(account_with)
-
-        ceding_drive = get_or_create_ceding_folders(
-            service=service,
-            period_folder_id=PERIOD_DRIVE_ID,
-            ceding_name=ceding_folder_name
-        )
-
-        CEDING_VOUCHER_DRIVE_ID = ceding_drive["voucher_id"]
-
-
         # ==========================
         # POST VOUCHER (LOCKED)
         # ==========================
@@ -421,6 +408,7 @@ with tab_post:
                 st.stop()
 
             lock_path = log_path + ".lock"
+
 
             try:
                 acquire_lock(lock_path)
@@ -445,6 +433,20 @@ with tab_post:
 
                 voucher_path = os.path.join(BASE_PATH, local_folder, f"{vin}.xlsx")
                 df.to_excel(voucher_path, index=False)
+
+
+                service = get_drive_service()
+
+                ceding_folder_name = normalize_folder_name(account_with)
+
+                ceding_drive = get_or_create_ceding_folders(
+                    service=service,
+                    period_folder_id=PERIOD_DRIVE_ID,
+                    ceding_name=ceding_folder_name
+                )
+
+                CEDING_VOUCHER_DRIVE_ID = ceding_drive["voucher_id"]
+
 
                 # Upload voucher (selalu CREATE)
                 upload_or_update_drive_file(
