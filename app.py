@@ -259,19 +259,30 @@ with tab_post:
             # ==========================
             # DISPLAY DF (ACCOUNTING VIEW)
             # ==========================
+
+            MAX_PREVIEW_ROWS = 2000
+
             display_df = filtered_df.copy()
 
             for col in ACCOUNTING_COLS:
                 if col in display_df.columns:
                     display_df[col] = display_df[col].apply(accounting_format)
 
-            st.caption(f"Menampilkan {len(display_df):,} baris")
+            total_rows = len(display_df)
+
+            if total_rows > MAX_PREVIEW_ROWS:
+                st.warning(
+                    f"⚠️ Data sangat besar ({total_rows:,} baris). "
+                    f"Hanya menampilkan {MAX_PREVIEW_ROWS:,} baris pertama untuk preview."
+                )
+                preview_df = display_df.head(MAX_PREVIEW_ROWS)
+            else:
+                preview_df = display_df
+
+            st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
 
             st.dataframe(
-                display_df.style.set_properties(
-                    subset=[c for c in ACCOUNTING_COLS if c in display_df.columns],
-                    **{"text-align": "right"}
-                ),
+                preview_df,
                 height=450,
                 use_container_width=True
             )
