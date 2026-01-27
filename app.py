@@ -9,6 +9,18 @@ from drive_utils import upload_or_update_drive_file, get_period_drive_folders
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
+
+def normalize_folder_name(name: str) -> str:
+    return (
+        name.upper()
+        .replace("/", "-")
+        .replace("&", "AND")
+        .replace("(", "")
+        .replace(")", "")
+        .strip()
+    )
+
+
 def now_wib_naive():
     return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
 
@@ -409,7 +421,14 @@ with tab_post:
 
                 vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
-                local_folder = f"{year}_{month:02d}/vouchers"
+                ceding_folder = normalize_folder_name(account_with)
+
+                local_folder = os.path.join(
+                    f"{year}_{month:02d}",
+                    ceding_folder,
+                    "vouchers"
+                )
+
                 os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
 
                 voucher_path = os.path.join(BASE_PATH, local_folder, f"{vin}.xlsx")
