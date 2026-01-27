@@ -5,7 +5,7 @@ import os
 
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
@@ -399,6 +399,19 @@ with tab_post:
         )
 
 
+        service = get_drive_service()
+
+        ceding_folder_name = normalize_folder_name(account_with)
+
+        ceding_drive = get_or_create_ceding_folders(
+            service=service,
+            period_folder_id=PERIOD_DRIVE_ID,
+            ceding_name=ceding_folder_name
+        )
+
+        CEDING_VOUCHER_DRIVE_ID = ceding_drive["voucher_id"]
+
+
         # ==========================
         # POST VOUCHER (LOCKED)
         # ==========================
@@ -421,11 +434,11 @@ with tab_post:
 
                 vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
-                ceding_folder = normalize_folder_name(account_with)
+                ceding_folder_name = normalize_folder_name(account_with)
 
                 local_folder = os.path.join(
                     f"{year}_{month:02d}",
-                    ceding_folder,
+                    ceding_folder_name,
                     "vouchers"
                 )
 
@@ -438,7 +451,7 @@ with tab_post:
                 upload_or_update_drive_file(
                     file_path=voucher_path,
                     filename=f"{vin}.xlsx",
-                    folder_id=VOUCHER_DRIVE_ID
+                    folder_id=CEDING_VOUCHER_DRIVE_ID
                 )
 
                 if business_event_code == "NEW":

@@ -110,3 +110,26 @@ def get_period_drive_folders(year, month, root_folder_id):
         "period_id": period_id,
         "voucher_folder_id": voucher_folder_id
     }
+
+def get_or_create_ceding_folders(
+    service,
+    period_folder_id: str,
+    ceding_name: str
+):
+    ceding_id = get_or_create_folder(
+        service,
+        folder_name=ceding_name,
+        parent_id=period_folder_id
+    )
+
+    voucher_id = get_or_create_folder(
+        service,
+        folder_name="vouchers",
+        parent_id=ceding_id
+    )
+
+    return {
+        "ceding_id": ceding_id,
+        "voucher_id": voucher_id
+    }
+
