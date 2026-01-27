@@ -302,7 +302,6 @@ with tab_post:
         )
 
         PERIOD_DRIVE_ID = drive_folders["period_id"]
-        VOUCHER_DRIVE_ID = drive_folders["voucher_folder_id"]
 
 
         # ==========================
