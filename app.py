@@ -337,6 +337,7 @@ with tab_post:
                         "RELIANCE SYARIAH",
                         "SINARMAS SYARIAH",
                         "SUN LIFE SYARIAH",
+                        "TAKAFUL KELUARGA"
                     ]
                 )
 
