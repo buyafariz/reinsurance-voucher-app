@@ -480,7 +480,7 @@ with tab_post:
                     "Ujrah": df["reins ujrah"].sum(),
                     "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
                     "Claim": df["claim"].sum() if "claim" in df.columns else 0,
-                    "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - df["overiding"].sum() if "overiding" in df.columns else 0 - df["claim"].sum() if "claim" in df.columns else 0,
+                    "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
                     "REMARKS": remarks,
                     "BUSINESS EVENT": business_event_code,
                     "STATUS": "POSTED",
