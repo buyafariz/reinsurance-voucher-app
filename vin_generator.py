@@ -69,11 +69,11 @@ def generate_vin(base_path, year, month):
     return vin, next_seq, log_path
 
 
-def create_cancel_row(original_row, new_vin, seq_no, user, reason):
+def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     cancel = original_row.copy()
 
     cancel["Seq No"] = seq_no
-    cancel["VIN No"] = new_vin
+    cancel["VIN No"] = new_voucher
     #cancel["ENTRY_TYPE"] = "CANCEL"
     cancel["CANCEL_OF_VIN"] = original_row["VIN No"]
     cancel["STATUS"] = "CANCELED"
