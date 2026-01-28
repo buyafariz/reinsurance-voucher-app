@@ -522,7 +522,7 @@ with tab_post:
                 else:
                     log_df = pd.DataFrame()
 
-                vin, seq_no, _ = generate_vin(BASE_PATH, year, month)
+                voucher, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
                 ceding_folder_name = normalize_folder_name(account_with)
 
@@ -534,7 +534,7 @@ with tab_post:
 
                 os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
 
-                voucher_path = os.path.join(BASE_PATH, local_folder, f"{vin}.xlsx")
+                voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
                 df.to_excel(voucher_path, index=False)
 
 
@@ -554,7 +554,7 @@ with tab_post:
                 # Upload voucher (selalu CREATE)
                 upload_or_update_drive_file(
                     file_path=voucher_path,
-                    filename=f"{vin}.xlsx",
+                    filename=f"{voucher}.xlsx",
                     folder_id=CEDING_VOUCHER_DRIVE_ID
                 )
 
@@ -567,7 +567,7 @@ with tab_post:
 
                 log_entry = {
                     "Seq No": seq_no,
-                    "VIN No": vin,
+                    "Voucher No": voucher,
                     "BUSINESS TYPE": biz_type,
                     "Account With": account_with,
                     "Cedant Company": cedant_company,
@@ -600,7 +600,7 @@ with tab_post:
                     "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
                     "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
                     "REMARKS": remarks,
-                    #"STATUS": "POSTED",
+                    "STATUS": "POSTED",
                     #"ENTRY_TYPE": entry_type,
                     "CREATED_AT": now_wib_naive(),
                     "CREATED_BY": pic,
@@ -632,8 +632,8 @@ with tab_post:
                         folder_id=PERIOD_DRIVE_ID
                     )
 
-                st.success(f"✅ Voucher berhasil diposting: {vin}")
-                st.code(vin)
+                st.success(f"✅ Voucher berhasil diposting: {voucher}")
+                st.code(voucher)
 
             finally:
                 release_lock(lock_path)
@@ -665,9 +665,9 @@ with tab_cancel:
         if posted_df.empty:
             st.info("Tidak ada voucher POSTED")
         else:
-            selected_vin = st.selectbox(
-                "Pilih VIN",
-                posted_df["VIN No"].tolist()
+            selected_voucher = st.selectbox(
+                "Pilih Voucher",
+                posted_df["Voucher No"].tolist()
             )
 
             cancel_reason = st.text_area("Alasan Pembatalan (WAJIB)")
@@ -679,21 +679,21 @@ with tab_cancel:
                     st.stop()
 
                 original_row = log_df[
-                    log_df["VIN No"] == selected_vin
+                    log_df["Voucher No"] == selected_voucher
                 ].iloc[0]
 
-                cancel_vin, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
+                cancel_voucher, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
 
                 cancel_row = create_cancel_row(
                     original_row=original_row,
-                    new_vin=cancel_vin,
+                    new_voucher=cancel_voucher,
                     seq_no=cancel_seq,
                     user=pic,
                     reason=cancel_reason
                 )
 
                 log_df.loc[
-                    log_df["VIN No"] == selected_vin,
+                    log_df["Voucher No"] == selected_voucher,
                     ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
                 ] = ["CANCELLED", now_wib_naive(), pic, cancel_reason]
 
@@ -728,7 +728,7 @@ with tab_cancel:
 
 
                 st.success(
-                    f"Voucher {selected_vin} dibatalkan → VIN cancel {cancel_vin}"
+                    f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
                 )
                 st.rerun()
 
