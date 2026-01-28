@@ -705,7 +705,7 @@ with tab_cancel:
                 log_df.loc[
                     log_df["Voucher No"] == selected_voucher,
                     ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
-                ] = ["CANCELLED", now_wib_naive(), pic, cancel_reason]
+                ] = ["CANCELED", now_wib_naive(), pic, cancel_reason]
 
                 log_df = pd.concat(
                     [log_df, pd.DataFrame([cancel_row])],
