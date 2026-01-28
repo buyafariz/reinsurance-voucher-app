@@ -74,7 +74,7 @@ ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 st.title("📄 Reinsurance Voucher System")
 st.write("")
 
-tab_post, tab_cancel, tab_claim = st.tabs([
+tab_post, tab_cancel = st.tabs([
     "📥 Create Voucher",
     "🚫 Cancel Voucher",
 ])
