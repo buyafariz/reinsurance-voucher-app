@@ -115,15 +115,15 @@ def get_or_create_ceding_folders(
         parent_id=period_folder_id
     )
 
-    voucher_id = get_or_create_folder(
-        service,
-        folder_name="vouchers",
-        parent_id=ceding_id
-    )
+    # voucher_id = get_or_create_folder(
+    #     service,
+    #     folder_name="vouchers",
+    #     parent_id=ceding_id
+    # )
 
     return {
-        "ceding_id": ceding_id,
-        "voucher_id": voucher_id
+        "ceding_id": ceding_id
+        #"voucher_id": voucher_id
     }
 
 
