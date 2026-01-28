@@ -694,6 +694,17 @@ with tab_cancel:
 
                 service = get_drive_service()
 
+                year = st.session_state["log_period"]["year"]
+                month = st.session_state["log_period"]["month"]
+
+                drive_folders = get_period_drive_folders(
+                    year=year,
+                    month=month,
+                    root_folder_id=ROOT_DRIVE_FOLDER_ID
+                )
+
+                PERIOD_DRIVE_ID = drive_folders["period_id"]
+
                 ceding_folder_name = normalize_folder_name(original_row["Account With"])
 
                 ceding_drive = get_or_create_ceding_folders(
