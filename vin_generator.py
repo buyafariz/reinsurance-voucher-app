@@ -104,6 +104,6 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     for col in numeric_cols:
         cancel[col] = -1 * float(original_row.get(col, 0))
 
-    cancel["REMARKS"] = f"Cancel voucher {original_row['VIN No']}"
+    cancel["REMARKS"] = f"Cancel voucher {original_row['Voucher No']}"
 
     return cancel
