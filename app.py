@@ -692,6 +692,24 @@ with tab_cancel:
                     log_df["Voucher No"] == selected_voucher
                 ].iloc[0]
 
+
+                ceding_drive = get_or_create_ceding_folders(
+                    service=service,
+                    period_folder_id=PERIOD_DRIVE_ID,
+                    ceding_name=ceding_folder_name
+                )
+
+                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+                voucher_filename = f"{selected_voucher}.xlsx"
+
+                voucher_file_id = find_drive_file(
+                    service=service,
+                    filename=voucher_filename,
+                    parent_id=CEDING_DRIVE_ID
+                )
+
+
                 cancel_voucher, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
 
                 cancel_row = create_cancel_row(
@@ -736,6 +754,15 @@ with tab_cancel:
                         folder_id=PERIOD_DRIVE_ID
                     )
 
+                    if voucher_file_id:
+                        service.files().delete(
+                            fileId=voucher_file_id,
+                            supportsAllDrives=True
+                        ).execute()
+
+                        st.success(f"File voucher {voucher_filename} berhasil dihapus dari Drive")
+                    else:
+                        st.warning("File voucher tidak ditemukan di Drive (mungkin sudah terhapus)")
 
                 st.success(
                     f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"

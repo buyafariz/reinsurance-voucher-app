@@ -144,3 +144,13 @@ def find_drive_file(service, filename, parent_id):
 
     files = results.get("files", [])
     return files[0]["id"] if files else None
+
+
+def delete_drive_file(file_id: str):
+    service = get_drive_service()
+
+    service.files().delete(
+        fileId=file_id,
+        supportsAllDrives=True
+    ).execute()
+
