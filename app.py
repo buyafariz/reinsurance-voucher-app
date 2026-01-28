@@ -528,8 +528,7 @@ with tab_post:
 
                 local_folder = os.path.join(
                     f"{year}_{month:02d}",
-                    ceding_folder_name,
-                    "vouchers"
+                    ceding_folder_name
                 )
 
                 os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
