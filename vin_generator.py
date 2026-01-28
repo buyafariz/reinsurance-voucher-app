@@ -74,12 +74,22 @@ def create_cancel_row(original_row, new_vin, seq_no, user, reason):
     numeric_cols = [
         "Total Contribution",
         "Commission",
+        "Overiding",
+        "Total Commission",
+        "Gross Premium Income",
         "Tabarru",
         "Ujrah",
-        "Overiding",
         "Claim",
         "Balance",
-    ]
+        "Kontribusi (IDR)",
+        "Commission (IDR)",
+        "Overiding (IDR)",
+        "Total Commission (IDR)",
+        "Gross Premium Income (IDR)",
+        "Tabarru (IDR)",
+        "Ujrah (IDR)",
+        "Claim (IDR)"
+        ]
 
     for col in numeric_cols:
         cancel[col] = -1 * float(original_row.get(col, 0))
