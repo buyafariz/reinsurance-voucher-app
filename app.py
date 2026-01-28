@@ -757,15 +757,15 @@ with tab_cancel:
                         folder_id=PERIOD_DRIVE_ID
                     )
 
-                    if voucher_file_id:
-                        service.files().delete(
-                            fileId=voucher_file_id,
-                            supportsAllDrives=True
-                        ).execute()
+                if voucher_file_id:
+                    service.files().delete(
+                        fileId=voucher_file_id,
+                        supportsAllDrives=True
+                    ).execute()
 
-                        st.success(f"File voucher {voucher_filename} berhasil dihapus dari Drive")
-                    else:
-                        st.warning("File voucher tidak ditemukan di Drive (mungkin sudah terhapus)")
+                    st.success(f"File voucher {voucher_filename} berhasil dihapus dari Drive")
+                else:
+                    st.warning("File voucher tidak ditemukan di Drive (mungkin sudah terhapus)")
 
                 st.success(
                     f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
