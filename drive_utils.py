@@ -154,3 +154,49 @@ def delete_drive_file(file_id: str):
         supportsAllDrives=True
     ).execute()
 
+
+def acquire_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
+    query = (
+        f"name='{lock_name}' "
+        f"and '{parent_id}' in parents "
+        f"and trashed=false"
+    )
+
+    result = service.files().list(
+        q=query,
+        fields="files(id)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+    ).execute()
+
+    if result.get("files"):
+        raise RuntimeError("LOG SEDANG DIGUNAKAN USER LAIN")
+
+    service.files().create(
+        body={
+            "name": lock_name,
+            "parents": [parent_id]
+        },
+        supportsAllDrives=True
+    ).execute()
+
+
+def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
+    query = (
+        f"name='{lock_name}' "
+        f"and '{parent_id}' in parents "
+        f"and trashed=false"
+    )
+
+    result = service.files().list(
+        q=query,
+        fields="files(id)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+    ).execute()
+
+    for f in result.get("files", []):
+        service.files().delete(
+            fileId=f["id"],
+            supportsAllDrives=True
+        ).execute()

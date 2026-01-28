@@ -5,7 +5,7 @@ import os
 
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
@@ -518,11 +518,11 @@ with tab_post:
                 st.error("Product dan Remarks wajib diisi")
                 st.stop()
 
-            lock_path = log_path + ".lock"
-
+            #lock_path = log_path + ".lock"
+            service = get_drive_service()
 
             try:
-                acquire_lock(lock_path)
+                acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                 # reload log terbaru setelah lock
                 if os.path.exists(log_path):
@@ -645,8 +645,12 @@ with tab_post:
                 st.success(f"✅ Voucher berhasil diposting: {voucher}")
                 st.code(voucher)
 
+            except RuntimeError as e:
+                    st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                    st.stop()
+
             finally:
-                release_lock(lock_path)
+                release_drive_lock(service, PERIOD_DRIVE_ID)
 
 
 with tab_cancel:
