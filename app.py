@@ -447,6 +447,14 @@ with tab_post:
                 st.text_input("OBY", value=year, disabled=True)
                 st.text_input("OBM", value=month, disabled=True)
 
+            kob = st.selectbox(
+                "Kind of Business (KOB)",
+                [
+                    "TTY",
+                    "FAC"
+                ]
+            )
+
             cob = st.selectbox(
                 "Class of Business (COB)",
                 [
@@ -567,8 +575,9 @@ with tab_post:
 
                 log_entry = {
                     "Seq No": seq_no,
+                    "Department":department,
+                    "Biz Type": biz_type,
                     "Voucher No": voucher,
-                    "BUSINESS TYPE": biz_type,
                     "Account With": account_with,
                     "Cedant Company": cedant_company,
                     "PIC": pic,
@@ -577,6 +586,7 @@ with tab_post:
                     "CBM": cbm,
                     "OBY": year,
                     "OBM": month,
+                    "KOB": kob,
                     "COB": cob,
                     "MOP": mop,
                     "Curr":curr,
