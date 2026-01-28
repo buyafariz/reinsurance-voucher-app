@@ -726,6 +726,12 @@ with tab_cancel:
 
                 cancel_voucher, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
 
+                pic = st.selectbox(
+                    "PIC",
+                    ["Ardelia", "Buya", "Khansa"],
+                    key="cancel pic"
+                )
+
                 cancel_row = create_cancel_row(
                     original_row=original_row,
                     new_voucher=cancel_voucher,
