@@ -75,30 +75,29 @@ st.title("📄 Reinsurance Voucher System")
 st.write("")
 
 tab_post, tab_cancel, tab_claim = st.tabs([
-    "📥 Simpan VIN",
+    "📥 Create Voucher",
     "🚫 Cancel Voucher",
-    "📄 Klaim"
 ])
 
 # ==========================
 # CLAIM
 # ==========================
 
-with tab_claim:
-    st.subheader("📄 Klaim")
+# with tab_claim:
+#     st.subheader("📄 Klaim")
 
-    uploaded_claim = st.file_uploader(
-        "Upload File Klaim (.xlsx)",
-        type=["xlsx"],
-        key="upload_claim"
-    )
+#     uploaded_claim = st.file_uploader(
+#         "Upload File Klaim (.xlsx)",
+#         type=["xlsx"],
+#         key="upload_claim"
+#     )
 
-    if uploaded_claim is None:
-        st.info("Silakan upload file klaim")
-    else:
-        df_claim = pd.read_excel(uploaded_claim)
-        st.success("File klaim berhasil dibaca")
-        st.dataframe(df_claim, use_container_width=True)
+#     if uploaded_claim is None:
+#         st.info("Silakan upload file klaim")
+#     else:
+#         df_claim = pd.read_excel(uploaded_claim)
+#         st.success("File klaim berhasil dibaca")
+#         st.dataframe(df_claim, use_container_width=True)
 
 
 # ==========================
@@ -106,7 +105,7 @@ with tab_claim:
 # ==========================
 
 with tab_post:
-    st.subheader("📥 Simpan VIN (Posting Voucher)")
+    st.subheader("📥 Create Voucher")
     
     col1, col2 = st.columns(2)
 
@@ -123,6 +122,7 @@ with tab_post:
             "Biz Type",
             [
                 "Kontribusi",
+                "Claim"
                 "Refund",
                 "Alteration",
                 "Retur",
