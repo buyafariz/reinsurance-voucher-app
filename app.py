@@ -466,7 +466,7 @@ with tab_post:
             )
 
             curr = st.selectbox(
-                "Curr",
+                "Currency",
                 ["IDR", "USD"]
             )
 
