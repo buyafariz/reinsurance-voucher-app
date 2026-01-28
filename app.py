@@ -60,6 +60,13 @@ st.set_page_config(
     layout="centered"
 )
 
+if "log_period" not in st.session_state:
+    now = datetime.now(ZoneInfo("Asia/Jakarta"))
+    st.session_state["log_period"] = {
+        "year": now.year,
+        "month": now.month
+    }
+
 
 BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
@@ -100,9 +107,33 @@ with tab_claim:
 
 with tab_post:
     st.subheader("📥 Simpan VIN (Posting Voucher)")
+    
+    col1, col2 = st.columns(2)
 
-    business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
-    business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
+    with col1:
+        department = st.selectbox(
+                "Department",
+                [
+                    "ADMIN",
+                    "CLAIM"
+                ]
+        )
+    with col2:
+        biz_type = st.selectbox(
+            "Biz Type",
+            [
+                "Kontribusi",
+                "Refund",
+                "Alteration",
+                "Retur",
+                "Revise",
+                "Batal"
+            ]
+        )
+
+   
+    #business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
+    #business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
 
     uploaded_file = st.file_uploader(
         "Upload Voucher (.xlsx)",
@@ -125,7 +156,7 @@ with tab_post:
         # ==========================
         # VALIDATION
         # ==========================
-        errors = validate_voucher(df, business_event_code)
+        errors = validate_voucher(df, biz_type)
 
         if errors:
             st.error("❌ VALIDASI GAGAL")
@@ -292,8 +323,8 @@ with tab_post:
         # ==========================
         # PERIOD & LOG
         # ==========================
-        today = datetime.today()
-        year, month = today.year, today.month
+        year = st.session_state["log_period"]["year"]
+        month = st.session_state["log_period"]["month"]
 
         log_path = get_log_path(BASE_PATH, year, month)
 
@@ -324,17 +355,24 @@ with tab_post:
             col1, col2 = st.columns(2)
 
             with col1:
+
                 account_with = st.selectbox(
                     "Account With",
                     [
                         "AIA FINANCIAL SYARIAH",
                         "AJS KITABISA (D/H AMANAH GITHA)",
                         "ALLIANZ LIFE SYARIAH",
+                        "ALLIANZ LIFE SYARIAH (Health)",
+                        "ALLIANZ LIFE SYARIAH (FlexiCare)",
+                        "ALLIANZ LIFE SYARIAH (HSCP)",
+                        "ALLIANZ LIFE SYARIAH (Individu DMTM)",
                         "ASTRA AVIVA LIFE",
                         "AVRIST ASSURANCE SYARIAH",
+                        "AXA FINANCIAL INDONESIA SYARIAH",
                         "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
                         "BNI LIFE SYARIAH",
                         "BRINGIN LIFE SYARIAH",
+                        "BUMIPUTERA SYARIAH",
                         "CAPITAL LIFE SYARIAH",
                         "CENTRAL ASIA RAYA SYARIAH",
                         "FWD LIFE INDONESIA SYARIAH",
@@ -342,15 +380,63 @@ with tab_post:
                         "GREAT EASTERN LIFE SYARIAH",
                         "JASA MITRA ABADI SYARIAH",
                         "MANULIFE INDONESIA SYARIAH",
-                        "MEGA LIFE INSURANCE SYARIAH",
-                        "PFI",
+                        "PFI MEGA LIFE INSURANCE SYARIAH",
                         "PRUDENTIAL LIFE SYARIAH",
+                        "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                        "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
                         "RELIANCE SYARIAH",
                         "SINARMAS SYARIAH",
                         "SUN LIFE SYARIAH",
-                        "TAKAFUL KELUARGA"
+                        "SYARIAH AL-AMIN",
+                        "TAKAFUL KELUARGA",
+                        "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                        "HANNOVER RETAKAFUL",
+                        "MAREIN SYARIAH",
+                        "MUNICH RE RETAKAFUL",
+                        "SCOR SE LABUAN BRANCH",
+                        "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                     ]
                 )
+
+                cedant_company = st.selectbox(
+                    "Cedant Company",
+                    [
+                        "AIA FINANCIAL SYARIAH",
+                        "AJS KITABISA (D/H AMANAH GITHA)",
+                        "ALLIANZ LIFE SYARIAH",
+                        "ASTRA AVIVA LIFE",
+                        "AVRIST ASSURANCE SYARIAH",
+                        "AXA FINANCIAL INDONESIA SYARIAH",
+                        "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                        "BNI LIFE SYARIAH",
+                        "BRINGIN LIFE SYARIAH",
+                        "BUMIPUTERA SYARIAH",
+                        "CAPITAL LIFE SYARIAH",
+                        "CENTRAL ASIA RAYA SYARIAH",
+                        "FWD LIFE INDONESIA SYARIAH",
+                        "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                        "GREAT EASTERN LIFE SYARIAH",
+                        "JASA MITRA ABADI SYARIAH",
+                        "MANULIFE INDONESIA SYARIAH",
+                        "PANIN DAICHI LIFE SYARIAH",
+                        "PFI MEGA LIFE INSURANCE SYARIAH",
+                        "PRUDENTIAL LIFE SYARIAH",
+                        "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                        "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                        "RELIANCE SYARIAH",
+                        "SINARMAS SYARIAH",
+                        "SUN LIFE SYARIAH",
+                        "SYARIAH AL-AMIN",
+                        "TAKAFUL KELUARGA",
+                        "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                        "HANNOVER RETAKAFUL",
+                        "MAREIN SYARIAH",
+                        "MUNICH RE RETAKAFUL",
+                        "SCOR SE LABUAN BRANCH",
+                        "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                    ]
+                )
+
 
                 pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa"])
                 product = st.text_input("Product")
@@ -377,6 +463,11 @@ with tab_post:
             mop = st.selectbox(
                 "Mode of Payment (MOP)",
                 ["Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"]
+            )
+
+            curr = st.selectbox(
+                "Curr",
+                ["IDR", "USD"]
             )
 
             remarks = st.text_area("Remarks (WAJIB)")
@@ -467,16 +558,19 @@ with tab_post:
                     folder_id=CEDING_VOUCHER_DRIVE_ID
                 )
 
-                if business_event_code == "NEW":
-                    entry_type = "POST"
-                elif business_event_code == "TERMINATED":
-                    entry_type = "TERMINATE"
+                #if business_event_code == "NEW":
+                #    entry_type = "POST"
+                #elif business_event_code == "TERMINATED":
+                #    entry_type = "TERMINATE"
 
+                rate_exchange = 1 if curr == "IDR" else (1000 if curr == "USD" else 0)
 
                 log_entry = {
                     "Seq No": seq_no,
                     "VIN No": vin,
+                    "BUSINESS TYPE": biz_type,
                     "Account With": account_with,
+                    "Cedant Company": cedant_company,
                     "PIC": pic,
                     "Product": product,
                     "CBY": cby,
@@ -485,18 +579,29 @@ with tab_post:
                     "OBM": month,
                     "COB": cob,
                     "MOP": mop,
+                    "Curr":curr,
                     "Total Contribution": df["reins total premium"].sum(),
                     "Commission": df["reins total comm"].sum(),
-                    "GPI": df["reins total premium"].sum() - df["reins total comm"].sum(),
+                    "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
+                    "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
+                    "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
                     "Tabarru": df["reins tabarru"].sum(),
                     "Ujrah": df["reins ujrah"].sum(),
-                    "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
                     "Claim": df["claim"].sum() if "claim" in df.columns else 0,
                     "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                    "Rate Exchange": rate_exchange,
+                    "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
+                    "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
+                    "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
+                    "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
+                    "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
+                    "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
+                    "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
+                    "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
+                    "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
                     "REMARKS": remarks,
-                    "BUSINESS EVENT": business_event_code,
-                    "STATUS": "POSTED",
-                    "ENTRY_TYPE": entry_type,
+                    #"STATUS": "POSTED",
+                    #"ENTRY_TYPE": entry_type,
                     "CREATED_AT": now_wib_naive(),
                     "CREATED_BY": pic,
                 }
@@ -537,8 +642,9 @@ with tab_post:
 with tab_cancel:
     st.subheader("🚫 Cancel Voucher")
 
-    today = datetime.today()
-    year, month = today.year, today.month
+    year = st.session_state["log_period"]["year"]
+    month = st.session_state["log_period"]["month"]
+
     log_path = get_log_path(BASE_PATH, year, month)
 
     # 🔑 PASTIKAN log_df SELALU ADA

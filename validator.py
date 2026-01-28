@@ -56,7 +56,7 @@ INTEGER_COLUMNS = [
 ]
 
 
-def validate_voucher(df, business_event: str):
+def validate_voucher(df, biz_type: str):
     errors = []
 
     # =========================
@@ -90,8 +90,8 @@ def validate_voucher(df, business_event: str):
     # =========================
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
-    if business_event not in ["NEW", "TERMINATED"]:
-        errors.append("BUSINESS EVENT tidak valid (NEW / TERMINATED)")
+    if biz_type not in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        errors.append("BUSINESS TYPE tidak valid")
         return errors   # ⛔ stop sekali saja
 
     for col in NUMERIC_COLUMNS:
@@ -101,16 +101,21 @@ def validate_voucher(df, business_event: str):
             errors.append(f"Kolom {col} harus numerik")
             continue
 
-        # 🔹 NEW → tidak boleh negatif
-        if business_event == "NEW":
+        # 🔹 Kontribusi → tidak boleh negatif
+        if biz_type in ["Kontribusi"]:
             if (numeric < 0).any():
                 errors.append(
-                    f"Kolom {col} tidak boleh bernilai negatif untuk NEW BUSINESS"
+                    f"Kolom {col} tidak boleh bernilai negatif untuk Kontribusi"
                 )
 
-        # 🔹 TERMINATED → negatif diizinkan
-        # tidak perlu apa-apa
-
+        # 🔹 Refund, Retur, Batal → harus negatif
+        if biz_type in ["Refund", "Retur", "Batal"]:
+            if col in ["reins total premium", "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"]: 
+                if (numeric > 0).any():
+                    errors.append(
+                        f"Kolom {col} harus bernilai negatif"
+                    )
+  
         df[col] = numeric
 
 
