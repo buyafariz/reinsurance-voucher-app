@@ -548,14 +548,14 @@ with tab_post:
                     ceding_name=ceding_folder_name
                 )
 
-                CEDING_VOUCHER_DRIVE_ID = ceding_drive["voucher_id"]
+                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
 
 
                 # Upload voucher (selalu CREATE)
                 upload_or_update_drive_file(
                     file_path=voucher_path,
                     filename=f"{voucher}.xlsx",
-                    folder_id=CEDING_VOUCHER_DRIVE_ID
+                    folder_id=CEDING_DRIVE_ID
                 )
 
                 #if business_event_code == "NEW":
