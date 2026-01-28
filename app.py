@@ -694,6 +694,8 @@ with tab_cancel:
 
                 service = get_drive_service()
 
+                ceding_folder_name = normalize_folder_name(account_with)
+
                 ceding_drive = get_or_create_ceding_folders(
                     service=service,
                     period_folder_id=PERIOD_DRIVE_ID,
