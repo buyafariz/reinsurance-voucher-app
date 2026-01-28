@@ -692,6 +692,7 @@ with tab_cancel:
                     log_df["Voucher No"] == selected_voucher
                 ].iloc[0]
 
+                service = get_drive_service()
 
                 ceding_drive = get_or_create_ceding_folders(
                     service=service,
