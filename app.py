@@ -658,8 +658,8 @@ with tab_cancel:
         st.info("Belum ada voucher")
     else:
         posted_df = log_df[
-            (log_df["STATUS"] == "POSTED") &
-            (log_df["ENTRY_TYPE"] == "POST")
+            (log_df["STATUS"] == "POSTED") #&
+            #(log_df["ENTRY_TYPE"] == "POST")
         ]
 
         if posted_df.empty:
