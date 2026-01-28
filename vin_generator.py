@@ -55,7 +55,7 @@ def generate_vin(base_path, year, month):
     else:
         next_seq = int(log_df["Seq No"].max()) + 1
 
-    vin = f"VIN{year}{month:02d}LST{next_seq:03d}"
+    vin = f"VIN{year}{month:02d}LST{next_seq:04d}"
     return vin, next_seq, log_path
 
 
