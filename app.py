@@ -122,7 +122,7 @@ with tab_post:
             "Biz Type",
             [
                 "Kontribusi",
-                "Claim"
+                "Claim",
                 "Refund",
                 "Alteration",
                 "Retur",
