@@ -521,136 +521,138 @@ with tab_post:
             #lock_path = log_path + ".lock"
             service = get_drive_service()
 
-            try:
-                acquire_drive_lock(service, PERIOD_DRIVE_ID)
+            with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
 
-                # reload log terbaru setelah lock
-                if os.path.exists(log_path):
-                    log_df = pd.read_excel(log_path)
-                else:
-                    log_df = pd.DataFrame()
+                try:
+                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                voucher, seq_no, _ = generate_vin(BASE_PATH, year, month)
+                    # reload log terbaru setelah lock
+                    if os.path.exists(log_path):
+                        log_df = pd.read_excel(log_path)
+                    else:
+                        log_df = pd.DataFrame()
 
-                ceding_folder_name = normalize_folder_name(account_with)
+                    voucher, seq_no, _ = generate_vin(BASE_PATH, year, month)
 
-                local_folder = os.path.join(
-                    f"{year}_{month:02d}",
-                    ceding_folder_name
-                    #"vouchers"
-                )
+                    ceding_folder_name = normalize_folder_name(account_with)
 
-                os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
-
-                voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
-                df.to_excel(voucher_path, index=False)
-
-
-                service = get_drive_service()
-
-                ceding_folder_name = normalize_folder_name(account_with)
-
-                ceding_drive = get_or_create_ceding_folders(
-                    service=service,
-                    period_folder_id=PERIOD_DRIVE_ID,
-                    ceding_name=ceding_folder_name
-                )
-
-                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
-
-
-                # Upload voucher (selalu CREATE)
-                upload_or_update_drive_file(
-                    file_path=voucher_path,
-                    filename=f"{voucher}.xlsx",
-                    folder_id=CEDING_DRIVE_ID
-                )
-
-                #if business_event_code == "NEW":
-                #    entry_type = "POST"
-                #elif business_event_code == "TERMINATED":
-                #    entry_type = "TERMINATE"
-
-                rate_exchange = 1 if curr == "IDR" else (1000 if curr == "USD" else 0)
-
-                log_entry = {
-                    "Seq No": seq_no,
-                    "Department":department,
-                    "Biz Type": biz_type,
-                    "Voucher No": voucher,
-                    "Account With": account_with,
-                    "Cedant Company": cedant_company,
-                    "PIC": pic,
-                    "Product": product,
-                    "CBY": cby,
-                    "CBM": cbm,
-                    "OBY": year,
-                    "OBM": month,
-                    "KOB": kob,
-                    "COB": cob,
-                    "MOP": mop,
-                    "Curr":curr,
-                    "Total Contribution": df["reins total premium"].sum(),
-                    "Commission": df["reins total comm"].sum(),
-                    "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
-                    "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
-                    "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
-                    "Tabarru": df["reins tabarru"].sum(),
-                    "Ujrah": df["reins ujrah"].sum(),
-                    "Claim": df["claim"].sum() if "claim" in df.columns else 0,
-                    "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
-                    "Rate Exchange": rate_exchange,
-                    "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
-                    "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
-                    "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
-                    "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
-                    "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
-                    "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
-                    "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
-                    "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
-                    "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
-                    "REMARKS": remarks,
-                    "STATUS": "POSTED",
-                    #"ENTRY_TYPE": entry_type,
-                    "CREATED_AT": now_wib_naive(),
-                    "CREATED_BY": pic,
-                }
-
-                log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
-                log_df.to_excel(log_path, index=False)
-
-                # Upload / update log (SATU FILE)
-                service = get_drive_service()
-
-                log_drive_id = find_drive_file(
-                    service=service,
-                    filename="log_produksi.xlsx",
-                    parent_id=PERIOD_DRIVE_ID
-                )
-
-                if log_drive_id:
-                    upload_or_update_drive_file(
-                        file_path=log_path,
-                        filename="log_produksi.xlsx",
-                        folder_id=PERIOD_DRIVE_ID,
-                        file_id=log_drive_id
-                    )
-                else:
-                    upload_or_update_drive_file(
-                        file_path=log_path,
-                        filename="log_produksi.xlsx",
-                        folder_id=PERIOD_DRIVE_ID
+                    local_folder = os.path.join(
+                        f"{year}_{month:02d}",
+                        ceding_folder_name
+                        #"vouchers"
                     )
 
-                st.success(f"✅ Voucher berhasil diposting: {voucher}")
-                st.code(voucher)
+                    os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
 
-            except RuntimeError as e:
-                    st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
-                    st.stop()
+                    voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
+                    df.to_excel(voucher_path, index=False)
 
-            finally:
-                release_drive_lock(service, PERIOD_DRIVE_ID)
+
+                    service = get_drive_service()
+
+                    ceding_folder_name = normalize_folder_name(account_with)
+
+                    ceding_drive = get_or_create_ceding_folders(
+                        service=service,
+                        period_folder_id=PERIOD_DRIVE_ID,
+                        ceding_name=ceding_folder_name
+                    )
+
+                    CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+
+                    # Upload voucher (selalu CREATE)
+                    upload_or_update_drive_file(
+                        file_path=voucher_path,
+                        filename=f"{voucher}.xlsx",
+                        folder_id=CEDING_DRIVE_ID
+                    )
+
+                    #if business_event_code == "NEW":
+                    #    entry_type = "POST"
+                    #elif business_event_code == "TERMINATED":
+                    #    entry_type = "TERMINATE"
+
+                    rate_exchange = 1 if curr == "IDR" else (1000 if curr == "USD" else 0)
+
+                    log_entry = {
+                        "Seq No": seq_no,
+                        "Department":department,
+                        "Biz Type": biz_type,
+                        "Voucher No": voucher,
+                        "Account With": account_with,
+                        "Cedant Company": cedant_company,
+                        "PIC": pic,
+                        "Product": product,
+                        "CBY": cby,
+                        "CBM": cbm,
+                        "OBY": year,
+                        "OBM": month,
+                        "KOB": kob,
+                        "COB": cob,
+                        "MOP": mop,
+                        "Curr":curr,
+                        "Total Contribution": df["reins total premium"].sum(),
+                        "Commission": df["reins total comm"].sum(),
+                        "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
+                        "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
+                        "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
+                        "Tabarru": df["reins tabarru"].sum(),
+                        "Ujrah": df["reins ujrah"].sum(),
+                        "Claim": df["claim"].sum() if "claim" in df.columns else 0,
+                        "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                        "Rate Exchange": rate_exchange,
+                        "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
+                        "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
+                        "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
+                        "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
+                        "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
+                        "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
+                        "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
+                        "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
+                        "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
+                        "REMARKS": remarks,
+                        "STATUS": "POSTED",
+                        #"ENTRY_TYPE": entry_type,
+                        "CREATED_AT": now_wib_naive(),
+                        "CREATED_BY": pic,
+                    }
+
+                    log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
+                    log_df.to_excel(log_path, index=False)
+
+                    # Upload / update log (SATU FILE)
+                    service = get_drive_service()
+
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    if log_drive_id:
+                        upload_or_update_drive_file(
+                            file_path=log_path,
+                            filename="log_produksi.xlsx",
+                            folder_id=PERIOD_DRIVE_ID,
+                            file_id=log_drive_id
+                        )
+                    else:
+                        upload_or_update_drive_file(
+                            file_path=log_path,
+                            filename="log_produksi.xlsx",
+                            folder_id=PERIOD_DRIVE_ID
+                        )
+
+                    st.success(f"✅ Voucher berhasil diposting: {voucher}")
+                    st.code(voucher)
+
+                except RuntimeError as e:
+                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                        st.stop()
+
+                finally:
+                    release_drive_lock(service, PERIOD_DRIVE_ID)
 
 
 with tab_cancel:
