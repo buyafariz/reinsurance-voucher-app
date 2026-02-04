@@ -446,7 +446,7 @@ with tab_post:
                 months = list(range(1, 13))
 
                 cby = st.selectbox("CBY", years, index=years.index(year))
-                cbm = st.selectbox("CBM", months, index=months.index(month))
+                cbm = st.selectbox("CBM", months)#, index=months.index(month))
                 st.text_input("OBY", value=year, disabled=True)
                 st.text_input("OBM", value=month, disabled=True)
 
