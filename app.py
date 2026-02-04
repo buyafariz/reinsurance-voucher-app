@@ -442,8 +442,11 @@ with tab_post:
                 product = st.text_input("Product")
 
             with col2:
-                cby = st.selectbox("CBY", list(range(2015, year + 1)))
-                cbm = st.selectbox("CBM", list(range(1, 13)))
+                years = list(range(2015, year + 1))
+                months = list(range(1, 13))
+
+                cby = st.selectbox("CBY", years, index=years.index(year))
+                cbm = st.selectbox("CBM", months, index=months.index(month))
                 st.text_input("OBY", value=year, disabled=True)
                 st.text_input("OBM", value=month, disabled=True)
 
@@ -692,12 +695,12 @@ with tab_cancel:
                 key="cancel pic"
             )
 
-            cancel_reason = st.text_area("Alasan Pembatalan (WAJIB)")
+            cancel_reason = st.text_area("Alasan Cancel (WAJIB)")
 
-            if st.button("❌ Batalkan Voucher"):
+            if st.button("❌ Cancel Voucher"):
 
                 if not cancel_reason.strip():
-                    st.error("Alasan pembatalan wajib diisi")
+                    st.error("Alasan Cancel wajib diisi")
                     st.stop()
 
                 original_row = log_df[
@@ -706,7 +709,7 @@ with tab_cancel:
 
                 service = get_drive_service()
 
-                with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
+                with st.spinner("⏳ Cancel voucher, mohon tunggu..."):
 
                     year = st.session_state["log_period"]["year"]
                     month = st.session_state["log_period"]["month"]
