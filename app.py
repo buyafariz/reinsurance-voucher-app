@@ -717,15 +717,16 @@ with tab_cancel:
         st.info("Tidak ada voucher POSTED")
         st.stop()
 
+    action_type = st.radio(
+        "",
+        ["Delete Voucher", "Cancel Voucher"]
+    )
+
     selected_voucher = st.selectbox(
         "Pilih Voucher",
         posted_df["Voucher No"].tolist()
     )
 
-    action_type = st.radio(
-        "",
-        ["Delete Voucher", "Cancel Voucher"]
-    )
 
     pic = st.selectbox(
         "PIC",
