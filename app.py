@@ -729,7 +729,8 @@ with tab_cancel:
 
     pic = st.selectbox(
         "PIC",
-        ["Ardelia", "Buya", "Khansa"]
+        ["Ardelia", "Buya", "Khansa"],
+        key="update_pic"
     )
 
     cancel_reason = st.text_area("Alasan (WAJIB)")
