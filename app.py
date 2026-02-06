@@ -657,6 +657,20 @@ with tab_post:
                         file_id=log_drive_id
                     )
 
+                    service.files().update(
+                        fileId=log_drive_id,
+                        body={
+                            "contentRestrictions": [
+                                {
+                                    "readOnly": True,
+                                    "reason": "Managed by Voucher System"
+                                }
+                            ]
+                        },
+                        supportsAllDrives=True
+                    ).execute()
+
+
                     st.success(f"✅ Voucher berhasil diposting: {voucher}")
                     st.code(voucher)
 
