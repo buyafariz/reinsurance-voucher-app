@@ -683,7 +683,7 @@ with tab_post:
 
 
 with tab_cancel:
-    st.subheader("🚫 Cancel Voucher")
+    st.subheader("🛠 Update Voucher")
 
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
@@ -698,6 +698,9 @@ with tab_cancel:
 
     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
+    # ===============================
+    # LOAD LOG FROM DRIVE
+    # ===============================
     log_df = load_log_from_drive(
         service=service,
         filename="log_produksi.xlsx",
@@ -708,119 +711,296 @@ with tab_cancel:
         st.info("Belum ada voucher")
         st.stop()
 
-    else:
-        posted_df = log_df[
-            (log_df["STATUS"] == "POSTED") #&
-            #(log_df["ENTRY_TYPE"] == "POST")
-        ]
+    posted_df = log_df[log_df["STATUS"] == "POSTED"]
 
-        if posted_df.empty:
-            st.info("Tidak ada voucher POSTED")
-        else:
-            selected_voucher = st.selectbox(
-                "Pilih Voucher",
-                posted_df["Voucher No"].tolist()
-            )
+    if posted_df.empty:
+        st.info("Tidak ada voucher POSTED")
+        st.stop()
 
-            pic = st.selectbox(
-                "PIC",
-                ["Ardelia", "Buya", "Khansa"],
-                key="cancel pic"
-            )
+    selected_voucher = st.selectbox(
+        "Pilih Voucher",
+        posted_df["Voucher No"].tolist()
+    )
 
-            cancel_reason = st.text_area("Alasan Cancel (WAJIB)")
+    action_type = st.radio(
+        "",
+        ["Delete Voucher", "Cancel Voucher"]
+    )
 
-            if st.button("❌ Cancel Voucher"):
+    pic = st.selectbox(
+        "PIC",
+        ["Ardelia", "Buya", "Khansa"]
+    )
 
-                if not cancel_reason.strip():
-                    st.error("Alasan Cancel wajib diisi")
-                    st.stop()
+    cancel_reason = st.text_area("Alasan (WAJIB)")
 
-                with st.spinner("⏳ Cancel voucher, mohon tunggu..."):
+    if st.button("🚀 Proses"):
 
-                    try:
-                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+        if not cancel_reason.strip():
+            st.error("Alasan wajib diisi")
+            st.stop()
 
-                        # 🔁 Reload log terbaru dari Drive
-                        log_df = load_log_from_drive(
-                            service=service,
-                            filename="log_produksi.xlsx",
-                            parent_id=PERIOD_DRIVE_ID
-                        )
+        original_row = log_df[
+            log_df["Voucher No"] == selected_voucher
+        ].iloc[0]
 
-                        original_row = log_df[
-                            log_df["Voucher No"] == selected_voucher
-                        ].iloc[0]
+        with st.spinner("⏳ Memproses, mohon tunggu..."):
 
-                        # 🔢 Generate seq dari log Drive
-                        cancel_voucher, cancel_seq = generate_vin_from_drive_log(
-                            log_df=log_df,
-                            year=year,
-                            month=month
-                        )
+            try:
+                acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                        cancel_row = create_cancel_row(
-                            original_row=original_row,
-                            new_voucher=cancel_voucher,
-                            seq_no=cancel_seq,
-                            user=pic,
-                            reason=cancel_reason
-                        )
+                # ===============================
+                # RELOAD LOG TERBARU
+                # ===============================
+                log_df = load_log_from_drive(
+                    service=service,
+                    filename="log_produksi.xlsx",
+                    parent_id=PERIOD_DRIVE_ID
+                )
 
-                        # 🔁 Update status original
-                        log_df.loc[
-                            log_df["Voucher No"] == selected_voucher,
-                            ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
-                        ] = ["CANCELED", now_wib_naive(), pic, cancel_reason]
+                # ===============================
+                # GET CEDING FOLDER
+                # ===============================
+                ceding_folder_name = normalize_folder_name(
+                    original_row["Account With"]
+                )
 
-                        # ➕ Tambah row cancel
-                        log_df = pd.concat(
-                            [log_df, pd.DataFrame([cancel_row])],
-                            ignore_index=True
-                        )
+                ceding_drive = get_or_create_ceding_folders(
+                    service=service,
+                    period_folder_id=PERIOD_DRIVE_ID,
+                    ceding_name=ceding_folder_name
+                )
 
-                        # 🔎 Cari log file di Drive
-                        log_drive_id = find_drive_file(
-                            service=service,
-                            filename="log_produksi.xlsx",
-                            parent_id=PERIOD_DRIVE_ID
-                        )
+                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
 
-                        # ☁️ Upload log langsung dari memory
-                        upload_log_dataframe(
-                            service=service,
-                            df=log_df,
-                            filename="log_produksi.xlsx",
-                            parent_id=PERIOD_DRIVE_ID,
-                            file_id=log_drive_id
-                        )
+                voucher_filename = f"{selected_voucher}.xlsx"
 
-                        # 🗑 Delete voucher file
-                        voucher_filename = f"{selected_voucher}.xlsx"
+                voucher_file_id = find_drive_file(
+                    service=service,
+                    filename=voucher_filename,
+                    parent_id=CEDING_DRIVE_ID
+                )
 
-                        voucher_file_id = find_drive_file(
-                            service=service,
-                            filename=voucher_filename,
-                            parent_id=CEDING_DRIVE_ID
-                        )
+                # =====================================================
+                # 1️⃣ DELETE VOUCHER (HANYA BULAN BERJALAN)
+                # =====================================================
+                if action_type == "Delete Voucher":
 
-                        if voucher_file_id:
-                            service.files().delete(
-                                fileId=voucher_file_id,
-                                supportsAllDrives=True
-                            ).execute()
-
-                        st.success(
-                            f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
-                        )
-
-                    except RuntimeError:
-                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                    if (
+                        original_row["OBY"] != year or
+                        original_row["OBM"] != month
+                    ):
+                        st.error("Delete hanya boleh untuk bulan berjalan")
                         st.stop()
 
-                    finally:
-                        release_drive_lock(service, PERIOD_DRIVE_ID)
+                    if voucher_file_id:
+                        service.files().delete(
+                            fileId=voucher_file_id,
+                            supportsAllDrives=True
+                        ).execute()
 
-                st.rerun()
+                    # Hapus dari log
+                    log_df = log_df[
+                        log_df["Voucher No"] != selected_voucher
+                    ]
+
+                    upload_log_dataframe(
+                        service=service,
+                        df=log_df,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    st.success("✅ Voucher berhasil dihapus")
+
+                # =====================================================
+                # 2️⃣ CANCEL VOUCHER (REVERSAL)
+                # =====================================================
+                elif action_type == "Cancel Voucher":
+
+                    cancel_voucher, cancel_seq = generate_vin_from_drive_log(
+                        log_df=log_df,
+                        year=year,
+                        month=month
+                    )
+
+                    cancel_row = create_cancel_row(
+                        original_row=original_row,
+                        new_voucher=cancel_voucher,
+                        seq_no=cancel_seq,
+                        user=pic,
+                        reason=cancel_reason
+                    )
+
+                    log_df.loc[
+                        log_df["Voucher No"] == selected_voucher,
+                        "STATUS"
+                    ] = "CANCELED"
+
+                    log_df = pd.concat(
+                        [log_df, pd.DataFrame([cancel_row])],
+                        ignore_index=True
+                    )
+
+                    upload_log_dataframe(
+                        service=service,
+                        df=log_df,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    st.success(
+                        f"✅ Voucher dicancel → dibuat reversal {cancel_voucher}"
+                    )
+
+            except RuntimeError:
+                st.error("⛔ Log sedang digunakan user lain")
+
+            finally:
+                release_drive_lock(service, PERIOD_DRIVE_ID)
+
+        st.rerun()
+
+
+# with tab_cancel:
+#     st.subheader("🚫 Cancel Voucher")
+
+#     year = st.session_state["log_period"]["year"]
+#     month = st.session_state["log_period"]["month"]
+
+#     service = get_drive_service()
+
+#     drive_folders = get_period_drive_folders(
+#         year=year,
+#         month=month,
+#         root_folder_id=ROOT_DRIVE_FOLDER_ID
+#     )
+
+#     PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+#     log_df = load_log_from_drive(
+#         service=service,
+#         filename="log_produksi.xlsx",
+#         parent_id=PERIOD_DRIVE_ID
+#     )
+
+#     if log_df.empty:
+#         st.info("Belum ada voucher")
+#         st.stop()
+
+#     else:
+#         posted_df = log_df[
+#             (log_df["STATUS"] == "POSTED") #&
+#             #(log_df["ENTRY_TYPE"] == "POST")
+#         ]
+
+#         if posted_df.empty:
+#             st.info("Tidak ada voucher POSTED")
+#         else:
+#             selected_voucher = st.selectbox(
+#                 "Pilih Voucher",
+#                 posted_df["Voucher No"].tolist()
+#             )
+
+#             pic = st.selectbox(
+#                 "PIC",
+#                 ["Ardelia", "Buya", "Khansa"],
+#                 key="cancel pic"
+#             )
+
+#             cancel_reason = st.text_area("Alasan Cancel (WAJIB)")
+
+#             if st.button("❌ Cancel Voucher"):
+
+#                 if not cancel_reason.strip():
+#                     st.error("Alasan Cancel wajib diisi")
+#                     st.stop()
+
+#                 with st.spinner("⏳ Cancel voucher, mohon tunggu..."):
+
+#                     try:
+#                         acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
+#                         # 🔁 Reload log terbaru dari Drive
+#                         log_df = load_log_from_drive(
+#                             service=service,
+#                             filename="log_produksi.xlsx",
+#                             parent_id=PERIOD_DRIVE_ID
+#                         )
+
+#                         original_row = log_df[
+#                             log_df["Voucher No"] == selected_voucher
+#                         ].iloc[0]
+
+#                         # 🔢 Generate seq dari log Drive
+#                         cancel_voucher, cancel_seq = generate_vin_from_drive_log(
+#                             log_df=log_df,
+#                             year=year,
+#                             month=month
+#                         )
+
+#                         cancel_row = create_cancel_row(
+#                             original_row=original_row,
+#                             new_voucher=cancel_voucher,
+#                             seq_no=cancel_seq,
+#                             user=pic,
+#                             reason=cancel_reason
+#                         )
+
+#                         # 🔁 Update status original
+#                         log_df.loc[
+#                             log_df["Voucher No"] == selected_voucher,
+#                             ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
+#                         ] = ["CANCELED", now_wib_naive(), pic, cancel_reason]
+
+#                         # ➕ Tambah row cancel
+#                         log_df = pd.concat(
+#                             [log_df, pd.DataFrame([cancel_row])],
+#                             ignore_index=True
+#                         )
+
+#                         # 🔎 Cari log file di Drive
+#                         log_drive_id = find_drive_file(
+#                             service=service,
+#                             filename="log_produksi.xlsx",
+#                             parent_id=PERIOD_DRIVE_ID
+#                         )
+
+#                         # ☁️ Upload log langsung dari memory
+#                         upload_log_dataframe(
+#                             service=service,
+#                             df=log_df,
+#                             filename="log_produksi.xlsx",
+#                             parent_id=PERIOD_DRIVE_ID,
+#                             file_id=log_drive_id
+#                         )
+
+#                         # 🗑 Delete voucher file
+#                         voucher_filename = f"{selected_voucher}.xlsx"
+
+#                         voucher_file_id = find_drive_file(
+#                             service=service,
+#                             filename=voucher_filename,
+#                             parent_id=CEDING_DRIVE_ID
+#                         )
+
+#                         if voucher_file_id:
+#                             service.files().delete(
+#                                 fileId=voucher_file_id,
+#                                 supportsAllDrives=True
+#                             ).execute()
+
+#                         st.success(
+#                             f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
+#                         )
+
+#                     except RuntimeError:
+#                         st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+#                         st.stop()
+
+#                     finally:
+#                         release_drive_lock(service, PERIOD_DRIVE_ID)
+
+#                 st.rerun()
 
 
