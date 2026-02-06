@@ -1,6 +1,10 @@
+import io
 import os
 import pandas as pd
 from datetime import datetime
+from googleapiclient.http import MediaIoBaseDownload
+
+
 
 LOG_COLUMNS = [
     "Seq No",
@@ -67,6 +71,65 @@ def generate_vin(base_path, year, month):
 
     vin = f"VIN{year}{month:02d}LST{next_seq:04d}"
     return vin, next_seq, log_path
+
+def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_file):
+    """
+    Generate voucher number berdasarkan log yang ada di Google Drive.
+    Tidak tergantung file lokal.
+    """
+
+    filename = "log_produksi.xlsx"
+
+    # 🔎 Cek apakah log sudah ada di Drive
+    file_id = find_drive_file(
+        service=service,
+        filename=filename,
+        parent_id=period_folder_id
+    )
+
+    # ==========================
+    # Jika belum ada log sama sekali
+    # ==========================
+    if not file_id:
+        next_seq = 1
+
+    else:
+        # ==========================
+        # Download log dari Drive ke memory
+        # ==========================
+        request = service.files().get_media(fileId=file_id)
+        file_buffer = io.BytesIO()
+
+        downloader = MediaIoBaseDownload(file_buffer, request)
+
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+        file_buffer.seek(0)
+
+        log_df = pd.read_excel(file_buffer)
+
+        if log_df.empty:
+            next_seq = 1
+        else:
+            next_seq = int(log_df["Seq No"].max()) + 1
+
+    voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+
+    return voucher, next_seq
+
+
+def generate_vin_from_drive_log(log_df, year, month):
+    if log_df.empty:
+        next_seq = 1
+    else:
+        next_seq = int(log_df["Seq No"].max()) + 1
+
+    voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+    return voucher, next_seq
+
+
 
 
 def create_cancel_row(original_row, new_voucher, seq_no, user, reason):

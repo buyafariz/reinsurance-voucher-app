@@ -4,8 +4,8 @@ from datetime import datetime
 import os
 
 from validator import validate_voucher
-from vin_generator import generate_vin, create_cancel_row, get_log_path
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock
+from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 
@@ -68,7 +68,7 @@ if "log_period" not in st.session_state:
     }
 
 
-BASE_PATH = "data"
+#BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 
 st.title("📄 Reinsurance Voucher System")
@@ -326,12 +326,12 @@ with tab_post:
         year = st.session_state["log_period"]["year"]
         month = st.session_state["log_period"]["month"]
 
-        log_path = get_log_path(BASE_PATH, year, month)
+        # log_path = get_log_path(BASE_PATH, year, month)
 
-        if os.path.exists(log_path):
-            log_df = pd.read_excel(log_path)
-        else:
-            log_df = pd.DataFrame()
+        # if os.path.exists(log_path):
+        #     log_df = pd.read_excel(log_path)
+        # else:
+        #     log_df = pd.DataFrame()
 
 
         # ==========================
@@ -530,25 +530,32 @@ with tab_post:
                     acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                     # reload log terbaru setelah lock
-                    if os.path.exists(log_path):
-                        log_df = pd.read_excel(log_path)
-                    else:
-                        log_df = pd.DataFrame()
+                    # if os.path.exists(log_path):
+                    #     log_df = pd.read_excel(log_path)
+                    # else:
+                    #     log_df = pd.DataFrame()
 
-                    voucher, seq_no, _ = generate_vin(BASE_PATH, year, month)
+                    voucher, seq_no = generate_vin_from_drive(
+                        service=service,
+                        period_folder_id=PERIOD_DRIVE_ID,
+                        year=year,
+                        month=month,
+                        find_drive_file=find_drive_file
+                    )
+
 
                     ceding_folder_name = normalize_folder_name(account_with)
 
-                    local_folder = os.path.join(
-                        f"{year}_{month:02d}",
-                        ceding_folder_name
-                        #"vouchers"
-                    )
+                    # local_folder = os.path.join(
+                    #     f"{year}_{month:02d}",
+                    #     ceding_folder_name
+                    #     #"vouchers"
+                    # )
 
-                    os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
+                    # os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
 
-                    voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
-                    df.to_excel(voucher_path, index=False)
+                    # voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
+                    # df.to_excel(voucher_path, index=False)
 
 
                     service = get_drive_service()
@@ -565,11 +572,13 @@ with tab_post:
 
 
                     # Upload voucher (selalu CREATE)
-                    upload_or_update_drive_file(
-                        file_path=voucher_path,
+                    upload_dataframe_to_drive(
+                        service=service,
+                        df=df,
                         filename=f"{voucher}.xlsx",
                         folder_id=CEDING_DRIVE_ID
                     )
+
 
                     #if business_event_code == "NEW":
                     #    entry_type = "POST"
@@ -621,31 +630,32 @@ with tab_post:
                         "CREATED_BY": pic,
                     }
 
+                    log_df = load_log_from_drive(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
                     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
-                    log_df.to_excel(log_path, index=False)
 
                     # Upload / update log (SATU FILE)
                     service = get_drive_service()
 
+                    # Cek apakah file sudah ada
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID
                     )
 
-                    if log_drive_id:
-                        upload_or_update_drive_file(
-                            file_path=log_path,
-                            filename="log_produksi.xlsx",
-                            folder_id=PERIOD_DRIVE_ID,
-                            file_id=log_drive_id
-                        )
-                    else:
-                        upload_or_update_drive_file(
-                            file_path=log_path,
-                            filename="log_produksi.xlsx",
-                            folder_id=PERIOD_DRIVE_ID
-                        )
+                    # Upload / update langsung dari memory
+                    upload_log_dataframe(
+                        service=service,
+                        df=log_df,
+                        filename="log_produksi.xlsx",
+                        folder_id=PERIOD_DRIVE_ID,
+                        file_id=log_drive_id
+                    )
 
                     st.success(f"✅ Voucher berhasil diposting: {voucher}")
                     st.code(voucher)
@@ -664,17 +674,26 @@ with tab_cancel:
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
 
-    log_path = get_log_path(BASE_PATH, year, month)
+    service = get_drive_service()
 
-    # 🔑 PASTIKAN log_df SELALU ADA
-    if not os.path.exists(log_path):
-        st.info("Belum ada voucher")
-        st.stop()
+    drive_folders = get_period_drive_folders(
+        year=year,
+        month=month,
+        root_folder_id=ROOT_DRIVE_FOLDER_ID
+    )
 
-    log_df = pd.read_excel(log_path)
+    PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+    log_df = load_log_from_drive(
+        service=service,
+        filename="log_produksi.xlsx",
+        parent_id=PERIOD_DRIVE_ID
+    )
 
     if log_df.empty:
         st.info("Belum ada voucher")
+        st.stop()
+
     else:
         posted_df = log_df[
             (log_df["STATUS"] == "POSTED") #&
@@ -703,101 +722,91 @@ with tab_cancel:
                     st.error("Alasan Cancel wajib diisi")
                     st.stop()
 
-                original_row = log_df[
-                    log_df["Voucher No"] == selected_voucher
-                ].iloc[0]
-
-                service = get_drive_service()
-
                 with st.spinner("⏳ Cancel voucher, mohon tunggu..."):
 
-                    year = st.session_state["log_period"]["year"]
-                    month = st.session_state["log_period"]["month"]
+                    try:
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                    drive_folders = get_period_drive_folders(
-                        year=year,
-                        month=month,
-                        root_folder_id=ROOT_DRIVE_FOLDER_ID
-                    )
-
-                    PERIOD_DRIVE_ID = drive_folders["period_id"]
-
-                    ceding_folder_name = normalize_folder_name(original_row["Account With"])
-
-                    ceding_drive = get_or_create_ceding_folders(
-                        service=service,
-                        period_folder_id=PERIOD_DRIVE_ID,
-                        ceding_name=ceding_folder_name
-                    )
-
-                    CEDING_DRIVE_ID = ceding_drive["ceding_id"]
-
-                    voucher_filename = f"{selected_voucher}.xlsx"
-
-                    voucher_file_id = find_drive_file(
-                        service=service,
-                        filename=voucher_filename,
-                        parent_id=CEDING_DRIVE_ID
-                    )
-
-
-                    cancel_voucher, cancel_seq, _ = generate_vin(BASE_PATH, year, month)
-
-                    cancel_row = create_cancel_row(
-                        original_row=original_row,
-                        new_voucher=cancel_voucher,
-                        seq_no=cancel_seq,
-                        user=pic,
-                        reason=cancel_reason
-                    )
-
-                    log_df.loc[
-                        log_df["Voucher No"] == selected_voucher,
-                        ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
-                    ] = ["CANCELED", now_wib_naive(), pic, cancel_reason]
-
-                    log_df = pd.concat(
-                        [log_df, pd.DataFrame([cancel_row])],
-                        ignore_index=True
-                    )
-
-                    log_df.to_excel(log_path, index=False)
-
-                    service = get_drive_service()
-
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID
-                    )
-
-                    if log_drive_id:
-                        upload_or_update_drive_file(
-                            file_path=log_path,
+                        # 🔁 Reload log terbaru dari Drive
+                        log_df = load_log_from_drive(
+                            service=service,
                             filename="log_produksi.xlsx",
-                            folder_id=PERIOD_DRIVE_ID,
+                            parent_id=PERIOD_DRIVE_ID
+                        )
+
+                        original_row = log_df[
+                            log_df["Voucher No"] == selected_voucher
+                        ].iloc[0]
+
+                        # 🔢 Generate seq dari log Drive
+                        cancel_voucher, cancel_seq = generate_vin_from_drive_log(
+                            log_df=log_df,
+                            year=year,
+                            month=month
+                        )
+
+                        cancel_row = create_cancel_row(
+                            original_row=original_row,
+                            new_voucher=cancel_voucher,
+                            seq_no=cancel_seq,
+                            user=pic,
+                            reason=cancel_reason
+                        )
+
+                        # 🔁 Update status original
+                        log_df.loc[
+                            log_df["Voucher No"] == selected_voucher,
+                            ["STATUS", "CANCELLED_AT", "CANCELLED_BY", "CANCEL_REASON"]
+                        ] = ["CANCELED", now_wib_naive(), pic, cancel_reason]
+
+                        # ➕ Tambah row cancel
+                        log_df = pd.concat(
+                            [log_df, pd.DataFrame([cancel_row])],
+                            ignore_index=True
+                        )
+
+                        # 🔎 Cari log file di Drive
+                        log_drive_id = find_drive_file(
+                            service=service,
+                            filename="log_produksi.xlsx",
+                            parent_id=PERIOD_DRIVE_ID
+                        )
+
+                        # ☁️ Upload log langsung dari memory
+                        upload_log_dataframe(
+                            service=service,
+                            df=log_df,
+                            filename="log_produksi.xlsx",
+                            parent_id=PERIOD_DRIVE_ID,
                             file_id=log_drive_id
                         )
-                    else:
-                        upload_or_update_drive_file(
-                            file_path=log_path,
-                            filename="log_produksi.xlsx",
-                            folder_id=PERIOD_DRIVE_ID
+
+                        # 🗑 Delete voucher file
+                        voucher_filename = f"{selected_voucher}.xlsx"
+
+                        voucher_file_id = find_drive_file(
+                            service=service,
+                            filename=voucher_filename,
+                            parent_id=CEDING_DRIVE_ID
                         )
 
-                    if voucher_file_id:
-                        service.files().delete(
-                            fileId=voucher_file_id,
-                            supportsAllDrives=True
-                        ).execute()
+                        if voucher_file_id:
+                            service.files().delete(
+                                fileId=voucher_file_id,
+                                supportsAllDrives=True
+                            ).execute()
 
-                        st.success(f"File voucher {voucher_filename} berhasil dihapus dari Drive")
-                    else:
-                        st.warning("File voucher tidak ditemukan di Drive (mungkin sudah terhapus)")
+                        st.success(
+                            f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
+                        )
 
-                    st.success(
-                        f"Voucher {selected_voucher} dibatalkan → VIN cancel {cancel_voucher}"
-                    )
+                    except RuntimeError:
+                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                        st.stop()
+
+                    finally:
+                        release_drive_lock(service, PERIOD_DRIVE_ID)
+
                 st.rerun()
 
 

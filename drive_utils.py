@@ -1,7 +1,12 @@
 import streamlit as st
+import io
+import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from io import BytesIO
+from googleapiclient.http import MediaIoBaseUpload
+from googleapiclient.http import MediaIoBaseDownload
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
@@ -198,5 +203,77 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
     for f in result.get("files", []):
         service.files().delete(
             fileId=f["id"],
+            supportsAllDrives=True
+        ).execute()
+
+
+
+def upload_dataframe_to_drive(service, df, filename, folder_id):
+    buffer = BytesIO()
+    df.to_excel(buffer, index=False)
+    buffer.seek(0)
+
+    media = MediaIoBaseUpload(
+        buffer,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        resumable=True
+    )
+
+    file_metadata = {
+        "name": filename,
+        "parents": [folder_id]
+    }
+
+    file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id",
+        supportsAllDrives=True
+    ).execute()
+
+    return file.get("id")
+
+def load_log_from_drive(service, filename, parent_id):
+    file_id = find_drive_file(service, filename, parent_id)
+
+    if not file_id:
+        return pd.DataFrame()
+
+    request = service.files().get_media(fileId=file_id)
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+
+    while not done:
+        _, done = downloader.next_chunk()
+
+    fh.seek(0)
+    return pd.read_excel(fh)
+
+
+def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
+    output = io.BytesIO()
+    df.to_excel(output, index=False)
+    output.seek(0)
+
+    media = MediaIoBaseUpload(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        resumable=True
+    )
+
+    if file_id:
+        service.files().update(
+            fileId=file_id,
+            media_body=media,
+            supportsAllDrives=True
+        ).execute()
+    else:
+        service.files().create(
+            body={
+                "name": filename,
+                "parents": [folder_id]
+            },
+            media_body=media,
             supportsAllDrives=True
         ).execute()
