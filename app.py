@@ -993,6 +993,6 @@ with tab_cancel:
             finally: 
                 if PROD_PERIOD_ID:
                     release_drive_lock(service, PROD_PERIOD_ID)
-                if NOW_PERIOD_ID:
-                    release_drive_lock(service, NOW_PERIOD_ID)
+                # if NOW_PERIOD_ID:
+                #     release_drive_lock(service, NOW_PERIOD_ID)
                 st.rerun()
