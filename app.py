@@ -991,6 +991,8 @@ with tab_cancel:
                 st.error("⛔ Log sedang digunakan user lain") 
             
             finally: 
-                release_drive_lock(service, PROD_PERIOD_ID)
-                release_drive_lock(service, NOW_PERIOD_ID)
+                if PROD_PERIOD_ID:
+                    release_drive_lock(service, PROD_PERIOD_ID)
+                if NOW_PERIOD_ID:
+                    release_drive_lock(service, NOW_PERIOD_ID)
                 st.rerun()
