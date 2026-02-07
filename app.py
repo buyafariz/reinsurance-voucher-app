@@ -448,8 +448,11 @@ with tab_post:
 
                 cby = st.selectbox("CBY", years, index=years.index(year))
                 cbm = st.selectbox("CBM", months)#, index=months.index(month))
-                st.text_input("OBY", value=year, disabled=True)
-                st.text_input("OBM", value=month, disabled=True)
+                oby = st.selectbox("OBY", years, index=years.index(year))
+                obm = st.selectbox("OBM", months)#, index=months.index(month))
+
+                # st.text_input("OBY", value=year, disabled=True)
+                # st.text_input("OBM", value=month, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
@@ -529,8 +532,8 @@ with tab_post:
 
                 try:
                     drive_folders = get_period_drive_folders(
-                        year=year,
-                        month=month,
+                        year=int(oby),
+                        month=int(obm),
                         root_folder_id=ROOT_DRIVE_FOLDER_ID
                     )
 
@@ -547,8 +550,8 @@ with tab_post:
                     voucher, seq_no = generate_vin_from_drive(
                         service=service,
                         period_folder_id=PERIOD_DRIVE_ID,
-                        year=year,
-                        month=month,
+                        year=int(oby),
+                        month=int(obm),
                         find_drive_file=find_drive_file
                     )
 
