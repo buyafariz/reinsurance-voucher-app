@@ -839,36 +839,26 @@ with tab_cancel:
 
                 elif action_type == "Cancel Voucher":
 
-                    # 1️⃣ Update status periode lama
+                    # =============================
+                    # 1️⃣ UPDATE LOG PERIODE LAMA
+                    # =============================
+
                     prod_log_df.loc[
                         prod_log_df["Voucher No"] == selected_voucher,
                         "STATUS"
                     ] = "CANCELED"
 
-                    log_drive_id = find_drive_file(
+                    upload_log_dataframe(
                         service=service,
+                        df=prod_log_df,
                         filename="log_produksi.xlsx",
-                        parent_id=PROD_PERIOD_ID
+                        folder_id=PROD_PERIOD_ID
                     )
 
-                    if log_drive_id:
-                        upload_log_dataframe(
-                            service=service,
-                            df=prod_log_df,
-                            filename="log_produksi.xlsx",
-                            folder_id=PROD_PERIOD_ID,
-                            file_id=log_drive_id
-                        )
-                    else:
-                        upload_log_dataframe(
-                            service=service,
-                            df=prod_log_df,
-                            filename="log_produksi.xlsx",
-                            folder_id=PROD_PERIOD_ID
-                        )
+                    # =============================
+                    # 2️⃣ LOAD LOG BULAN SEKARANG
+                    # =============================
 
-
-                    # 2️⃣ Load log bulan sekarang
                     now_year = st.session_state["log_period"]["year"]
                     now_month = st.session_state["log_period"]["month"]
 
@@ -886,7 +876,10 @@ with tab_cancel:
                         parent_id=NOW_PERIOD_ID
                     )
 
-                    # 3️⃣ Generate reversal voucher
+                    # =============================
+                    # 3️⃣ GENERATE NOMOR BARU
+                    # =============================
+
                     cancel_voucher, cancel_seq = generate_vin_from_drive_log(
                         log_df=current_log_df,
                         year=now_year,
@@ -906,27 +899,46 @@ with tab_cancel:
                         ignore_index=True
                     )
 
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID
-                    )
-
                     upload_log_dataframe(
                         service=service,
                         df=current_log_df,
                         filename="log_produksi.xlsx",
-                        folder_id=NOW_PERIOD_ID,
-                        file_id=log_drive_id
+                        folder_id=NOW_PERIOD_ID
                     )
 
-                    # 4️⃣ Buat file excel negatif
+                    # =============================
+                    # 4️⃣ BUAT FILE REVERSAL
+                    # =============================
+
+                    # cari folder ceding bulan sekarang
+                    ceding_folder_name = normalize_folder_name(original_row["Account With"])
+
+                    ceding_drive = get_or_create_ceding_folders(
+                        service=service,
+                        period_folder_id=NOW_PERIOD_ID,
+                        ceding_name=ceding_folder_name
+                    )
+
+                    CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+                    old_ceding_folder_name = normalize_folder_name(
+                        original_row["Account With"]
+                    )
+
+                    old_ceding_drive = get_or_create_ceding_folders(
+                        service=service,
+                        period_folder_id=PROD_PERIOD_ID,   # ⬅️ periode produksi lama
+                        ceding_name=old_ceding_folder_name
+                    )
+
+                    OLD_CEDING_DRIVE_ID = old_ceding_drive["ceding_id"]
+
+                    # load file lama
                     original_file_df = load_voucher_excel_from_drive(
                         service=service,
                         voucher_no=selected_voucher,
-                        ceding_folder_id=CEDING_DRIVE_ID
+                        ceding_folder_id=OLD_CEDING_DRIVE_ID
                     )
-
 
                     reversal_df = create_negative_excel(original_file_df)
 
@@ -936,17 +948,14 @@ with tab_cancel:
                         service=service,
                         file_bytes=file_bytes,
                         filename=f"{cancel_voucher}.xlsx",
-                        parent_id=NOW_PERIOD_ID
+                        parent_id=CEDING_DRIVE_ID
                     )
 
-                    st.success(
-                        f"✅ Voucher dicancel → dibuat reversal {cancel_voucher}"
-                    )
+                    st.success(f"✅ Reversal dibuat: {cancel_voucher}")
 
             except RuntimeError:
-                st.error("⛔ Log sedang digunakan user lain")
-
-            finally:
-                release_drive_lock(service, PROD_PERIOD_ID)
-
-            st.rerun()
+                st.error("⛔ Log sedang digunakan user lain") 
+            
+            finally: 
+                release_drive_lock(service, PROD_PERIOD_ID) 
+                st.rerun()
