@@ -549,8 +549,8 @@ with tab_post:
                     voucher, seq_no = generate_vin_from_drive(
                         service=service,
                         period_folder_id=PERIOD_DRIVE_ID,
-                        year=int(oby),
-                        month=int(obm),
+                        year=year,
+                        month=month,
                         find_drive_file=find_drive_file
                     )
 
