@@ -529,8 +529,8 @@ with tab_post:
 
                 try:
                     drive_folders = get_period_drive_folders(
-                        year=oby,
-                        month=obm,
+                        year=int(oby),
+                        month=int(obm),
                         root_folder_id=ROOT_DRIVE_FOLDER_ID
                     )
 
