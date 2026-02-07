@@ -651,7 +651,7 @@ with tab_post:
                     service = get_drive_service()
 
                     # Cek apakah file sudah ada
-                    log_drive_id = find_drive_file(
+                    log_drive_id = load_log_from_drive(
                         service=service,
                         filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID
