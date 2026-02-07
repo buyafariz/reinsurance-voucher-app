@@ -705,6 +705,8 @@ with tab_post:
 
 with tab_cancel:
     st.subheader("🛠 Update Voucher")
+    PROD_PERIOD_ID = None
+    NOW_PERIOD_ID = None
 
     service = get_drive_service()
 
@@ -787,8 +789,6 @@ with tab_cancel:
             st.stop()
 
         with st.spinner("⏳ Update voucher, mohon tunggu..."):
-            PROD_PERIOD_ID = None
-            NOW_PERIOD_ID = None
             
             try:
                 acquire_drive_lock(service, PROD_PERIOD_ID)
