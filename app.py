@@ -76,7 +76,7 @@ st.write("")
 
 tab_post, tab_cancel = st.tabs([
     "📥 Create Voucher",
-    "🚫 Cancel Voucher",
+    "🚫 Update Voucher",
 ])
 
 # ==========================
@@ -765,170 +765,171 @@ with tab_cancel:
             st.error("Reason wajib diisi")
             st.stop()
 
-        try:
-            acquire_drive_lock(service, PROD_PERIOD_ID)
+        with st.spinner("⏳ Update voucher, mohon tunggu..."):
+            try:
+                acquire_drive_lock(service, PROD_PERIOD_ID)
 
-            original_row = prod_log_df[
-                prod_log_df["Voucher No"] == selected_voucher
-            ].iloc[0]
+                original_row = prod_log_df[
+                    prod_log_df["Voucher No"] == selected_voucher
+                ].iloc[0]
 
-            # ==============================
-            # DELETE VOUCHER
-            # ==============================
+                # ==============================
+                # DELETE VOUCHER
+                # ==============================
 
-            if action_type == "Delete Voucher":
-                
-                # Delete log record 
-                prod_log_df = prod_log_df[
-                    prod_log_df["Voucher No"] != selected_voucher
-                ]
+                if action_type == "Delete Voucher":
+                    
+                    # Delete log record 
+                    prod_log_df = prod_log_df[
+                        prod_log_df["Voucher No"] != selected_voucher
+                    ]
 
-                log_drive_id = find_drive_file(
-                    service=service,
-                    filename="log_produksi.xlsx",
-                    parent_id=PROD_PERIOD_ID
-                )
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PROD_PERIOD_ID
+                    )
 
-                upload_log_dataframe(
-                    service=service,
-                    df=prod_log_df,
-                    filename="log_produksi.xlsx",
-                    folder_id=PROD_PERIOD_ID,
-                    file_id=log_drive_id
-                )
+                    upload_log_dataframe(
+                        service=service,
+                        df=prod_log_df,
+                        filename="log_produksi.xlsx",
+                        folder_id=PROD_PERIOD_ID,
+                        file_id=log_drive_id
+                    )
 
-                # Delete voucher file
-                ceding_folder_name = normalize_folder_name(original_row["Account With"])
+                    # Delete voucher file
+                    ceding_folder_name = normalize_folder_name(original_row["Account With"])
 
-                ceding_drive = get_or_create_ceding_folders(
-                    service=service,
-                    period_folder_id=PROD_PERIOD_ID,
-                    ceding_name=ceding_folder_name
-                )
+                    ceding_drive = get_or_create_ceding_folders(
+                        service=service,
+                        period_folder_id=PROD_PERIOD_ID,
+                        ceding_name=ceding_folder_name
+                    )
 
-                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+                    CEDING_DRIVE_ID = ceding_drive["ceding_id"]
 
-                voucher_filename = f"{selected_voucher}.xlsx"
+                    voucher_filename = f"{selected_voucher}.xlsx"
 
-                voucher_file_id = find_drive_file(
-                    service=service,
-                    filename=voucher_filename,
-                    parent_id=CEDING_DRIVE_ID
-                )
+                    voucher_file_id = find_drive_file(
+                        service=service,
+                        filename=voucher_filename,
+                        parent_id=CEDING_DRIVE_ID
+                    )
 
-                if voucher_file_id:
-                    service.files().delete(
-                        fileId=voucher_file_id,
-                        supportsAllDrives=True
-                    ).execute()
+                    if voucher_file_id:
+                        service.files().delete(
+                            fileId=voucher_file_id,
+                            supportsAllDrives=True
+                        ).execute()
 
-                st.success("Voucher & record berhasil dihapus")
+                    st.success("Voucher & record berhasil dihapus")
 
-            # ==============================
-            # CANCEL LINTAS PERIODE
-            # ==============================
+                # ==============================
+                # CANCEL LINTAS PERIODE
+                # ==============================
 
-            elif action_type == "Cancel Voucher":
+                elif action_type == "Cancel Voucher":
 
-                # 1️⃣ Update status periode lama
-                prod_log_df.loc[
-                    prod_log_df["Voucher No"] == selected_voucher,
-                    "STATUS"
-                ] = "CANCELED"
+                    # 1️⃣ Update status periode lama
+                    prod_log_df.loc[
+                        prod_log_df["Voucher No"] == selected_voucher,
+                        "STATUS"
+                    ] = "CANCELED"
 
-                log_drive_id = find_drive_file(
-                    service=service,
-                    filename="log_produksi.xlsx",
-                    parent_id=PERIOD_DRIVE_ID
-                )
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
 
-                upload_log_dataframe(
-                    service=service,
-                    df=prod_log_df,
-                    filename="log_produksi.xlsx",
-                    folder_id=PROD_PERIOD_ID,
-                    file_id=log_drive_id
-                )
+                    upload_log_dataframe(
+                        service=service,
+                        df=prod_log_df,
+                        filename="log_produksi.xlsx",
+                        folder_id=PROD_PERIOD_ID,
+                        file_id=log_drive_id
+                    )
 
-                # 2️⃣ Load log bulan sekarang
-                now_year = st.session_state["log_period"]["year"]
-                now_month = st.session_state["log_period"]["month"]
+                    # 2️⃣ Load log bulan sekarang
+                    now_year = st.session_state["log_period"]["year"]
+                    now_month = st.session_state["log_period"]["month"]
 
-                now_folders = get_period_drive_folders(
-                    year=now_year,
-                    month=now_month,
-                    root_folder_id=ROOT_DRIVE_FOLDER_ID
-                )
+                    now_folders = get_period_drive_folders(
+                        year=now_year,
+                        month=now_month,
+                        root_folder_id=ROOT_DRIVE_FOLDER_ID
+                    )
 
-                NOW_PERIOD_ID = now_folders["period_id"]
+                    NOW_PERIOD_ID = now_folders["period_id"]
 
-                current_log_df = load_log_from_drive(
-                    service=service,
-                    filename="log_produksi.xlsx",
-                    parent_id=NOW_PERIOD_ID
-                )
+                    current_log_df = load_log_from_drive(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=NOW_PERIOD_ID
+                    )
 
-                # 3️⃣ Generate reversal voucher
-                cancel_voucher, cancel_seq = generate_vin_from_drive_log(
-                    log_df=current_log_df,
-                    year=now_year,
-                    month=now_month
-                )
+                    # 3️⃣ Generate reversal voucher
+                    cancel_voucher, cancel_seq = generate_vin_from_drive_log(
+                        log_df=current_log_df,
+                        year=now_year,
+                        month=now_month
+                    )
 
-                cancel_row = create_cancel_row(
-                    original_row=original_row,
-                    new_voucher=cancel_voucher,
-                    seq_no=cancel_seq,
-                    user=pic,
-                    reason=cancel_reason
-                )
+                    cancel_row = create_cancel_row(
+                        original_row=original_row,
+                        new_voucher=cancel_voucher,
+                        seq_no=cancel_seq,
+                        user=pic,
+                        reason=cancel_reason
+                    )
 
-                current_log_df = pd.concat(
-                    [current_log_df, pd.DataFrame([cancel_row])],
-                    ignore_index=True
-                )
+                    current_log_df = pd.concat(
+                        [current_log_df, pd.DataFrame([cancel_row])],
+                        ignore_index=True
+                    )
 
-                log_drive_id = find_drive_file(
-                    service=service,
-                    filename="log_produksi.xlsx",
-                    parent_id=PERIOD_DRIVE_ID
-                )
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
 
-                upload_log_dataframe(
-                    service=service,
-                    df=current_log_df,
-                    filename="log_produksi.xlsx",
-                    folder_id=NOW_PERIOD_ID,
-                    file_id=log_drive_id
-                )
+                    upload_log_dataframe(
+                        service=service,
+                        df=current_log_df,
+                        filename="log_produksi.xlsx",
+                        folder_id=NOW_PERIOD_ID,
+                        file_id=log_drive_id
+                    )
 
-                # 4️⃣ Buat file excel negatif
-                original_file_df = load_voucher_excel_from_drive(
-                    service=service,
-                    voucher_no=selected_voucher,
-                    ceding_folder_id=CEDING_DRIVE_ID
-                )
+                    # 4️⃣ Buat file excel negatif
+                    original_file_df = load_voucher_excel_from_drive(
+                        service=service,
+                        voucher_no=selected_voucher,
+                        ceding_folder_id=CEDING_DRIVE_ID
+                    )
 
 
-                reversal_df = create_negative_excel(original_file_df)
+                    reversal_df = create_negative_excel(original_file_df)
 
-                file_bytes = dataframe_to_excel_bytes(reversal_df)
+                    file_bytes = dataframe_to_excel_bytes(reversal_df)
 
-                upload_excel_bytes(
-                    service=service,
-                    file_bytes=file_bytes,
-                    filename=f"{cancel_voucher}.xlsx",
-                    parent_id=NOW_PERIOD_ID
-                )
+                    upload_excel_bytes(
+                        service=service,
+                        file_bytes=file_bytes,
+                        filename=f"{cancel_voucher}.xlsx",
+                        parent_id=NOW_PERIOD_ID
+                    )
 
-                st.success(
-                    f"✅ Voucher dicancel → dibuat reversal {cancel_voucher}"
-                )
+                    st.success(
+                        f"✅ Voucher dicancel → dibuat reversal {cancel_voucher}"
+                    )
 
-        except RuntimeError:
-            st.error("⛔ Log sedang digunakan user lain")
+            except RuntimeError:
+                st.error("⛔ Log sedang digunakan user lain")
 
-        finally:
-            release_drive_lock(service, PROD_PERIOD_ID)
+            finally:
+                release_drive_lock(service, PROD_PERIOD_ID)
 
-        st.rerun()
+            st.rerun()
