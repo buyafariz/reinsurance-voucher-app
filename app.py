@@ -127,7 +127,8 @@ with tab_post:
                 "Alteration",
                 "Retur",
                 "Revise",
-                "Batal"
+                "Batal",
+                "Cancel"
             ]
         )
 
