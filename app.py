@@ -713,6 +713,11 @@ with tab_cancel:
     # ==============================
     # PILIH PERIODE PRODUKSI
     # ==============================
+    action_type = st.radio(
+        "Pilih Aksi",
+        ["Delete Voucher", "Cancel Voucher"],
+        key="action_type"
+    )
 
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
@@ -762,12 +767,6 @@ with tab_cancel:
         "Pilih Voucher",
         posted_df["Voucher No"].tolist(),
         key="update_voucher"
-    )
-
-    action_type = st.radio(
-        "Pilih Aksi",
-        ["Delete Voucher", "Cancel Voucher"],
-        key="action_type"
     )
 
     pic = st.selectbox(
