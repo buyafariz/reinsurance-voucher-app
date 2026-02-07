@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseUpload
 
 
 
@@ -129,6 +130,61 @@ def generate_vin_from_drive_log(log_df, year, month):
     voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
     return voucher, next_seq
 
+
+def create_negative_excel(original_df):
+
+    negative_cols = [
+        "reins premium",
+        "reins em premium",
+        "reins er premium",
+        "reins oth. premium",
+        "reins total premium",
+        "reins comm",
+        "reins em comm",
+        "reins er comm",
+        "reins oth. comm",
+        "reins profit share",
+        "reins overriding",
+        "reins broker fee",
+        "reins total comm",
+        "reins tabarru",
+        "reins ujrah",
+        "reins nett premium"
+    ]
+
+    df_negative = original_df.copy()
+
+    for col in negative_cols:
+        if col in df_negative.columns:
+            df_negative[col] = -1 * df_negative[col]
+
+    return df_negative
+
+
+def dataframe_to_excel_bytes(df):
+    output = io.BytesIO()
+    df.to_excel(output, index=False)
+    output.seek(0)
+    return output
+
+
+def upload_excel_bytes(service, file_bytes, filename, parent_id):
+
+    file_metadata = {
+        "name": filename,
+        "parents": [parent_id]
+    }
+
+    media = MediaIoBaseUpload(
+        file_bytes,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    service.files().create(
+        body=file_metadata,
+        media_body=media,
+        supportsAllDrives=True
+    ).execute()
 
 
 

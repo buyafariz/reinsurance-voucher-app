@@ -277,3 +277,49 @@ def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
             media_body=media,
             supportsAllDrives=True
         ).execute()
+
+
+def load_voucher_excel_from_drive(service, voucher_no, ceding_folder_id):
+
+    filename = f"{voucher_no}.xlsx"
+
+    # 🔎 Cari file di dalam folder ceding
+    query = (
+        f"name='{filename}' "
+        f"and '{ceding_folder_id}' in parents "
+        f"and trashed=false"
+    )
+
+    results = service.files().list(
+        q=query,
+        spaces="drive",
+        fields="files(id, name)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+    ).execute()
+
+    files = results.get("files", [])
+
+    if not files:
+        raise FileNotFoundError(
+            f"Voucher {filename} tidak ditemukan di folder ceding"
+        )
+
+    file_id = files[0]["id"]
+
+    # 📥 Download file ke memory (tanpa simpan local)
+    request = service.files().get_media(fileId=file_id)
+    file_stream = io.BytesIO()
+
+    downloader = MediaIoBaseDownload(file_stream, request)
+
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+
+    file_stream.seek(0)
+
+    # 📊 Convert ke DataFrame
+    df = pd.read_excel(file_stream)
+
+    return df
