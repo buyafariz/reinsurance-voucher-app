@@ -658,12 +658,11 @@ with tab_post:
                     )
 
                     # Upload / update langsung dari memory
-                    upload_log_dataframe(
+                    upload_dataframe_to_drive(
                         service=service,
                         df=log_df,
                         filename="log_produksi.xlsx",
                         folder_id=PERIOD_DRIVE_ID,
-                        file_id=log_drive_id
                     )
 
                     service.files().update(
