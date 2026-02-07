@@ -71,7 +71,7 @@ if "log_period" not in st.session_state:
 #BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 
-st.title("📄 Reinsurance Voucher System")
+st.title("📄 Retakaful Voucher System")
 st.write("")
 
 tab_post, tab_cancel = st.tabs([
