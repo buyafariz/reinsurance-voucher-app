@@ -776,6 +776,7 @@ with tab_cancel:
         with st.spinner("⏳ Update voucher, mohon tunggu..."):
             try:
                 acquire_drive_lock(service, PROD_PERIOD_ID)
+                
 
                 original_row = prod_log_df[
                     prod_log_df["Voucher No"] == selected_voucher
@@ -877,6 +878,8 @@ with tab_cancel:
 
                     NOW_PERIOD_ID = now_folders["period_id"]
 
+                    acquire_drive_lock(service, NOW_PERIOD_ID)
+
                     current_log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi.xlsx",
@@ -888,6 +891,23 @@ with tab_cancel:
                         filename="log_produksi.xlsx",
                         parent_id=NOW_PERIOD_ID,
                     )
+
+                    if not current_log_drive_id:
+                        upload_log_dataframe(
+                            service=service,
+                            df=current_log_df,
+                            filename="log_produksi.xlsx",
+                            folder_id=NOW_PERIOD_ID
+                        )
+                    else:
+                        upload_log_dataframe(
+                            service=service,
+                            df=current_log_df,
+                            filename="log_produksi.xlsx",
+                            folder_id=NOW_PERIOD_ID,
+                            file_id=current_log_drive_id
+                        )
+
 
                     # =============================
                     # 3️⃣ GENERATE NOMOR BARU
@@ -971,5 +991,6 @@ with tab_cancel:
                 st.error("⛔ Log sedang digunakan user lain") 
             
             finally: 
-                release_drive_lock(service, PROD_PERIOD_ID) 
+                release_drive_lock(service, PROD_PERIOD_ID)
+                release_drive_lock(service, NOW_PERIOD_ID)
                 st.rerun()
