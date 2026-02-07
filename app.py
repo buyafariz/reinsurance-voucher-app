@@ -691,6 +691,9 @@ with tab_cancel:
     # PILIH PERIODE PRODUKSI
     # ==============================
 
+    year = st.session_state["log_period"]["year"]
+    month = st.session_state["log_period"]["month"]
+
     years = list(range(2015, datetime.now().year + 1))
     months = list(range(1, 13))
 
