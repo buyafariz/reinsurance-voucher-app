@@ -448,8 +448,8 @@ with tab_post:
 
                 cby = st.selectbox("CBY", years, index=years.index(year))
                 cbm = st.selectbox("CBM", months)#, index=months.index(month))
-                st.text_input("OBY", value=year, disabled=True)
-                st.text_input("OBM", value=month, disabled=True)
+                st.text_input("OBY", value=2026, disabled=True)
+                st.text_input("OBM", value=1, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
