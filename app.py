@@ -778,7 +778,7 @@ with tab_cancel:
                     service=service,
                     df=prod_log_df,
                     filename="log_produksi.xlsx",
-                    parent_id=PROD_PERIOD_ID
+                    folder_id=PROD_PERIOD_ID
                 )
 
                 st.success("Voucher & record berhasil dihapus")
@@ -799,7 +799,7 @@ with tab_cancel:
                     service=service,
                     df=prod_log_df,
                     filename="log_produksi.xlsx",
-                    parent_id=PROD_PERIOD_ID
+                    folder_id=PROD_PERIOD_ID
                 )
 
                 # 2️⃣ Load log bulan sekarang
@@ -844,7 +844,7 @@ with tab_cancel:
                     service=service,
                     df=current_log_df,
                     filename="log_produksi.xlsx",
-                    parent_id=NOW_PERIOD_ID
+                    folder_id=NOW_PERIOD_ID
                 )
 
                 # 4️⃣ Buat file excel negatif
