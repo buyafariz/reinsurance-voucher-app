@@ -694,13 +694,15 @@ with tab_cancel:
     prod_year = st.selectbox(
         "Tahun Produksi",
         list(range(2015, datetime.now().year + 1)),
-        key="prod_year"
+        key="prod_year",
+        index=years.index(year)
     )
 
     prod_month = st.selectbox(
         "Bulan Produksi",
         list(range(1, 13)),
-        key="prod_month"
+        key="prod_month",
+        index=months.index(month)
     )
 
     prod_folders = get_period_drive_folders(
