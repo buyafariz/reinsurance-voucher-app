@@ -76,7 +76,7 @@ st.write("")
 
 tab_post, tab_cancel = st.tabs([
     "📥 Create Voucher",
-    "🚫 Update Voucher",
+    "🛠 Update Voucher",
 ])
 
 # ==========================
