@@ -848,16 +848,25 @@ with tab_cancel:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID
+                        parent_id=PROD_PERIOD_ID
                     )
 
-                    upload_log_dataframe(
-                        service=service,
-                        df=prod_log_df,
-                        filename="log_produksi.xlsx",
-                        folder_id=PROD_PERIOD_ID,
-                        file_id=log_drive_id
-                    )
+                    if log_drive_id:
+                        upload_log_dataframe(
+                            service=service,
+                            df=prod_log_df,
+                            filename="log_produksi.xlsx",
+                            folder_id=PROD_PERIOD_ID,
+                            file_id=log_drive_id
+                        )
+                    else:
+                        upload_log_dataframe(
+                            service=service,
+                            df=prod_log_df,
+                            filename="log_produksi.xlsx",
+                            folder_id=PROD_PERIOD_ID
+                        )
+
 
                     # 2️⃣ Load log bulan sekarang
                     now_year = st.session_state["log_period"]["year"]
