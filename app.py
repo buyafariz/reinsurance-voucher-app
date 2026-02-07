@@ -714,7 +714,7 @@ with tab_cancel:
     # PILIH PERIODE PRODUKSI
     # ==============================
     action_type = st.radio(
-        "Pilih Aksi",
+        "Pilih Opsi",
         ["Delete Voucher", "Cancel Voucher"],
         key="action_type"
     )
@@ -725,19 +725,38 @@ with tab_cancel:
     years = list(range(2026, datetime.now().year + 1))
     months = list(range(1, 13))
 
-    prod_year = st.selectbox(
-        "Tahun Produksi",
-        years,
-        key="prod_year",
-        index=years.index(year)
-    )
+    if action_type == "Delete Voucher":
+        prod_year = st.selectbox(
+            "Tahun Produksi",
+            [year],
+            key="prod_year"
+        )
 
-    prod_month = st.selectbox(
-        "Bulan Produksi",
-        months,
-        key="prod_month",
-        index=months.index(month)
-    )
+        prod_month = st.selectbox(
+            "Bulan Produksi",
+            [month],
+            key="prod_month"
+        )
+
+    elif action_type == 'Cancel Voucher':
+        prod_year = st.selectbox(
+            "Tahun Produksi",
+            years,
+            key="prod_year",
+            index=years.index(year)
+        )
+
+        # kalau pilih tahun berjalan → exclude bulan berjalan
+        if prod_year == year:
+            allowed_months = [m for m in months if m != month]
+        else:
+            allowed_months = months
+
+        prod_month = st.selectbox(
+            "Bulan Produksi",
+            allowed_months,
+            key="prod_month"
+        )
 
     prod_folders = get_period_drive_folders(
         year=prod_year,
