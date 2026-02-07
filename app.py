@@ -848,11 +848,18 @@ with tab_cancel:
                         "STATUS"
                     ] = "CANCELED"
 
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PROD_PERIOD_ID
+                    )
+
                     upload_log_dataframe(
                         service=service,
                         df=prod_log_df,
                         filename="log_produksi.xlsx",
-                        folder_id=PROD_PERIOD_ID
+                        folder_id=PROD_PERIOD_ID,
+                        file_id=log_drive_id
                     )
 
                     # =============================
@@ -870,10 +877,16 @@ with tab_cancel:
 
                     NOW_PERIOD_ID = now_folders["period_id"]
 
-                    current_log_df = load_log_from_drive(
+                    current_log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi.xlsx",
                         parent_id=NOW_PERIOD_ID
+                    )
+
+                    current_log_df = load_log_from_drive(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=NOW_PERIOD_ID,
                     )
 
                     # =============================
@@ -903,7 +916,8 @@ with tab_cancel:
                         service=service,
                         df=current_log_df,
                         filename="log_produksi.xlsx",
-                        folder_id=NOW_PERIOD_ID
+                        folder_id=NOW_PERIOD_ID,
+                        file_id=current_log_drive_id
                     )
 
                     # =============================
