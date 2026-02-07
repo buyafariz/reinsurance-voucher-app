@@ -832,11 +832,17 @@ with tab_cancel:
 
     cancel_reason = st.text_area("Reason (WAJIB)")
 
+
     # ==============================
     # PROSES
     # ==============================
 
-    if st.button("🚀 Proses Update"):
+    if action_type == "Delete Voucher":
+        button_label = "❌ Delete Voucher"
+    elif action_type == "Cancel Voucher":
+        button_label = "🔁 Cancel Voucher"
+
+    if st.button(button_label, key="process_update"):
 
         if not cancel_reason.strip():
             st.error("Reason wajib diisi")
