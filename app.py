@@ -786,7 +786,7 @@ with tab_cancel:
                 log_drive_id = find_drive_file(
                     service=service,
                     filename="log_produksi.xlsx",
-                    parent_id=PERIOD_DRIVE_ID
+                    parent_id=PROD_PERIOD_ID
                 )
 
                 upload_log_dataframe(
