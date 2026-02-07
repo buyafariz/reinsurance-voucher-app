@@ -729,13 +729,15 @@ with tab_cancel:
         prod_year = st.selectbox(
             "Tahun Produksi",
             [year],
-            key="prod_year"
+            key="prod_year",
+            disabled=True
         )
 
         prod_month = st.selectbox(
             "Bulan Produksi",
             [month],
-            key="prod_month"
+            key="prod_month",
+            disabled=True
         )
 
     elif action_type == 'Cancel Voucher':
