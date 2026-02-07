@@ -750,7 +750,7 @@ with tab_cancel:
 
         # kalau pilih tahun berjalan → exclude bulan berjalan
         if prod_year == year:
-            allowed_months = [m for m in months if m != month]
+            allowed_months = [m for m in months if m < month]
         else:
             allowed_months = months
 
