@@ -448,8 +448,8 @@ with tab_post:
 
                 cby = st.selectbox("CBY", years, index=years.index(year))
                 cbm = st.selectbox("CBM", months)#, index=months.index(month))
-                oby = st.text_input("OBY", value=2026, disabled=True)
-                obm = st.text_input("OBM", value=1, disabled=True)
+                st.text_input("OBY", value=year, disabled=True)
+                st.text_input("OBM", value=month, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
@@ -529,8 +529,8 @@ with tab_post:
 
                 try:
                     drive_folders = get_period_drive_folders(
-                        year=int(oby),
-                        month=int(obm),
+                        year=year,
+                        month=month,
                         root_folder_id=ROOT_DRIVE_FOLDER_ID
                     )
 
