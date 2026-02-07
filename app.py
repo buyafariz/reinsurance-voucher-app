@@ -777,17 +777,50 @@ with tab_cancel:
             # ==============================
 
             if action_type == "Delete Voucher":
-
+                
+                # Delete log record 
                 prod_log_df = prod_log_df[
                     prod_log_df["Voucher No"] != selected_voucher
                 ]
+
+                log_drive_id = find_drive_file(
+                    service=service,
+                    filename="log_produksi.xlsx",
+                    parent_id=PERIOD_DRIVE_ID
+                )
 
                 upload_log_dataframe(
                     service=service,
                     df=prod_log_df,
                     filename="log_produksi.xlsx",
-                    folder_id=PROD_PERIOD_ID
+                    folder_id=PROD_PERIOD_ID,
+                    file_id=log_drive_id
                 )
+
+                # Delete voucher file
+                ceding_folder_name = normalize_folder_name(original_row["Account With"])
+
+                ceding_drive = get_or_create_ceding_folders(
+                    service=service,
+                    period_folder_id=PROD_PERIOD_ID,
+                    ceding_name=ceding_folder_name
+                )
+
+                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+                voucher_filename = f"{selected_voucher}.xlsx"
+
+                voucher_file_id = find_drive_file(
+                    service=service,
+                    filename=voucher_filename,
+                    parent_id=CEDING_DRIVE_ID
+                )
+
+                if voucher_file_id:
+                    service.files().delete(
+                        fileId=voucher_file_id,
+                        supportsAllDrives=True
+                    ).execute()
 
                 st.success("Voucher & record berhasil dihapus")
 
@@ -803,11 +836,18 @@ with tab_cancel:
                     "STATUS"
                 ] = "CANCELED"
 
+                log_drive_id = find_drive_file(
+                    service=service,
+                    filename="log_produksi.xlsx",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
                 upload_log_dataframe(
                     service=service,
                     df=prod_log_df,
                     filename="log_produksi.xlsx",
-                    folder_id=PROD_PERIOD_ID
+                    folder_id=PROD_PERIOD_ID,
+                    file_id=log_drive_id
                 )
 
                 # 2️⃣ Load log bulan sekarang
@@ -848,11 +888,18 @@ with tab_cancel:
                     ignore_index=True
                 )
 
+                log_drive_id = find_drive_file(
+                    service=service,
+                    filename="log_produksi.xlsx",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
                 upload_log_dataframe(
                     service=service,
                     df=current_log_df,
                     filename="log_produksi.xlsx",
-                    folder_id=NOW_PERIOD_ID
+                    folder_id=NOW_PERIOD_ID,
+                    file_id=log_drive_id
                 )
 
                 # 4️⃣ Buat file excel negatif
