@@ -439,7 +439,7 @@ with tab_post:
                 )
 
 
-                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa"])
+                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
                 product = st.text_input("Product")
 
             with col2:
@@ -792,7 +792,7 @@ with tab_cancel:
 
     pic = st.selectbox(
         "PIC",
-        ["Ardelia", "Buya", "Khansa"],
+        ["Ardelia", "Buya", "Khansa", "Prabu"],
         key="update_pic"
     )
 
