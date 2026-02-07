@@ -660,14 +660,7 @@ with tab_post:
                     # Upload / update log (SATU FILE)
                     service = get_drive_service()
 
-                    # Cek apakah file sudah ada
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID
-                    )
-
-                    # Upload / update langsung dari memory
+                    # Upload / update log
                     upload_log_dataframe(
                         service=service,
                         df=log_df,
@@ -676,18 +669,27 @@ with tab_post:
                         file_id=log_drive_id
                     )
 
-                    service.files().update(
-                        fileId=log_drive_id,
-                        body={
-                            "contentRestrictions": [
-                                {
-                                    "readOnly": True,
-                                    "reason": "Managed by Voucher System"
-                                }
-                            ]
-                        },
-                        supportsAllDrives=True
-                    ).execute()
+                    # 🔁 Cari ulang file id setelah upload
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    # 🔒 Lock hanya jika file benar-benar ada
+                    if log_drive_id:
+                        service.files().update(
+                            fileId=log_drive_id,
+                            body={
+                                "contentRestrictions": [
+                                    {
+                                        "readOnly": True,
+                                        "reason": "Managed by Voucher System"
+                                    }
+                                ]
+                            },
+                            supportsAllDrives=True
+                        ).execute()
 
 
                     st.success(f"✅ Voucher berhasil diposting: {voucher}")
