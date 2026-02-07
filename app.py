@@ -775,17 +775,54 @@ with tab_cancel:
         st.info("Tidak ada voucher pada periode tersebut")
         st.stop()
 
+    # Filter hanya yang POSTED
     posted_df = prod_log_df[prod_log_df["STATUS"] == "POSTED"]
 
     if posted_df.empty:
         st.info("Tidak ada voucher POSTED")
         st.stop()
 
-    selected_voucher = st.selectbox(
+    # =========================
+    # 1️⃣ PILIH CEDING
+    # =========================
+
+    ceding_list = sorted(posted_df["Account With"].dropna().unique())
+
+    selected_ceding = st.selectbox(
+        "Pilih Ceding",
+        ceding_list,
+        key="update_ceding"
+    )
+
+    # =========================
+    # 2️⃣ FILTER BERDASARKAN CEDING
+    # =========================
+
+    ceding_df = posted_df[
+        posted_df["Account With"] == selected_ceding
+    ]
+
+    # =========================
+    # 3️⃣ PILIH VOUCHER - PRODUCT
+    # =========================
+
+    voucher_options = [
+        f"{row['Voucher No']} - {row['Product']}"
+        for _, row in ceding_df.iterrows()
+    ]
+
+    selected_voucher_display = st.selectbox(
         "Pilih Voucher",
-        posted_df["Voucher No"].tolist(),
+        voucher_options,
         key="update_voucher"
     )
+
+    # Ambil voucher no asli
+    selected_voucher = selected_voucher_display.split(" - ")[0]
+
+    # =========================
+    # PIC
+    # =========================
 
     pic = st.selectbox(
         "PIC",
