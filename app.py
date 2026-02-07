@@ -584,11 +584,18 @@ with tab_post:
 
 
                     # Upload voucher (selalu CREATE)
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+                    
                     upload_dataframe_to_drive(
                         service=service,
                         df=df,
                         filename=f"{voucher}.xlsx",
-                        folder_id=CEDING_DRIVE_ID
+                        folder_id=CEDING_DRIVE_ID,
+                        file_id=log_drive_id
                     )
 
 
@@ -666,6 +673,7 @@ with tab_post:
                         df=log_df,
                         filename="log_produksi.xlsx",
                         folder_id=PERIOD_DRIVE_ID,
+                        file_id=log_drive_id
                     )
 
                     service.files().update(
@@ -777,6 +785,9 @@ with tab_cancel:
             st.stop()
 
         with st.spinner("⏳ Update voucher, mohon tunggu..."):
+            PROD_PERIOD_ID = None
+            NOW_PERIOD_ID = None
+            
             try:
                 acquire_drive_lock(service, PROD_PERIOD_ID)
                 
@@ -895,21 +906,21 @@ with tab_cancel:
                         parent_id=NOW_PERIOD_ID,
                     )
 
-                    if not current_log_drive_id:
-                        upload_log_dataframe(
-                            service=service,
-                            df=current_log_df,
-                            filename="log_produksi.xlsx",
-                            folder_id=NOW_PERIOD_ID
-                        )
-                    else:
-                        upload_log_dataframe(
-                            service=service,
-                            df=current_log_df,
-                            filename="log_produksi.xlsx",
-                            folder_id=NOW_PERIOD_ID,
-                            file_id=current_log_drive_id
-                        )
+                    # if not current_log_drive_id:
+                    #     upload_log_dataframe(
+                    #         service=service,
+                    #         df=current_log_df,
+                    #         filename="log_produksi.xlsx",
+                    #         folder_id=NOW_PERIOD_ID
+                    #     )
+                    # else:
+                    #     upload_log_dataframe(
+                    #         service=service,
+                    #         df=current_log_df,
+                    #         filename="log_produksi.xlsx",
+                    #         folder_id=NOW_PERIOD_ID,
+                    #         file_id=current_log_drive_id
+                    #     )
 
 
                     # =============================
@@ -996,6 +1007,6 @@ with tab_cancel:
             finally: 
                 if PROD_PERIOD_ID:
                     release_drive_lock(service, PROD_PERIOD_ID)
-                # if NOW_PERIOD_ID:
-                #     release_drive_lock(service, NOW_PERIOD_ID)
+                if NOW_PERIOD_ID:
+                    release_drive_lock(service, NOW_PERIOD_ID)
                 st.rerun()
