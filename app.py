@@ -56,7 +56,7 @@ def accounting_format(x):
 # CONFIG
 # ==========================
 st.set_page_config(
-    page_title="Reinsurance Voucher System",
+    page_title="Retakaful Voucher System",
     layout="centered"
 )
 
