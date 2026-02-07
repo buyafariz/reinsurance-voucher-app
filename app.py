@@ -590,7 +590,7 @@ with tab_post:
                         parent_id=PERIOD_DRIVE_ID
                     )
                     
-                    upload_dataframe_to_drive(
+                    upload_log_dataframe(
                         service=service,
                         df=df,
                         filename=f"{voucher}.xlsx",
@@ -668,7 +668,7 @@ with tab_post:
                     )
 
                     # Upload / update langsung dari memory
-                    upload_dataframe_to_drive(
+                    upload_log_dataframe(
                         service=service,
                         df=log_df,
                         filename="log_produksi.xlsx",
