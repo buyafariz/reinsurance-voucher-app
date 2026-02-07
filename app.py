@@ -677,19 +677,19 @@ with tab_post:
                     )
 
                     # 🔒 Lock hanya jika file benar-benar ada
-                    if log_drive_id:
-                        service.files().update(
-                            fileId=log_drive_id,
-                            body={
-                                "contentRestrictions": [
-                                    {
-                                        "readOnly": True,
-                                        "reason": "Managed by Voucher System"
-                                    }
-                                ]
-                            },
-                            supportsAllDrives=True
-                        ).execute()
+                    # if log_drive_id:
+                    #     service.files().update(
+                    #         fileId=log_drive_id,
+                    #         body={
+                    #             "contentRestrictions": [
+                    #                 {
+                    #                     "readOnly": True,
+                    #                     "reason": "Managed by Voucher System"
+                    #                 }
+                    #             ]
+                    #         },
+                    #         supportsAllDrives=True
+                    #     ).execute()
 
 
                     st.success(f"✅ Voucher berhasil diposting: {voucher}")
