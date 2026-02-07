@@ -589,14 +589,12 @@ with tab_post:
                         parent_id=PERIOD_DRIVE_ID
                     )
                     
-                    upload_log_dataframe(
+                    upload_dataframe_to_drive(
                         service=service,
                         df=df,
                         filename=f"{voucher}.xlsx",
-                        folder_id=CEDING_DRIVE_ID,
-                        file_id=log_drive_id
+                        folder_id=CEDING_DRIVE_ID
                     )
-
 
                     #if business_event_code == "NEW":
                     #    entry_type = "POST"
