@@ -691,16 +691,19 @@ with tab_cancel:
     # PILIH PERIODE PRODUKSI
     # ==============================
 
+    years = list(range(2015, datetime.now().year + 1))
+    months = list(range(1, 13))
+
     prod_year = st.selectbox(
         "Tahun Produksi",
-        list(range(2015, datetime.now().year + 1)),
+        years,
         key="prod_year",
         index=years.index(year)
     )
 
     prod_month = st.selectbox(
         "Bulan Produksi",
-        list(range(1, 13)),
+        months,
         key="prod_month",
         index=months.index(month)
     )
