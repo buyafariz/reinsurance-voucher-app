@@ -448,8 +448,8 @@ with tab_post:
 
                 cby = st.selectbox("CBY", years, index=years.index(year))
                 cbm = st.selectbox("CBM", months)#, index=months.index(month))
-                st.text_input("OBY", value=2026, disabled=True)
-                st.text_input("OBM", value=1, disabled=True)
+                oby = st.text_input("OBY", value=2026, disabled=True)
+                obm = st.text_input("OBM", value=1, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
@@ -528,6 +528,14 @@ with tab_post:
             with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
 
                 try:
+                    drive_folders = get_period_drive_folders(
+                        year=oby,
+                        month=obm,
+                        root_folder_id=ROOT_DRIVE_FOLDER_ID
+                    )
+
+                    PERIOD_DRIVE_ID = drive_folders["period_id"]
+
                     acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                     # reload log terbaru setelah lock
