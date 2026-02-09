@@ -486,7 +486,7 @@ with tab_post:
                 ["IDR", "USD"]
             )
 
-
+            subject_email = st.text_area("Subject Email")
 
             remarks = st.text_area("Remarks (WAJIB)")
 
@@ -524,8 +524,8 @@ with tab_post:
         # ==========================
         if st.button("💾 Simpan Voucher"):
 
-            if not product.strip() or not remarks.strip():
-                st.error("Product dan Remarks wajib diisi")
+            if not product.strip() or not remarks.strip() or not subject_email.strip():
+                st.error("Product, Subject Email, dan Remarks wajib diisi")
                 st.stop()
 
             #lock_path = log_path + ".lock"
@@ -658,6 +658,9 @@ with tab_post:
 
                     if "Due Date" not in log_df.columns:
                         log_df["Due Date"] = None
+
+                    if "Subject Email" not in log_df.columns:
+                        log_df["Subject Email"] = None
                     
 
                     due_date = calculate_due_date(
@@ -668,6 +671,7 @@ with tab_post:
                     )
 
                     log_entry["Due Date"] = due_date
+                    log_entry["Subject Email"] = subject_email
 
 
                     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
