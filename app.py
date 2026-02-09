@@ -5,9 +5,10 @@ import os
 
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
+
 
 
 def normalize_folder_name(name: str) -> str:
@@ -23,6 +24,7 @@ def normalize_folder_name(name: str) -> str:
 
 def now_wib_naive():
     return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
+
 
 
 # ==========================
@@ -68,8 +70,9 @@ if "log_period" not in st.session_state:
     }
 
 
-#BASE_PATH = "data"
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
+CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
+
 
 st.title("📄 Retakaful Voucher System")
 st.write("")
@@ -484,6 +487,8 @@ with tab_post:
                 ["IDR", "USD"]
             )
 
+
+
             remarks = st.text_area("Remarks (WAJIB)")
 
 
@@ -651,6 +656,20 @@ with tab_post:
                         filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID
                     )
+
+                    if "Due Date" not in log_df.columns:
+                        log_df["Due Date"] = None
+                    
+
+                    due_date = calculate_due_date(
+                        account_with=account_with,
+                        year=year,
+                        month=month,
+                        service=service
+                    )
+
+                    log_entry["Due Date"] = due_date
+
 
                     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
 

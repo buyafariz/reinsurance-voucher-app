@@ -7,8 +7,11 @@ from googleapiclient.http import MediaFileUpload
 from io import BytesIO
 from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
+import calendar
+from datetime import datetime
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
+CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
 
 
 def get_drive_service():
@@ -323,3 +326,53 @@ def load_voucher_excel_from_drive(service, voucher_no, ceding_folder_id):
     df = pd.read_excel(file_stream)
 
     return df
+
+
+def load_due_mapping(service):
+    file_id = find_drive_file(
+        service=service,
+        filename="due_date_config.xlsx",
+        parent_id=CONFIG_FOLDER_ID
+    )
+
+    if not file_id:
+        return pd.DataFrame(columns=["Account With", "Days"])
+
+    file_df = load_voucher_excel_from_drive(
+        service=service,
+        voucher_no="due_date_config",
+        ceding_folder_id=CONFIG_FOLDER_ID
+    )
+
+    return file_df
+
+
+
+def get_quarter_end(year, month):
+    if month in [1,2,3]:
+        q_month = 3
+    elif month in [4,5,6]:
+        q_month = 6
+    elif month in [7,8,9]:
+        q_month = 9
+    else:
+        q_month = 12
+
+    last_day = calendar.monthrange(year, q_month)[1]
+    return datetime(year, q_month, last_day)
+
+
+def calculate_due_date(account_with, year, month, service):
+    config_df = load_due_mapping(service)
+
+    quarter_end = get_quarter_end(year, month)
+
+    row = config_df[
+        config_df["Account With"] == account_with
+    ]
+
+    if row.empty:
+        return quarter_end  # default tanpa tambahan hari
+
+    days = int(row.iloc[0]["Days"])
+    return quarter_end + pd.Timedelta(days=days)
