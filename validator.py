@@ -298,8 +298,13 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 8. CCY CODE (3 HURUF)
     # =========================
-    if not df["ccy code"].str.match(r"^[A-Z]{3}$").all():
-        errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        if not df["ccy code"].str.match(r"^[A-Z]{3}$").all():
+            errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
+
+    elif biz_type == "Claim":
+        if not df["Currency"].str.match(r"^[A-Z]{3}$").all():
+            errors.append("Currency harus 3 huruf kapital (contoh: IDR, USD)")
 
     # =========================
     # 9. EXPIRED DATE > ISSUE DATE
