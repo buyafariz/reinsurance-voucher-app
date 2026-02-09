@@ -303,7 +303,7 @@ def validate_voucher(df, biz_type: str):
             errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
 
     elif biz_type == "Claim":
-        if not df["Currency"].str.match(r"^[A-Z]{3}$").all():
+        if not df["currency"].str.match(r"^[A-Z]{3}$").all():
             errors.append("Currency harus 3 huruf kapital (contoh: IDR, USD)")
 
     # =========================
