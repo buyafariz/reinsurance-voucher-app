@@ -694,7 +694,7 @@ with tab_post:
                             "Tabarru": 0,
                             "Ujrah": 0,
                             "Claim": df["marein share idr"].sum(),
-                            "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
+                            "Balance": 0 - (df["marein share idr"].sum()),
                             "Rate Exchange": rate_exchange,
                             "Kontribusi (IDR)": 0,
                             "Commission (IDR)": 0,
