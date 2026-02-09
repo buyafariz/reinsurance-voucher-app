@@ -341,22 +341,23 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)
     # =========================
-    diff_nett = (
-        df["reins total premium"]
-        - df["reins total comm"]
-        - df["reins nett premium"]
-    ).abs()
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        diff_nett = (
+            df["reins total premium"]
+            - df["reins total comm"]
+            - df["reins nett premium"]
+        ).abs()
 
-    if not (diff_nett < 0.01).all():
-        errors.append("reins nett premium ≠ total premium - total comm")
+        if not (diff_nett < 0.01).all():
+            errors.append("reins nett premium ≠ total premium - total comm")
 
-    diff_tab = (
-        df["reins tabarru"]
-        + df["reins ujrah"]
-        - df["reins nett premium"]
-    ).abs()
+        diff_tab = (
+            df["reins tabarru"]
+            + df["reins ujrah"]
+            - df["reins nett premium"]
+        ).abs()
 
-    if not (diff_tab < 0.01).all():
-        errors.append("tabarru + ujrah ≠ reins nett premium")
+        if not (diff_tab < 0.01).all():
+            errors.append("tabarru + ujrah ≠ reins nett premium")
 
-    return errors
+        return errors
