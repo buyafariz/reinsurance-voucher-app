@@ -159,6 +159,8 @@ with tab_post:
         # ==========================
         # VALIDATION
         # ==========================
+        st.write("Biz Type saat validasi:", biz_type)
+
         errors = validate_voucher(df, biz_type)
 
         if errors:
