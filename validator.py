@@ -282,10 +282,17 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 7. MEDICAL (M / N)
     # =========================
-    df["medical"] = df["medical"].astype(str).str.strip().str.upper()
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
-    if not df["medical"].isin(["M", "N"]).all():
-        errors.append("Kolom medical hanya boleh bernilai M atau N")
+        if not df["medical"].isin(["M", "N"]).all():
+            errors.append("Kolom medical hanya boleh bernilai M atau N")
+
+    elif biz_type == "Claim":
+        df["medicalcategory"] = df["medicalcategory"].astype(str).str.strip().str.upper()
+
+        if not df["medicalcategory"].isin(["M", "N"]).all():
+            errors.append("Kolom medical hanya boleh bernilai M atau N")
 
 
     # =========================
