@@ -331,7 +331,7 @@ def load_voucher_excel_from_drive(service, voucher_no, ceding_folder_id):
 def load_due_mapping(service):
     file_id = find_drive_file(
         service=service,
-        filename="due_date_config.xlsx",
+        filename="Due Date Mapping.xlsx",
         parent_id=CONFIG_FOLDER_ID
     )
 
@@ -340,7 +340,7 @@ def load_due_mapping(service):
 
     file_df = load_voucher_excel_from_drive(
         service=service,
-        voucher_no="due_date_config",
+        voucher_no="Due Date Mapping",
         ceding_folder_id=CONFIG_FOLDER_ID
     )
 
