@@ -204,7 +204,7 @@ def validate_voucher(df, biz_type: str):
             df[col] = numeric
 
     elif biz_type == "Claim":
-        for col in NUMERIC_COLUMNS:
+        for col in NUMERIC_COLUMNS_CLAIM:
             numeric = pd.to_numeric(df[col], errors="coerce")
 
             if numeric.isna().any():
