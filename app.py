@@ -26,7 +26,6 @@ def now_wib_naive():
     return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
 
 
-
 # ==========================
 # ACCOUNTING FORMAT CONFIG
 # ==========================
