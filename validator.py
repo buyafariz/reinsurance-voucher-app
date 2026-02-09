@@ -73,8 +73,13 @@ DATE_COLUMNS = [
     "birth date", # Admin
     "issue date",
     "expired date",
-    "valuation date",
-    "end date policy", # Claim
+    "valuation date"
+]
+
+DATE_COLUMNS_CLAIM = [
+    "birth date", # Claim
+    "issue date",
+    "end date policy",
     "claim date"
 ]
 
@@ -142,12 +147,20 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 2. DATE VALIDATION
     # =========================
-    for col in DATE_COLUMNS:
-        converted = pd.to_datetime(df[col], errors="coerce")
-        if converted.isna().any():
-            errors.append(f"Kolom {col} harus bertipe tanggal (date)")
-        df[col] = converted
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        for col in DATE_COLUMNS:
+            converted = pd.to_datetime(df[col], errors="coerce")
+            if converted.isna().any():
+                errors.append(f"Kolom {col} harus bertipe tanggal (date)")
+            df[col] = converted
 
+    elif biz_type == "Claim":
+        for col in DATE_COLUMNS_CLAIM:
+            converted = pd.to_datetime(df[col], errors="coerce")
+            if converted.isna().any():
+                errors.append(f"Kolom {col} harus bertipe tanggal (date)")
+            df[col] = converted
+        
 
     # =========================
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
