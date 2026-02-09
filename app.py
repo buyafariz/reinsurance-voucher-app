@@ -78,7 +78,7 @@ st.write("")
 
 tab_post, tab_cancel = st.tabs([
     "📥 Create Voucher",
-    "🛠 Update Voucher",
+    "🔄 Update Voucher",
 ])
 
 # ==========================
@@ -496,22 +496,38 @@ with tab_post:
         # ==========================
         st.subheader("💰 Ringkasan Finansial")
 
-        summary_df = pd.DataFrame({
-            "Keterangan": [
-                "Total Contribution",
-                "Commission",
-                "Tabarru",
-                "Ujrah",
-                "Nett Premium"
-            ],
-            "Nilai": [
-                df["reins total premium"].sum(),
-                df["reins total comm"].sum(),
-                df["reins tabarru"].sum(),
-                df["reins ujrah"].sum(),
-                df["reins nett premium"].sum(),
-            ]
-        })
+        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+            summary_df = pd.DataFrame({
+                "Keterangan": [
+                    "Total Contribution",
+                    "Commission",
+                    "Tabarru",
+                    "Ujrah",
+                    "Nett Premium"
+                ],
+                "Nilai": [
+                    df["reins total premium"].sum(),
+                    df["reins total comm"].sum(),
+                    df["reins tabarru"].sum(),
+                    df["reins ujrah"].sum(),
+                    df["reins nett premium"].sum(),
+                ]
+            })
+
+        elif biz_type == "Claim":
+            summary_df = pd.DataFrame({
+                "Keterangan": [
+                    "Amount of Claim IDR",
+                    "Reins Claim IDR",
+                    "Marein Share IDR"
+                ],
+                "Nilai": [
+                    df["amount of claim idr"].sum(),
+                    df["reins claim idr"].sum(),
+                    df["marein share idr"].sum()
+                    ]
+            })
+            
 
         st.dataframe(
             summary_df.style.format({"Nilai": "{:,.2f}"}),
@@ -555,7 +571,8 @@ with tab_post:
                         period_folder_id=PERIOD_DRIVE_ID,
                         year=year,
                         month=month,
-                        find_drive_file=find_drive_file
+                        find_drive_file=find_drive_file,
+                        biz_type = biz_type
                     )
 
 
@@ -607,48 +624,93 @@ with tab_post:
 
                     rate_exchange = 1 if curr == "IDR" else (1000 if curr == "USD" else 0)
 
-                    log_entry = {
-                        "Seq No": seq_no,
-                        "Department":department,
-                        "Biz Type": biz_type,
-                        "Voucher No": voucher,
-                        "Account With": account_with,
-                        "Cedant Company": cedant_company,
-                        "PIC": pic,
-                        "Product": product,
-                        "CBY": cby,
-                        "CBM": cbm,
-                        "OBY": year,
-                        "OBM": month,
-                        "KOB": kob,
-                        "COB": cob,
-                        "MOP": mop,
-                        "Curr":curr,
-                        "Total Contribution": df["reins total premium"].sum(),
-                        "Commission": df["reins total comm"].sum(),
-                        "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
-                        "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
-                        "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
-                        "Tabarru": df["reins tabarru"].sum(),
-                        "Ujrah": df["reins ujrah"].sum(),
-                        "Claim": df["claim"].sum() if "claim" in df.columns else 0,
-                        "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
-                        "Rate Exchange": rate_exchange,
-                        "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
-                        "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
-                        "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
-                        "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
-                        "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
-                        "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
-                        "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
-                        "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
-                        "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
-                        "REMARKS": remarks,
-                        "STATUS": "POSTED",
-                        #"ENTRY_TYPE": entry_type,
-                        "CREATED_AT": now_wib_naive(),
-                        "CREATED_BY": pic,
-                    }
+                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+                        log_entry = {
+                            "Seq No": seq_no,
+                            "Department":department,
+                            "Biz Type": biz_type,
+                            "Voucher No": voucher,
+                            "Account With": account_with,
+                            "Cedant Company": cedant_company,
+                            "PIC": pic,
+                            "Product": product,
+                            "CBY": cby,
+                            "CBM": cbm,
+                            "OBY": year,
+                            "OBM": month,
+                            "KOB": kob,
+                            "COB": cob,
+                            "MOP": mop,
+                            "Curr":curr,
+                            "Total Contribution": df["reins total premium"].sum(),
+                            "Commission": df["reins total comm"].sum(),
+                            "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
+                            "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
+                            "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
+                            "Tabarru": df["reins tabarru"].sum(),
+                            "Ujrah": df["reins ujrah"].sum(),
+                            "Claim": 0,
+                            "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                            "Rate Exchange": rate_exchange,
+                            "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
+                            "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
+                            "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
+                            "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
+                            "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
+                            "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
+                            "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
+                            "Claim (IDR)": 0,
+                            "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
+                            "REMARKS": remarks,
+                            "STATUS": "POSTED",
+                            #"ENTRY_TYPE": entry_type,
+                            "CREATED_AT": now_wib_naive(),
+                            "CREATED_BY": pic,
+                        }
+
+                    elif biz_type == "Claim":
+                        log_entry = {
+                            "Seq No": seq_no,
+                            "Department":department,
+                            "Biz Type": biz_type,
+                            "Voucher No": voucher,
+                            "Account With": account_with,
+                            "Cedant Company": cedant_company,
+                            "PIC": pic,
+                            "Product": product,
+                            "CBY": cby,
+                            "CBM": cbm,
+                            "OBY": year,
+                            "OBM": month,
+                            "KOB": kob,
+                            "COB": cob,
+                            "MOP": mop,
+                            "Curr":curr,
+                            "Total Contribution": 0,
+                            "Commission": 0,
+                            "Overiding": 0,
+                            "Total Commission": 0,
+                            "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
+                            "Tabarru": 0,
+                            "Ujrah": 0,
+                            "Claim": df["marein share idr"].sum(),
+                            "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                            "Rate Exchange": rate_exchange,
+                            "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
+                            "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
+                            "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
+                            "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
+                            "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
+                            "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
+                            "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
+                            "Claim (IDR)": (df["claim"].sum() if "claim" in df.columns else 0)*rate_exchange,
+                            "Balance": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
+                            "REMARKS": remarks,
+                            "STATUS": "POSTED",
+                            #"ENTRY_TYPE": entry_type,
+                            "CREATED_AT": now_wib_naive(),
+                            "CREATED_BY": pic,
+                        }
 
                     log_df = load_log_from_drive(
                         service=service,
@@ -723,7 +785,7 @@ with tab_post:
 
 
 with tab_cancel:
-    st.subheader("🛠 Update Voucher")
+    st.subheader("🔄 Update  Voucher")
     PROD_PERIOD_ID = None
     NOW_PERIOD_ID = None
 
@@ -1014,7 +1076,8 @@ with tab_cancel:
                     cancel_voucher, cancel_seq = generate_vin_from_drive_log(
                         log_df=current_log_df,
                         year=now_year,
-                        month=now_month
+                        month=now_month,
+                        biz_type=biz_type
                     )
 
                     cancel_row = create_cancel_row(

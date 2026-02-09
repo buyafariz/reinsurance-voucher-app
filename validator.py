@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+
+# Admin
 REQUIRED_COLUMNS = [
     "certificate no",
     "insured full name",
@@ -30,15 +32,54 @@ REQUIRED_COLUMNS = [
     "valuation date"
 ]
 
-DATE_COLUMNS = [
+# Claim
+REQUIRED_COLUMNS_CLAIM = [
+    "bookyear",
+    "bookmonth",
+    "cedbookyear",
+    "cedbookmonth",
+    "company name",
+    "policy holder no",
+    "policy holder",
+    "certificate no",
+    "insured name",
     "birth date",
+    "age",
+    "gender",
+    "sum insured idr",
+    "sum reinsured idr",
+    "medicalcategory",
+    "product",
+    "coverage code",
+    "classofbusiness",
+    "payperiodtype",
+    "issue date",
+    "term year",
+    "term month",
+    "end date policy",
+    "claim date",
+    "claim register date",
+    "payment date",
+    "currency",
+    "exchangerate",
+    "amount of claim idr",
+    "reins claim idr",
+    "marein share idr",
+    "cause of claim"
+]
+
+
+DATE_COLUMNS = [
+    "birth date", # Admin
     "issue date",
     "expired date",
-    "valuation date"
+    "valuation date",
+    "end date policy", # Claim
+    "claim date"
 ]
 
 NUMERIC_COLUMNS = [
-    "sum insured",
+    "sum insured", # Admin
     "sum at risk",
     "reins sum insured",
     "reins sum at risk",
@@ -46,13 +87,24 @@ NUMERIC_COLUMNS = [
     "reins total comm",
     "reins tabarru",
     "reins ujrah",
-    "reins nett premium"
+    "reins nett premium",
+    "sum insured idr", # Claim
+    "sum reinsured idr",
+    "amount of claim idr",
+    "reins claim idr",
+    "marein share idr"
 ]
 
 INTEGER_COLUMNS = [
-    "age at",
+    "age at", # Admin
     "term year",
-    "term month"
+    "term month",
+    "bookyear", # Claim
+    "bookmonth",
+    "cedbookyear",
+    "cedbookmonth",
+    "age"
+
 ]
 
 
@@ -69,13 +121,23 @@ def validate_voucher(df, biz_type: str):
         .str.replace(r"\s+", " ", regex=True)
     )
 
+    biz_type = str(biz_type).strip()
+    allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal"]
+
     # =========================
     # 1. KOLOM WAJIB
     # =========================
-    missing_cols = set(REQUIRED_COLUMNS) - set(df.columns)
-    if missing_cols:
-        errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
-        return errors  # stop total
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        missing_cols = set(REQUIRED_COLUMNS) - set(df.columns)
+        if missing_cols:
+            errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
+            return errors  # stop total
+
+    elif biz_type == "Claim":
+        missing_cols = set(REQUIRED_COLUMNS_CLAIM) - set(df.columns)
+        if missing_cols:
+            errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
+            return errors  # stop total
 
     # =========================
     # 2. DATE VALIDATION
@@ -90,9 +152,6 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
-    biz_type = str(biz_type).strip()
-    allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal"]
-
     if biz_type not in allowed:
         errors.append("BUSINESS TYPE tidak valid")
         return errors   # ⛔ stop sekali saja
@@ -174,17 +233,34 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 9. EXPIRED DATE > ISSUE DATE
     # =========================
-    if not (df["expired date"] > df["issue date"]).all():
-        errors.append("expired date harus lebih besar dari issue date")
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        if not (df["expired date"] > df["issue date"]).all():
+            errors.append("expired date harus lebih besar dari issue date")
+
+    elif biz_type == "Claim":
+        if not (df["end date policy"] > df["issue date"]).all():
+            errors.append("end date policy harus lebih besar dari issue date")      
 
     # =========================
     # 10. REINS VS ORIGINAL LIMIT
     # =========================
-    if not (df["reins sum insured"] <= df["sum insured"]).all():
-        errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        if not (df["reins sum insured"] <= df["sum insured"]).all():
+            errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
 
-    if not (df["reins sum at risk"] <= df["sum at risk"]).all():
-        errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
+        if not (df["reins sum at risk"] <= df["sum at risk"]).all():
+            errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
+
+    elif biz_type == "Claim":
+        if not (df["sum insured idr"] <= df["sum reinsured idr"]).all():
+            errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
+
+        if not (df["amount of claim idr"] <= df["reins claim idr"]).all():
+            errors.append("reins claim idr tidak boleh lebih besar dari amount of claim idr")
+
+        if not (df["amount of claim idr"] <= df["marein share idr"]).all():
+            errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
+
 
     # =========================
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)

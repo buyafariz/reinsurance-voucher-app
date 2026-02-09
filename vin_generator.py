@@ -73,7 +73,7 @@ def generate_vin(base_path, year, month):
     vin = f"VIN{year}{month:02d}LST{next_seq:04d}"
     return vin, next_seq, log_path
 
-def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_file):
+def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_file, biz_type):
     """
     Generate voucher number berdasarkan log yang ada di Google Drive.
     Tidak tergantung file lokal.
@@ -116,18 +116,27 @@ def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_f
         else:
             next_seq = int(log_df["Seq No"].max()) + 1
 
-    voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"VCL{year}{month:02d}LST{next_seq:04d}"
 
     return voucher, next_seq
 
 
-def generate_vin_from_drive_log(log_df, year, month):
+def generate_vin_from_drive_log(log_df, year, month, biz_type):
     if log_df.empty:
         next_seq = 1
     else:
         next_seq = int(log_df["Seq No"].max()) + 1
 
-    voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"VCL{year}{month:02d}LST{next_seq:04d}"
+
     return voucher, next_seq
 
 
@@ -195,7 +204,7 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     cancel["Seq No"] = seq_no
     cancel["Voucher No"] = new_voucher
     #cancel["ENTRY_TYPE"] = "CANCEL"
-    cancel["CANCEL_OF_VIN"] = original_row["Voucher No"]
+    cancel["CANCEL OF VOUCHER"] = original_row["Voucher No"]
     cancel["STATUS"] = "CANCELED"
     cancel["CREATED_AT"] = datetime.now()
     cancel["CREATED_BY"] = user
