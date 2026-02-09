@@ -100,6 +100,15 @@ NUMERIC_COLUMNS = [
     "marein share idr"
 ]
 
+NUMERIC_COLUMNS_CLAIM = [
+    "sum insured idr", # Claim
+    "sum reinsured idr",
+    "amount of claim idr",
+    "reins claim idr",
+    "marein share idr"
+]
+
+
 INTEGER_COLUMNS = [
     "age at", # Admin
     "term year",
@@ -169,29 +178,47 @@ def validate_voucher(df, biz_type: str):
         errors.append("BUSINESS TYPE tidak valid")
         return errors   # ⛔ stop sekali saja
 
-    for col in NUMERIC_COLUMNS:
-        numeric = pd.to_numeric(df[col], errors="coerce")
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        for col in NUMERIC_COLUMNS:
+            numeric = pd.to_numeric(df[col], errors="coerce")
 
-        if numeric.isna().any():
-            errors.append(f"Kolom {col} harus numerik")
-            continue
+            if numeric.isna().any():
+                errors.append(f"Kolom {col} harus numerik")
+                continue
 
-        # 🔹 Kontribusi → tidak boleh negatif
-        if biz_type in ["Kontribusi", "Claim"]:
-            if (numeric < 0).any():
-                errors.append(
-                    f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
-                )
-
-        # 🔹 Refund, Retur, Batal → harus negatif
-        if biz_type in ["Refund", "Retur", "Batal"]:
-            if col in ["reins total premium", "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"]: 
-                if (numeric > 0).any():
+            # 🔹 Kontribusi → tidak boleh negatif
+            if biz_type == "Kontribusi":
+                if (numeric < 0).any():
                     errors.append(
-                        f"Kolom {col} harus bernilai negatif ({biz_type})"
+                        f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
                     )
-  
-        df[col] = numeric
+
+            # 🔹 Refund, Retur, Batal → harus negatif
+            if biz_type in ["Refund", "Retur", "Batal"]:
+                if col in ["reins total premium", "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"]: 
+                    if (numeric > 0).any():
+                        errors.append(
+                            f"Kolom {col} harus bernilai negatif ({biz_type})"
+                        )
+    
+            df[col] = numeric
+
+    elif biz_type == "Claim":
+        for col in NUMERIC_COLUMNS:
+            numeric = pd.to_numeric(df[col], errors="coerce")
+
+            if numeric.isna().any():
+                errors.append(f"Kolom {col} harus numerik")
+                continue
+
+            # 🔹 Kontribusi → tidak boleh negatif
+            if biz_type == "Claim":
+                if (numeric < 0).any():
+                    errors.append(
+                        f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
+                    )
+    
+            df[col] = numeric
 
 
     # =========================
