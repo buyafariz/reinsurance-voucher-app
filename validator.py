@@ -112,13 +112,17 @@ NUMERIC_COLUMNS_CLAIM = [
 INTEGER_COLUMNS = [
     "age at", # Admin
     "term year",
+    "term month"
+]
+
+INTEGER_COLUMNS_CLAIM = [
+    "term year", # Claim
     "term month",
-    "bookyear", # Claim
+    "bookyear", 
     "bookmonth",
     "cedbookyear",
     "cedbookmonth",
     "age"
-
 ]
 
 
@@ -230,23 +234,43 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 5. INTEGER >= 0 (AGE AT, TERM)
     # =========================
-    for col in INTEGER_COLUMNS:
-        numeric = pd.to_numeric(df[col], errors="coerce")
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        for col in INTEGER_COLUMNS:
+            numeric = pd.to_numeric(df[col], errors="coerce")
 
-        if numeric.isna().any():
-            errors.append(f"Kolom {col} harus berupa angka integer ≥ 0")
-            continue
+            if numeric.isna().any():
+                errors.append(f"Kolom {col} harus berupa angka integer ≥ 0")
+                continue
 
-        if not (numeric % 1 == 0).all():
-            errors.append(f"Kolom {col} tidak boleh mengandung desimal")
-            continue
+            if not (numeric % 1 == 0).all():
+                errors.append(f"Kolom {col} tidak boleh mengandung desimal")
+                continue
 
-        if (numeric < 0).any():
-            errors.append(f"Kolom {col} harus ≥ 0")
-            continue
+            if (numeric < 0).any():
+                errors.append(f"Kolom {col} harus ≥ 0")
+                continue
 
-        # ✅ AMAN untuk casting
-        df[col] = numeric.astype("Int64")
+            # ✅ AMAN untuk casting
+            df[col] = numeric.astype("Int64")
+
+    elif biz_type == "Claim":
+        for col in INTEGER_COLUMNS_CLAIM:
+            numeric = pd.to_numeric(df[col], errors="coerce")
+
+            if numeric.isna().any():
+                errors.append(f"Kolom {col} harus berupa angka integer ≥ 0")
+                continue
+
+            if not (numeric % 1 == 0).all():
+                errors.append(f"Kolom {col} tidak boleh mengandung desimal")
+                continue
+
+            if (numeric < 0).any():
+                errors.append(f"Kolom {col} harus ≥ 0")
+                continue
+
+            # ✅ AMAN untuk casting
+            df[col] = numeric.astype("Int64")
 
     # =========================
     # 6. TERM YEAR & TERM MONTH
