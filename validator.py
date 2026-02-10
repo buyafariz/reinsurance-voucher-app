@@ -183,7 +183,7 @@ def validate_voucher(df, biz_type: str):
         errors.append("BUSINESS TYPE tidak valid")
         return errors   # ⛔ stop sekali saja
 
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    elif biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
 
         for col in NUMERIC_COLUMNS:
 
