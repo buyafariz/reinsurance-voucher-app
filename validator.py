@@ -92,12 +92,7 @@ NUMERIC_COLUMNS = [
     "reins total comm",
     "reins tabarru",
     "reins ujrah",
-    "reins nett premium",
-    "sum insured idr", # Claim
-    "sum reinsured idr",
-    "amount of claim idr",
-    "reins claim idr",
-    "marein share idr"
+    "reins nett premium"
 ]
 
 NUMERIC_COLUMNS_CLAIM = [
