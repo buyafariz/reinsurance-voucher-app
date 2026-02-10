@@ -376,3 +376,45 @@ def calculate_due_date(account_with, year, month, service):
 
     days = int(row.iloc[0]["Days"])
     return quarter_end + pd.Timedelta(days=days)
+
+
+def load_exchange_rate_config(service, config_folder_id):
+    file_id = find_drive_file(
+        service=service,
+        filename="Rate Change.xlsx",
+        parent_id=config_folder_id
+    )
+
+    if not file_id:
+        return pd.DataFrame()
+
+    request = service.files().get_media(
+        fileId=file_id,
+        supportsAllDrives=True
+    )
+
+    file_bytes = request.execute()
+
+    return pd.read_excel(io.BytesIO(file_bytes))
+
+
+def get_exchange_rate(service, config_folder_id, currency, month):
+    df_rate = load_exchange_rate_config(service, config_folder_id)
+
+    if df_rate.empty:
+        return 1
+
+    df_rate.columns = df_rate.columns.map(str)
+
+    row = df_rate[df_rate["CcyID"] == currency]
+
+    if row.empty:
+        return 1
+
+    month_col = str(month)
+
+    if month_col not in df_rate.columns:
+        return 1
+
+    return float(row.iloc[0][month_col])
+
