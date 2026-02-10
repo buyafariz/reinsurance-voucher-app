@@ -183,7 +183,14 @@ def validate_voucher(df, biz_type: str):
         return errors   # ⛔ stop sekali saja
 
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+
         for col in NUMERIC_COLUMNS:
+
+            # 🔹 CEK DULU ADA ATAU TIDAK
+            if col not in df.columns:
+                errors.append(f"Kolom {col} tidak ditemukan di file")
+                continue
+
             numeric = pd.to_numeric(df[col], errors="coerce")
 
             if numeric.isna().any():
@@ -199,13 +206,20 @@ def validate_voucher(df, biz_type: str):
 
             # 🔹 Refund, Retur, Batal → harus negatif
             if biz_type in ["Refund", "Retur", "Batal"]:
-                if col in ["reins total premium", "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"]: 
+                if col in [
+                    "reins total premium",
+                    "reins total comm",
+                    "reins tabarru",
+                    "reins ujrah",
+                    "reins nett premium"
+                ]:
                     if (numeric > 0).any():
                         errors.append(
                             f"Kolom {col} harus bernilai negatif ({biz_type})"
                         )
-    
+
             df[col] = numeric
+
 
     elif biz_type == "Claim":
         for col in NUMERIC_COLUMNS_CLAIM:
