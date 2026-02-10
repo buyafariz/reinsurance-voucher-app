@@ -131,7 +131,8 @@ with tab_post:
                 "Revise",
                 "Batal",
                 "Cancel"
-            ]
+            ],
+            key="biz_type"
         )
 
    
@@ -159,7 +160,7 @@ with tab_post:
         # ==========================
         # VALIDATION
         # ==========================
-        errors = validate_voucher(df, biz_type)
+        errors = validate_voucher(df, st.session_state["biz_type"])
 
         if errors:
             st.error("❌ VALIDASI GAGAL")
