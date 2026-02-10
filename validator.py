@@ -127,6 +127,11 @@ INTEGER_COLUMNS_CLAIM = [
 
 
 def validate_voucher(df, biz_type: str):
+    print("COLUMNS DI FILE:")
+    print(df.columns.tolist())
+    print("NUMERIC_COLUMNS:")
+    print(NUMERIC_COLUMNS)
+
     errors = []
 
     # =========================
