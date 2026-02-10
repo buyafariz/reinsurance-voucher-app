@@ -143,6 +143,10 @@ def validate_voucher(df, biz_type: str):
     biz_type = str(biz_type).strip()
     allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal"]
 
+    if biz_type not in allowed:
+        errors.append("BUSINESS TYPE tidak valid")
+        return errors   # ⛔ stop sekali saja
+
     # =========================
     # 1. KOLOM WAJIB
     # =========================
@@ -179,11 +183,9 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
-    if biz_type not in allowed:
-        errors.append("BUSINESS TYPE tidak valid")
-        return errors   # ⛔ stop sekali saja
 
-    elif biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
 
         for col in NUMERIC_COLUMNS:
 
