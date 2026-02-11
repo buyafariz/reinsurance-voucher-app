@@ -290,7 +290,7 @@ with tab_post:
                         )
                     ]
 
-            st.caption(f"Menampilkan {len(filtered_df):,} baris")
+            #st.caption(f"Menampilkan {len(filtered_df):,} baris")
 
             # ==========================
             # DISPLAY DF (ACCOUNTING VIEW)
