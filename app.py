@@ -323,6 +323,8 @@ with tab_post:
                 use_container_width=True
             )
 
+            st.set_page_config(layout="wide")
+
 
 
         # ==========================
