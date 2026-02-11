@@ -784,7 +784,7 @@ with tab_post:
                     end_time = time.time()
                     duration = end_time - start_time
 
-                    st.success(f"✅ Voucher berhasil diposting: {voucher} ({duration} seconds)")
+                    st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
                     st.code(voucher)
 
                 except RuntimeError as e:
