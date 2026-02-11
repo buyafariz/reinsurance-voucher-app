@@ -319,7 +319,7 @@ with tab_post:
 
             st.dataframe(
                 preview_df,
-                height=450,
+                height=700,
                 use_container_width=True
             )
 
