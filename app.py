@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
+import time
 
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes
@@ -540,6 +541,7 @@ with tab_post:
         # POST VOUCHER (LOCKED)
         # ==========================
         if st.button("💾 Simpan Voucher"):
+            start_time = time.time()
 
             if not product.strip() or not remarks.strip() or not subject_email.strip():
                 st.error("Product, Subject Email, dan Remarks wajib diisi")
@@ -779,8 +781,10 @@ with tab_post:
                     #         supportsAllDrives=True
                     #     ).execute()
 
+                    end_time = time.time()
+                    duration = end_time - start_time
 
-                    st.success(f"✅ Voucher berhasil diposting: {voucher}")
+                    st.success(f"✅ Voucher berhasil diposting: {voucher} ({duration} seconds)")
                     st.code(voucher)
 
                 except RuntimeError as e:
