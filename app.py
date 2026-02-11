@@ -742,8 +742,8 @@ with tab_post:
                         service=service
                     )
 
-                    log_entry["Due Date"] = due_date
-                    log_entry["Subject Email"] = subject_email
+                    log_df["Due Date"] = due_date
+                    log_df["Subject Email"] = subject_email
 
                     # Upload / update log (SATU FILE)
                     service = get_drive_service()
