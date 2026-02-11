@@ -725,6 +725,9 @@ with tab_post:
                         parent_id=PERIOD_DRIVE_ID
                     )
 
+
+                    log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
+
                     if "Due Date" not in log_df.columns:
                         log_df["Due Date"] = None
 
@@ -741,9 +744,6 @@ with tab_post:
 
                     log_entry["Due Date"] = due_date
                     log_entry["Subject Email"] = subject_email
-
-
-                    log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
 
                     # Upload / update log (SATU FILE)
                     service = get_drive_service()
