@@ -379,7 +379,6 @@ with tab_post:
                 gridOptions=grid_options,
                 height=450,
                 fit_columns_on_grid_load=True,
-                enable_enterprise_modules=True,
                 update_mode=GridUpdateMode.NO_UPDATE
             )
 
