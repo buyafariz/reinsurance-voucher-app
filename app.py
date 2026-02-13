@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import time
 import st_aggrid
+import pkg_resources
+
 
 from datetime import datetime
 from validator import validate_voucher
@@ -12,6 +14,7 @@ from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
 from io import BytesIO
+
 
 
 
@@ -397,7 +400,8 @@ with tab_post:
                 enable_enterprise_modules=False
             )
 
-            st.write("AgGrid version:", st_aggrid.__version__)
+            #st.write("AgGrid version:", st_aggrid.__version__)
+            st.write("AgGrid version:", pkg_resources.get_distribution("streamlit-aggrid").version)
 
 
         # ==========================
