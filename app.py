@@ -379,10 +379,9 @@ with tab_post:
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
-                height=450,
-                fit_columns_on_grid_load=True
+                height=500,
+                use_container_width=True
             )
-
 
 
 
