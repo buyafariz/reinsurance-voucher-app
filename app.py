@@ -1,14 +1,17 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 import os
 import time
 
+from datetime import datetime
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes
 from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
+from io import BytesIO
+
 
 
 
@@ -299,13 +302,9 @@ with tab_post:
             MAX_PREVIEW_ROWS = 2000
 
             display_df = filtered_df.copy()
-
-            for col in ACCOUNTING_COLS:
-                if col in display_df.columns:
-                    display_df[col] = display_df[col].apply(accounting_format)
-
             total_rows = len(display_df)
 
+            # Limit preview rows
             if total_rows > MAX_PREVIEW_ROWS:
                 st.warning(
                     f"⚠️ Data sangat besar ({total_rows:,} baris). "
@@ -317,10 +316,71 @@ with tab_post:
 
             st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
 
-            st.dataframe(
+
+            # ==========================
+            # DOWNLOAD BUTTON (FULL DATA)
+            # ==========================
+
+            def convert_df_to_excel(df):
+                output = BytesIO()
+                df.to_excel(output, index=False, engine='openpyxl')
+                return output.getvalue()
+
+            excel_data = convert_df_to_excel(display_df)
+
+            st.download_button(
+                label="📥 Download Full Data (Excel)",
+                data=excel_data,
+                file_name="filtered_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+
+            # ==========================
+            # AGGRID CONFIG
+            # ==========================
+
+            gb = GridOptionsBuilder.from_dataframe(preview_df)
+
+            # Default column behavior
+            gb.configure_default_column(
+                filter=True,
+                sortable=True,
+                resizable=True
+            )
+
+            # Accounting formatter (JS)
+            accounting_formatter = JsCode("""
+            function(params) {
+                if (params.value == null) return '';
+                return params.value.toLocaleString('en-US');
+            }
+            """)
+
+            # Apply formatter only to accounting columns
+            for col in ACCOUNTING_COLS:
+                if col in preview_df.columns:
+                    gb.configure_column(
+                        col,
+                        type=["numericColumn"],
+                        valueFormatter=accounting_formatter
+                    )
+
+            # Pagination
+            gb.configure_pagination(
+                paginationAutoPageSize=False,
+                paginationPageSize=50
+            )
+
+            grid_options = gb.build()
+
+            AgGrid(
                 preview_df,
+                gridOptions=grid_options,
                 height=450,
-                use_container_width=True
+                fit_columns_on_grid_load=True,
+                enable_enterprise_modules=True,
+                update_mode=GridUpdateMode.NO_UPDATE
             )
 
 
