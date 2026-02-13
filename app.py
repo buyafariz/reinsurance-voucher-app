@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import time
+import st_aggrid
 
 from datetime import datetime
 from validator import validate_voucher
@@ -396,7 +397,7 @@ with tab_post:
                 enable_enterprise_modules=False
             )
 
-
+            st.write("AgGrid version:", st_aggrid.__version__)
 
 
         # ==========================
