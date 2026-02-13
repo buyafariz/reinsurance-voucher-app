@@ -380,7 +380,8 @@ with tab_post:
                 preview_df,
                 gridOptions=grid_options,
                 height=500,
-                use_container_width=True
+                use_container_width=True,
+                theme="streamlit"
             )
 
 
