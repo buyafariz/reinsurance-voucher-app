@@ -294,7 +294,6 @@ with tab_post:
                     ]
 
             #st.caption(f"Menampilkan {len(filtered_df):,} baris")
-
             # ==========================
             # DISPLAY DF (ACCOUNTING VIEW)
             # ==========================
@@ -304,7 +303,10 @@ with tab_post:
             display_df = filtered_df.copy()
             total_rows = len(display_df)
 
-            # Limit preview rows
+            # ==========================
+            # LIMIT PREVIEW ROWS
+            # ==========================
+
             if total_rows > MAX_PREVIEW_ROWS:
                 st.warning(
                     f"⚠️ Data sangat besar ({total_rows:,} baris). "
@@ -316,6 +318,26 @@ with tab_post:
 
             st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
 
+            # ==========================
+            # SANITIZE DATA (ANTI-CRASH)
+            # ==========================
+
+            preview_df = preview_df.copy()
+
+            for col in preview_df.columns:
+                # Convert datetime (including timezone) to string
+                if pd.api.types.is_datetime64_any_dtype(preview_df[col]):
+                    preview_df[col] = preview_df[col].astype(str)
+
+                # Convert Period
+                elif "period" in str(preview_df[col].dtype):
+                    preview_df[col] = preview_df[col].astype(str)
+
+                # Convert object that might contain mixed types
+                elif preview_df[col].dtype == "object":
+                    preview_df[col] = preview_df[col].astype(str)
+
+            preview_df = preview_df.fillna("")
 
             # ==========================
             # DOWNLOAD BUTTON (FULL DATA)
@@ -335,38 +357,18 @@ with tab_post:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-
             # ==========================
-            # AGGRID CONFIG
+            # AGGRID CONFIG (SAFE VERSION)
             # ==========================
 
             gb = GridOptionsBuilder.from_dataframe(preview_df)
 
-            # Default column behavior
             gb.configure_default_column(
                 filter=True,
                 sortable=True,
                 resizable=True
             )
 
-            # Accounting formatter (JS)
-            accounting_formatter = JsCode("""
-            function(params) {
-                if (params.value == null) return '';
-                return params.value.toLocaleString('en-US');
-            }
-            """)
-
-            # Apply formatter only to accounting columns
-            for col in ACCOUNTING_COLS:
-                if col in preview_df.columns:
-                    gb.configure_column(
-                        col,
-                        type=["numericColumn"],
-                        valueFormatter=accounting_formatter
-                    )
-
-            # Pagination
             gb.configure_pagination(
                 paginationAutoPageSize=False,
                 paginationPageSize=50
@@ -378,9 +380,9 @@ with tab_post:
                 preview_df,
                 gridOptions=grid_options,
                 height=450,
-                fit_columns_on_grid_load=True,
-                update_mode=GridUpdateMode.NO_UPDATE
+                fit_columns_on_grid_load=True
             )
+
 
 
 
