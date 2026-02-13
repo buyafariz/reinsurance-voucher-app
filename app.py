@@ -3,7 +3,6 @@ import pandas as pd
 import os
 import time
 import st_aggrid
-import pkg_resources
 
 
 from datetime import datetime
@@ -392,16 +391,23 @@ with tab_post:
 
             grid_options = gb.build()
 
+            st.markdown("""
+            <style>
+            .ag-theme-streamlit {
+                --ag-background-color: #0e1117;
+                --ag-header-background-color: #161b22;
+                --ag-foreground-color: #FAFAFA;
+                --ag-border-color: #262730;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
                 height=600,
-                theme="streamlit",
-                enable_enterprise_modules=False
+                theme="streamlit"
             )
-
-            #st.write("AgGrid version:", st_aggrid.__version__)
-            st.write("AgGrid version:", pkg_resources.get_distribution("streamlit-aggrid").version)
 
 
         # ==========================
