@@ -366,7 +366,9 @@ with tab_post:
             gb.configure_default_column(
                 filter=True,
                 sortable=True,
-                resizable=True
+                resizable=True,
+                minWidth=150,
+                flex=0
             )
 
             gb.configure_pagination(
@@ -374,15 +376,21 @@ with tab_post:
                 paginationPageSize=50
             )
 
+            gb.configure_grid_options(
+                domLayout='normal',
+                suppressHorizontalScroll=False
+            )
+
+
             grid_options = gb.build()
 
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
-                height=500,
-                use_container_width=True,
+                height=600,
                 theme="streamlit"
             )
+
 
 
 
