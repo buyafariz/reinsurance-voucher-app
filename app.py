@@ -381,6 +381,10 @@ with tab_post:
                 suppressHorizontalScroll=False
             )
 
+            gb.configure_grid_options(
+                headerHeight=40,
+                rowHeight=36
+            )
 
             grid_options = gb.build()
 
