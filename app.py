@@ -388,7 +388,8 @@ with tab_post:
                 preview_df,
                 gridOptions=grid_options,
                 height=600,
-                theme="streamlit"
+                theme="streamlit",
+                enable_enterprise_modules=False
             )
 
 
