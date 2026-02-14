@@ -499,7 +499,7 @@ with tab_post:
 
             AgGrid(
                 preview_df,
-                gridOptions=gb.build(),
+                gridOptions=grid_options,
                 height=600,
                 theme="dark",
                 custom_css=custom_css
