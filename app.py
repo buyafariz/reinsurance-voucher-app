@@ -494,7 +494,8 @@ with tab_post:
 
                 ".ag-header-cell": {
                     "padding-top": "8px",
-                    "padding-bottom": "8px"
+                    "padding-bottom": "8px",
+                    "border-right": "1px solid #2f3140"
                 },
 
                 ".ag-header-cell-label": {
@@ -527,6 +528,7 @@ with tab_post:
                 ".ag-row": {
                     "background-color": "#262730",
                     "color": "#F8FAFC",
+                    "border-bottom": "1px solid #2f3140"
                 },
 
                 ".ag-row-hover": {
@@ -534,7 +536,9 @@ with tab_post:
                 },
 
                 ".ag-cell": {
-                    "border-color": "#2d2e36"
+                    "border-color": "#2d2e36",
+                    "border-right": "1px solid #2f3140",
+                    "border-bottom": "1px solid #2f3140"
                 },
 
                 # ---------- PAGINATION ----------
