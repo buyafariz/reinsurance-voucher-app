@@ -506,7 +506,8 @@ with tab_post:
 
                 ".ag-header-cell-text": {
                     "flex-grow": "1",
-                    "text-align": "center"
+                    "text-align": "center",
+                    "text-transform": "capitalize"
                 },
 
                 # ---------- ICONS RIGHT ----------
