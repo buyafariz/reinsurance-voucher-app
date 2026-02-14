@@ -393,14 +393,42 @@ with tab_post:
 
             st.markdown("""
             <style>
+
+            /* Base grid */
             .ag-theme-streamlit {
-                --ag-background-color: #0e1117;
-                --ag-header-background-color: #161b22;
-                --ag-foreground-color: #FAFAFA;
-                --ag-border-color: #262730;
+                --ag-background-color: #0E1117;              /* main background */
+                --ag-foreground-color: #FAFAFA;              /* text color */
+                --ag-border-color: #1f2937;                  /* subtle border */
+
+                --ag-header-background-color: #111827;       /* header dark blue */
+                --ag-header-foreground-color: #E5E7EB;
+
+                --ag-row-hover-color: #1b2636;               /* hover effect */
+                --ag-selected-row-background-color: #1e3a5f;
+
+                --ag-odd-row-background-color: #0f172a;      /* zebra stripe */
             }
+
+            /* Remove harsh grid lines */
+            .ag-theme-streamlit .ag-root-wrapper {
+                border-radius: 10px;
+                border: 1px solid #1f2937;
+            }
+
+            /* Softer cell borders */
+            .ag-theme-streamlit .ag-cell {
+                border-color: #1f2937 !important;
+            }
+
+            /* Header style */
+            .ag-theme-streamlit .ag-header {
+                font-weight: 600;
+                font-size: 14px;
+            }
+
             </style>
             """, unsafe_allow_html=True)
+
 
             AgGrid(
                 preview_df,
