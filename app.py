@@ -13,6 +13,8 @@ from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
 from io import BytesIO
+from st_aggrid import JsCode
+
 
 
 
@@ -493,6 +495,54 @@ with tab_post:
                 }
 
             }
+
+            accounting_formatter = JsCode("""
+            function(params) {
+                if (params.value == null || params.value === '') return '';
+
+                let value = Number(params.value);
+
+                let formatted = Math.abs(value).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                if (value < 0) {
+                    return '(' + formatted + ')';
+                }
+
+                return formatted;
+            }
+            """)
+
+            ACCOUNTING_COLS = [
+                "Reins Premium",
+                "Reins Em Premium",
+                "Reins Er Premium",
+                "Reins Oth Premium",
+                "Reins Total Premium",
+                "Reins Comm",
+                "Reins Em Comm",
+                "Reins Er Comm",
+                "Reins Oth Comm",
+                "Reins Profit Share",
+                "Reins Overriding",
+                "Reins Broker Fee",
+                "Reins Total Comm",
+                "Reins Tabarru",
+                "Reins Ujrah",
+                "Reins Nett Premium"
+            ]
+
+
+            for col in ACCOUNTING_COLS:
+                if col in preview_df.columns:
+                    gb.configure_column(
+                        col,
+                        type=["numericColumn"],
+                        valueFormatter=accounting_formatter,
+                        cellStyle={"textAlign": "right"}  # accounting biasanya rata kanan
+                    )
 
             # ==========================
             # RENDER GRID
