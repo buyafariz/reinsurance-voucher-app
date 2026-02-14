@@ -539,6 +539,7 @@ with tab_post:
                 if col in preview_df.columns:
                     gb.configure_column(
                         col,
+                        field=col,
                         type=["numericColumn"],
                         valueFormatter=accounting_formatter,
                         cellStyle={
