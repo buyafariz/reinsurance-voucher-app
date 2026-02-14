@@ -431,32 +431,32 @@ with tab_post:
                     "padding-bottom": "10px"
                 },
 
-                ".ag-header-cell-text": {
-                    "text-transform": "capitalize",
-                    "font-weight": "600"
-                },
-
-                # =========================
-                # HEADER ICON ALIGNMENT (FIX TOTAL)
-                # =========================
-                ".header-right-icon .ag-header-cell-label": {
+                ".ag-header-cell-label": {
                     "display": "flex",
                     "align-items": "center",
-                    "justify-content": "space-between",
                     "width": "100%"
                 },
 
-                ".header-right-icon .ag-header-cell-text": {
+                ".ag-header-cell-text": {
                     "flex-grow": "1",
+                    "text-transform": "capitalize",
+                    "font-weight": "600",
                     "text-align": "left"
                 },
 
-                ".header-right-icon .ag-header-cell-label .ag-header-icon": {
-                    "order": "2"
+                # =========================
+                # FORCE ALL ICONS TO RIGHT
+                # =========================
+                ".ag-sort-indicator-container": {
+                    "margin-left": "auto"
                 },
 
-                ".header-right-icon .ag-header-cell-label .ag-header-cell-text": {
-                    "order": "1"
+                ".ag-header-icon": {
+                    "margin-left": "8px"
+                },
+
+                ".ag-header-cell-menu-button": {
+                    "margin-left": "8px"
                 },
 
                 # =========================
@@ -494,7 +494,6 @@ with tab_post:
                     "font-size": "12px",
                     "opacity": "0.7"
                 }
-
             }
 
             AgGrid(
