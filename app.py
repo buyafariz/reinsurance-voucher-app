@@ -393,32 +393,14 @@ with tab_post:
             grid_options = gb.build()
 
             custom_css = {
+
+                # =========================
+                # WRAPPER & BACKGROUND
+                # =========================
                 ".ag-root-wrapper": {
                     "background-color": "#262730",
                     "border": "1px solid #1f2937",
                     "border-radius": "12px",
-                },
-                ".ag-header": {
-                    "background-color": "#1f2937",
-                    "color": "#F1F5F9",
-                    "font-weight": "600",
-                },
-                ".ag-row": {
-                    "background-color": "#262730",
-                    "color": "#F8FAFC",
-                },
-                ".ag-row-hover": {
-                    "background-color": "#2e2f38",
-                },
-                ".ag-paging-panel": {
-                    "background-color": "#262730",
-                    "color": "#E2E8F0",
-                },
-                ".ag-cell": {
-                    "border-color": "#2d2e36",
-                },
-                ".ag-root-wrapper": {
-                    "background-color": "#262730",
                 },
 
                 ".ag-center-cols-viewport": {
@@ -432,8 +414,12 @@ with tab_post:
                 ".ag-center-cols-container": {
                     "background-color": "#262730",
                 },
+
+                # =========================
+                # HEADER
+                # =========================
                 ".ag-header": {
-                    "background-color": "#1F2937",  # lebih terang dari body
+                    "background-color": "#1F2937",
                     "color": "#F9FAFB",
                     "font-weight": "600",
                     "font-size": "14px",
@@ -444,10 +430,15 @@ with tab_post:
                     "padding-top": "10px",
                     "padding-bottom": "10px"
                 },
+
                 ".ag-header-cell-text": {
                     "text-transform": "capitalize",
                     "font-weight": "600"
                 },
+
+                # =========================
+                # HEADER ICON ALIGNMENT (FIX TOTAL)
+                # =========================
                 ".header-right-icon .ag-header-cell-label": {
                     "display": "flex",
                     "align-items": "center",
@@ -458,22 +449,57 @@ with tab_post:
                 ".header-right-icon .ag-header-cell-text": {
                     "flex-grow": "1",
                     "text-align": "left"
-                },                
-                ".ag-icon": {
-                    "font-size": "12px",
-                    "opacity": "0.7"
                 },
+
+                ".header-right-icon .ag-header-cell-label .ag-header-icon": {
+                    "order": "2"
+                },
+
+                ".header-right-icon .ag-header-cell-label .ag-header-cell-text": {
+                    "order": "1"
+                },
+
+                # =========================
+                # BODY
+                # =========================
+                ".ag-row": {
+                    "background-color": "#262730",
+                    "color": "#F8FAFC",
+                },
+
+                ".ag-row-hover": {
+                    "background-color": "#2e2f38",
+                },
+
                 ".ag-cell": {
+                    "border-color": "#2d2e36",
                     "text-align": "center",
                     "display": "flex",
                     "align-items": "center",
                     "justify-content": "center"
+                },
+
+                # =========================
+                # PAGINATION
+                # =========================
+                ".ag-paging-panel": {
+                    "background-color": "#262730",
+                    "color": "#E2E8F0",
+                },
+
+                # =========================
+                # ICON STYLE
+                # =========================
+                ".ag-icon": {
+                    "font-size": "12px",
+                    "opacity": "0.7"
                 }
+
             }
 
             AgGrid(
                 preview_df,
-                gridOptions=grid_options,
+                gridOptions=gb.build(),
                 height=600,
                 theme="dark",
                 custom_css=custom_css
