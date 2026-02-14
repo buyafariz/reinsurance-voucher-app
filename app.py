@@ -393,27 +393,31 @@ with tab_post:
 
             custom_css = {
                 ".ag-root-wrapper": {
-                    "background-color": "#0E1117",
-                    "border": "1px solid #1f2937",
+                    "background-color": "#0B1220",   # lebih gelap dari sebelumnya
+                    "border": "1px solid #1a2332",
                     "border-radius": "12px",
                 },
                 ".ag-header": {
-                    "background-color": "#111827",
-                    "color": "#E5E7EB",
+                    "background-color": "#0E1628",
+                    "color": "#E2E8F0",
                     "font-weight": "600",
                 },
                 ".ag-row": {
-                    "background-color": "#0f172a",
-                    "color": "#FAFAFA",
+                    "background-color": "#0B1220",
+                    "color": "#F1F5F9",
                 },
                 ".ag-row-hover": {
-                    "background-color": "#1b2636",
+                    "background-color": "#16213A",
                 },
                 ".ag-paging-panel": {
-                    "background-color": "#0E1117",
-                    "color": "#E5E7EB",
+                    "background-color": "#0B1220",
+                    "color": "#CBD5E1",
+                },
+                ".ag-cell": {
+                    "border-color": "#1a2332",
                 }
             }
+
 
             AgGrid(
                 preview_df,
