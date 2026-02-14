@@ -446,6 +446,28 @@ with tab_post:
                 ".ag-header-cell-text": {
                     "text-transform": "capitalize",
                     "font-weight": "600"
+                },
+                 ".ag-header-cell": {
+                    "display": "flex",
+                    "align-items": "center",
+                    "justify-content": "space-between"
+                },
+
+                ".ag-header-cell-label": {
+                    "display": "flex",
+                    "flex-direction": "row-reverse",  # ini yang bikin icon pindah ke kanan
+                    "align-items": "center",
+                    "gap": "6px"
+                },
+                    ".ag-icon": {
+                    "font-size": "12px",
+                    "opacity": "0.7"
+                },
+                ".ag-cell": {
+                    "text-align": "center",
+                    "display": "flex",
+                    "align-items": "center",
+                    "justify-content": "center"
                 }
             }
 
