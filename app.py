@@ -385,10 +385,15 @@ with tab_post:
                 domLayout="normal",
                 suppressHorizontalScroll=False,
 
-                # AUTO SIZE BERDASARKAN ISI
                 onFirstDataRendered="""
                 function(params) {
-                    params.columnApi.autoSizeAllColumns();
+                    var allColumnIds = [];
+                    params.columnApi.getAllColumns().forEach(function(column) {
+                        allColumnIds.push(column.getId());
+                    });
+
+                    // Ini penting: header ikut dihitung
+                    params.columnApi.autoSizeColumns(allColumnIds, false);
                 }
                 """
             )
@@ -503,7 +508,7 @@ with tab_post:
                 height=600,
                 theme="dark",
                 custom_css=custom_css,
-                allow_unsafe_jscode=True   # diperlukan untuk autoSizeAllColumns
+                allow_unsafe_jscode=True
             )
 
         # ==========================
