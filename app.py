@@ -436,7 +436,7 @@ with tab_post:
                     "color": "#F9FAFB",
                     "font-weight": "700",
                     "font-size": "14px",
-                    "border-bottom": "2px solid #3B82F6"
+                    "border-bottom": "1.5px solid #3B82F6"
                 },
 
                 ".ag-header-cell": {
