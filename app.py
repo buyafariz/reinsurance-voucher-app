@@ -433,8 +433,7 @@ with tab_post:
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
-                height=600,
-                theme="streamlit"
+                height=600
             )
 
 
