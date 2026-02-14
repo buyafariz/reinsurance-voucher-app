@@ -342,23 +342,23 @@ with tab_post:
 
             preview_df = preview_df.fillna("")
 
-            # ==========================
-            # DOWNLOAD BUTTON (FULL DATA)
-            # ==========================
+            # # ==========================
+            # # DOWNLOAD BUTTON (FULL DATA)
+            # # ==========================
 
-            def convert_df_to_excel(df):
-                output = BytesIO()
-                df.to_excel(output, index=False, engine='openpyxl')
-                return output.getvalue()
+            # def convert_df_to_excel(df):
+            #     output = BytesIO()
+            #     df.to_excel(output, index=False, engine='openpyxl')
+            #     return output.getvalue()
 
-            excel_data = convert_df_to_excel(display_df)
+            # excel_data = convert_df_to_excel(display_df)
 
-            st.download_button(
-                label="📥 Download Full Data (Excel)",
-                data=excel_data,
-                file_name="filtered_data.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+            # st.download_button(
+            #     label="📥 Download Full Data (Excel)",
+            #     data=excel_data,
+            #     file_name="filtered_data.xlsx",
+            #     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            # )
 
             # ==========================
             # GRID BUILDER
