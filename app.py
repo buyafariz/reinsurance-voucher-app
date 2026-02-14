@@ -431,6 +431,18 @@ with tab_post:
                 ".ag-center-cols-container": {
                     "background-color": "#262730",
                 },
+                ".ag-header": {
+                    "background-color": "#1F2937",  # lebih terang dari body
+                    "color": "#F9FAFB",
+                    "font-weight": "700",
+                    "font-size": "14px",
+                    "border-bottom": "2px solid #3B82F6"
+                },
+
+                ".ag-header-cell": {
+                    "padding-top": "10px",
+                    "padding-bottom": "10px"
+                }
             }
 
             AgGrid(
