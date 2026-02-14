@@ -384,15 +384,12 @@ with tab_post:
                 rowHeight=36,
                 domLayout="normal",
                 suppressHorizontalScroll=False,
-
                 onFirstDataRendered="""
                 function(params) {
-                    var allColumnIds = [];
-                    params.columnApi.getAllColumns().forEach(function(column) {
-                        allColumnIds.push(column.getId());
+                    const allColumnIds = [];
+                    params.columnApi.getAllColumns().forEach(function(col) {
+                        allColumnIds.push(col.getId());
                     });
-
-                    // Ini penting: header ikut dihitung
                     params.columnApi.autoSizeColumns(allColumnIds, false);
                 }
                 """
@@ -479,7 +476,6 @@ with tab_post:
                 ".ag-cell": {
                     "border-color": "#2d2e36",
                     "text-align": "center",
-                    "display": "flex",
                     "align-items": "center",
                     "justify-content": "center"
                 },
@@ -510,6 +506,7 @@ with tab_post:
                 custom_css=custom_css,
                 allow_unsafe_jscode=True
             )
+
 
         # ==========================
         # PERIOD & LOG
