@@ -371,7 +371,8 @@ with tab_post:
                 sortable=True,
                 resizable=True,
                 minWidth=150,
-                flex=0
+                flex=0,
+                headerClass="header-right-icon"
             )
 
             gb.configure_pagination(
@@ -447,19 +448,18 @@ with tab_post:
                     "text-transform": "capitalize",
                     "font-weight": "600"
                 },
-                 ".ag-header-cell": {
+                ".header-right-icon .ag-header-cell-label": {
                     "display": "flex",
                     "align-items": "center",
-                    "justify-content": "space-between"
+                    "justify-content": "space-between",
+                    "width": "100%"
                 },
 
-                ".ag-header-cell-label": {
-                    "display": "flex",
-                    "flex-direction": "row-reverse",  # ini yang bikin icon pindah ke kanan
-                    "align-items": "center",
-                    "gap": "6px"
-                },
-                    ".ag-icon": {
+                ".header-right-icon .ag-header-cell-text": {
+                    "flex-grow": "1",
+                    "text-align": "left"
+                },                
+                ".ag-icon": {
                     "font-size": "12px",
                     "opacity": "0.7"
                 },
