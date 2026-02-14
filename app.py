@@ -442,6 +442,10 @@ with tab_post:
                 ".ag-header-cell": {
                     "padding-top": "10px",
                     "padding-bottom": "10px"
+                },
+                ".ag-header-cell-text": {
+                    "text-transform": "capitalize",
+                    "font-weight": "700"
                 }
             }
 
