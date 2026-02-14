@@ -207,108 +207,108 @@ with tab_post:
 
             filtered_df = df.copy()
 
-            valid_columns = get_non_empty_columns(filtered_df)
+            # valid_columns = get_non_empty_columns(filtered_df)
 
-            col1, col2 = st.columns([2, 4])
+            # col1, col2 = st.columns([2, 4])
 
-            with col1:
-                filter_col = st.selectbox(
-                    "Filter berdasarkan kolom",
-                    options=valid_columns
-                )
+            # with col1:
+            #     filter_col = st.selectbox(
+            #         "Filter berdasarkan kolom",
+            #         options=valid_columns
+            #     )
 
-            col_series = filtered_df[filter_col]
+            # col_series = filtered_df[filter_col]
 
-            with col2:
+            # with col2:
 
-                # TEXT FILTER
-                if col_series.dtype == "object":
-                    keyword = st.text_input(
-                        f"Cari pada kolom `{filter_col}`"
-                    )
+            #     # TEXT FILTER
+            #     if col_series.dtype == "object":
+            #         keyword = st.text_input(
+            #             f"Cari pada kolom `{filter_col}`"
+            #         )
 
-                    if keyword:
-                        filtered_df = filtered_df[
-                            col_series.astype(str)
-                            .str.contains(keyword, case=False, na=False)
-                        ]
+            #         if keyword:
+            #             filtered_df = filtered_df[
+            #                 col_series.astype(str)
+            #                 .str.contains(keyword, case=False, na=False)
+            #             ]
 
-                # NUMERIC FILTER
-                elif pd.api.types.is_numeric_dtype(col_series):
-                    numeric_series = col_series.dropna()
+            #     # NUMERIC FILTER
+            #     elif pd.api.types.is_numeric_dtype(col_series):
+            #         numeric_series = col_series.dropna()
 
-                    if numeric_series.empty:
-                        st.info(f"Kolom `{filter_col}` kosong")
+            #         if numeric_series.empty:
+            #             st.info(f"Kolom `{filter_col}` kosong")
 
-                    else:
-                        unique_vals = numeric_series.unique()
+            #         else:
+            #             unique_vals = numeric_series.unique()
 
-                        # 🚫 HANYA 1 NILAI UNIK → TIDAK BOLEH SLIDER
-                        if len(unique_vals) == 1:
-                            st.info(
-                                f"Kolom `{filter_col}` hanya memiliki satu nilai: "
-                                f"**{unique_vals[0]}**"
-                            )
+            #             # 🚫 HANYA 1 NILAI UNIK → TIDAK BOLEH SLIDER
+            #             if len(unique_vals) == 1:
+            #                 st.info(
+            #                     f"Kolom `{filter_col}` hanya memiliki satu nilai: "
+            #                     f"**{unique_vals[0]}**"
+            #                 )
 
-                        else:
-                            is_integer = pd.api.types.is_integer_dtype(numeric_series)
+            #             else:
+            #                 is_integer = pd.api.types.is_integer_dtype(numeric_series)
 
-                            if is_integer:
-                                min_val = int(numeric_series.min())
-                                max_val = int(numeric_series.max())
+            #                 if is_integer:
+            #                     min_val = int(numeric_series.min())
+            #                     max_val = int(numeric_series.max())
 
-                                selected_range = st.slider(
-                                    f"Range `{filter_col}`",
-                                    min_value=min_val,
-                                    max_value=max_val,
-                                    value=(min_val, max_val),
-                                    step=1
-                                )
-                            else:
-                                min_val = float(numeric_series.min())
-                                max_val = float(numeric_series.max())
+            #                     selected_range = st.slider(
+            #                         f"Range `{filter_col}`",
+            #                         min_value=min_val,
+            #                         max_value=max_val,
+            #                         value=(min_val, max_val),
+            #                         step=1
+            #                     )
+            #                 else:
+            #                     min_val = float(numeric_series.min())
+            #                     max_val = float(numeric_series.max())
 
-                                selected_range = st.slider(
-                                    f"Range `{filter_col}`",
-                                    min_value=min_val,
-                                    max_value=max_val,
-                                    value=(min_val, max_val)
-                                )
+            #                     selected_range = st.slider(
+            #                         f"Range `{filter_col}`",
+            #                         min_value=min_val,
+            #                         max_value=max_val,
+            #                         value=(min_val, max_val)
+            #                     )
 
-                            filtered_df = filtered_df[
-                                col_series.between(*selected_range)
-                            ]
+            #                 filtered_df = filtered_df[
+            #                     col_series.between(*selected_range)
+            #                 ]
 
 
-                # DATETIME FILTER
-                elif pd.api.types.is_datetime64_any_dtype(col_series):
-                    valid_dates = col_series.dropna()
+            #     # DATETIME FILTER
+            #     elif pd.api.types.is_datetime64_any_dtype(col_series):
+            #         valid_dates = col_series.dropna()
 
-                    start_date, end_date = st.date_input(
-                        f"Range tanggal `{filter_col}`",
-                        value=(valid_dates.min(), valid_dates.max())
-                    )
+            #         start_date, end_date = st.date_input(
+            #             f"Range tanggal `{filter_col}`",
+            #             value=(valid_dates.min(), valid_dates.max())
+            #         )
 
-                    filtered_df = filtered_df[
-                        col_series.between(
-                            pd.to_datetime(start_date),
-                            pd.to_datetime(end_date)
-                        )
-                    ]
+            #         filtered_df = filtered_df[
+            #             col_series.between(
+            #                 pd.to_datetime(start_date),
+            #                 pd.to_datetime(end_date)
+            #             )
+            #         ]
 
-            #st.caption(f"Menampilkan {len(filtered_df):,} baris")
-            # ==========================
-            # DISPLAY DF (ACCOUNTING VIEW)
-            # ==========================
+            # #st.caption(f"Menampilkan {len(filtered_df):,} baris")
+            # # ==========================
+            # # DISPLAY DF (ACCOUNTING VIEW)
+            # # ==========================
 
             MAX_PREVIEW_ROWS = 2000
 
             display_df = filtered_df.copy()
             total_rows = len(display_df)
 
-            # ==========================
-            # LIMIT PREVIEW ROWS
-            # ==========================
+            # # ==========================
+            # # LIMIT PREVIEW ROWS
+            # # ==========================
 
             if total_rows > MAX_PREVIEW_ROWS:
                 st.warning(
