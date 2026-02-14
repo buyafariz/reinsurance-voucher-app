@@ -415,6 +415,32 @@ with tab_post:
                 },
                 ".ag-cell": {
                     "border-color": "#2d2e36",
+                },
+                ".ag-menu": {
+                    "background-color": "#262730",
+                    "color": "#F9FAFB",
+                    "border": "1px solid #2f3140"
+                },
+                ".ag-menu-option": {
+                    "background-color": "#262730",
+                    "color": "#F9FAFB"
+                },
+                ".ag-menu-option-active": {
+                    "background-color": "#2f3140",
+                },
+                ".ag-filter-wrapper": {
+                    "background-color": "#262730",
+                    "color": "#F9FAFB"
+                },
+                ".ag-floating-filter-input": {
+                    "background-color": "#1f2230",
+                    "color": "#F9FAFB",
+                    "border": "1px solid #2f3140"
+                },
+                ".ag-input-field-input": {
+                    "background-color": "#1f2230",
+                    "color": "#F9FAFB",
+                    "border": "1px solid #2f3140"
                 }
             }
 
