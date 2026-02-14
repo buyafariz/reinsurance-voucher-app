@@ -372,9 +372,13 @@ with tab_post:
                 filter=True,
                 sortable=True,
                 resizable=True,
-                minWidth=120,   # aman untuk 54 kolom
+                minWidth=120,
                 flex=0
             )
+
+            # ==========================
+            # ACCOUNTING FORMATTER (INTERNATIONAL)
+            # ==========================
 
             accounting_formatter = JsCode("""
             function(params) {
@@ -396,35 +400,36 @@ with tab_post:
             """)
 
             ACCOUNTING_COLS = [
-                "reins premium",
-                "reins em premium",
-                "reins er premium",
-                "reins oth premium",
-                "reins total premium",
-                "reins comm",
-                "reins em comm",
-                "reins er comm",
-                "reins oth comm",
-                "reins profit share",
-                "reins overriding",
-                "reins broker fee",
-                "reins total comm",
-                "reins tabarru",
-                "reins ujrah",
-                "reins nett premium"
+                "Reins Premium",
+                "Reins EM Premium",
+                "Reins ER Premium",
+                "Reins Oth Premium",
+                "Reins Total Premium",
+                "Reins Comm",
+                "Reins EM Comm",
+                "Reins ER Comm",
+                "Reins Oth Comm",
+                "Reins Profit Share",
+                "Reins Overriding",
+                "Reins Broker Fee",
+                "Reins Total Comm",
+                "Reins Tabarru",
+                "Reins Ujrah",
+                "Reins Nett Premium"
             ]
 
             for col in ACCOUNTING_COLS:
                 if col in preview_df.columns:
                     gb.configure_column(
                         col,
-                        field=col,
                         type=["numericColumn"],
                         valueFormatter=accounting_formatter,
-                        cellStyle={
-                            "textAlign": "right"
-                        }
+                        cellStyle={"textAlign": "right"}
                     )
+
+            # ==========================
+            # GRID OPTIONS
+            # ==========================
 
             gb.configure_pagination(
                 paginationAutoPageSize=False,
@@ -497,12 +502,10 @@ with tab_post:
 
                 ".ag-header-cell-text": {
                     "flex-grow": "1",
-                    "text-transform": "capitalize",
-                    "font-weight": "600",
                     "text-align": "center"
                 },
 
-                # ---------- FORCE ICONS RIGHT ----------
+                # ---------- ICONS RIGHT ----------
                 ".ag-sort-indicator-container": {
                     "margin-left": "auto"
                 },
@@ -526,10 +529,7 @@ with tab_post:
                 },
 
                 ".ag-cell": {
-                    "border-color": "#2d2e36",
-                    "text-align": "center",
-                    "align-items": "center",
-                    "justify-content": "center"
+                    "border-color": "#2d2e36"
                 },
 
                 # ---------- PAGINATION ----------
@@ -545,7 +545,6 @@ with tab_post:
                 }
 
             }
-
 
             # ==========================
             # RENDER GRID
