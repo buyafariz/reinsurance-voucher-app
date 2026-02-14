@@ -376,6 +376,56 @@ with tab_post:
                 flex=0
             )
 
+            accounting_formatter = JsCode("""
+            function(params) {
+                if (params.value == null || params.value === '') return '';
+
+                let value = Number(params.value);
+
+                let formatted = Math.abs(value).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                if (value < 0) {
+                    return '(' + formatted + ')';
+                }
+
+                return formatted;
+            }
+            """)
+
+            ACCOUNTING_COLS = [
+                "reins premium",
+                "reins em premium",
+                "reins er premium",
+                "reins oth premium",
+                "reins total premium",
+                "reins comm",
+                "reins em comm",
+                "reins er comm",
+                "reins oth comm",
+                "reins profit share",
+                "reins overriding",
+                "reins broker fee",
+                "reins total comm",
+                "reins tabarru",
+                "reins ujrah",
+                "reins nett premium"
+            ]
+
+            for col in ACCOUNTING_COLS:
+                if col in preview_df.columns:
+                    gb.configure_column(
+                        col,
+                        field=col,
+                        type=["numericColumn"],
+                        valueFormatter=accounting_formatter,
+                        cellStyle={
+                            "textAlign": "right"
+                        }
+                    )
+
             gb.configure_pagination(
                 paginationAutoPageSize=False,
                 paginationPageSize=50
@@ -495,57 +545,6 @@ with tab_post:
                 }
 
             }
-
-            accounting_formatter = JsCode("""
-            function(params) {
-                if (params.value == null || params.value === '') return '';
-
-                let value = Number(params.value);
-
-                let formatted = Math.abs(value).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-                if (value < 0) {
-                    return '(' + formatted + ')';
-                }
-
-                return formatted;
-            }
-            """)
-
-
-            ACCOUNTING_COLS = [
-                "reins premium",
-                "reins em premium",
-                "reins er premium",
-                "reins oth premium",
-                "reins total premium",
-                "reins comm",
-                "reins em comm",
-                "reins er comm",
-                "reins oth comm",
-                "reins profit share",
-                "reins overriding",
-                "reins broker fee",
-                "reins total comm",
-                "reins tabarru",
-                "reins ujrah",
-                "reins nett premium"
-            ]
-
-            for col in ACCOUNTING_COLS:
-                if col in preview_df.columns:
-                    gb.configure_column(
-                        col,
-                        field=col,
-                        type=["numericColumn"],
-                        valueFormatter=accounting_formatter,
-                        cellStyle={
-                            "textAlign": "right"
-                        }
-                    )
 
 
             # ==========================
