@@ -433,7 +433,7 @@ with tab_post:
                 preview_df,
                 gridOptions=grid_options,
                 height=600,
-                theme="alpine-dark"
+                theme="dark"
             )
 
 
