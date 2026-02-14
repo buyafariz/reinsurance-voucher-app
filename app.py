@@ -517,22 +517,22 @@ with tab_post:
 
 
             ACCOUNTING_COLS = [
-                "Reins Premium",
-                "Reins Em Premium",
-                "Reins Er Premium",
-                "Reins Oth Premium",
-                "Reins Total Premium",
-                "Reins Comm",
-                "Reins Em Comm",
-                "Reins Er Comm",
-                "Reins Oth Comm",
-                "Reins Profit Share",
-                "Reins Overriding",
-                "Reins Broker Fee",
-                "Reins Total Comm",
-                "Reins Tabarru",
-                "Reins Ujrah",
-                "Reins Nett Premium"
+                "reins premium",
+                "reins em premium",
+                "reins er premium",
+                "reins oth premium",
+                "reins total premium",
+                "reins comm",
+                "reins em comm",
+                "reins er comm",
+                "reins oth comm",
+                "reins profit share",
+                "reins overriding",
+                "reins broker fee",
+                "reins total comm",
+                "reins tabarru",
+                "reins ujrah",
+                "reins nett premium"
             ]
 
             for col in ACCOUNTING_COLS:
