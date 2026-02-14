@@ -449,6 +449,15 @@ with tab_post:
                 }
             }
 
+            if "fullscreen" not in st.session_state:
+                st.session_state.fullscreen = False
+
+            col1, col2 = st.columns([1, 6])
+
+            with col1:
+                if st.button("🔍 Full Screen"):
+                    st.session_state.fullscreen = not st.session_state.fullscreen
+
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
