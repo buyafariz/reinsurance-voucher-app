@@ -495,7 +495,7 @@ with tab_post:
                 ".ag-header-cell": {
                     "padding-top": "8px",
                     "padding-bottom": "8px",
-                    "border-right": "1px solid #2f3140"
+                    "border-right": "1.5px solid #2f3140"
                 },
 
                 ".ag-header-cell-label": {
