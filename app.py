@@ -730,7 +730,7 @@ with tab_post:
 
             subject_email = st.text_area("Subject Email")
 
-            remarks = st.text_area("Remarks (WAJIB)")
+            remarks = st.text_area("Remarks")
 
 
         # ==========================
