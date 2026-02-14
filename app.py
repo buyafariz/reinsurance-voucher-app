@@ -391,49 +391,35 @@ with tab_post:
 
             grid_options = gb.build()
 
-            st.markdown("""
-            <style>
-
-            /* Override semua theme aggrid dark */
-            .ag-root-wrapper {
-                background-color: #0E1117 !important;
-                border-radius: 12px !important;
-                border: 1px solid #1f2937 !important;
+            custom_css = {
+                ".ag-root-wrapper": {
+                    "background-color": "#0E1117",
+                    "border": "1px solid #1f2937",
+                    "border-radius": "12px",
+                },
+                ".ag-header": {
+                    "background-color": "#111827",
+                    "color": "#E5E7EB",
+                    "font-weight": "600",
+                },
+                ".ag-row": {
+                    "background-color": "#0f172a",
+                    "color": "#FAFAFA",
+                },
+                ".ag-row-hover": {
+                    "background-color": "#1b2636",
+                },
+                ".ag-paging-panel": {
+                    "background-color": "#0E1117",
+                    "color": "#E5E7EB",
+                }
             }
-
-            .ag-header {
-                background-color: #111827 !important;
-                color: #E5E7EB !important;
-                font-weight: 600 !important;
-            }
-
-            .ag-row {
-                background-color: #0f172a !important;
-            }
-
-            .ag-row-hover {
-                background-color: #1b2636 !important;
-            }
-
-            .ag-cell {
-                border-color: #1f2937 !important;
-                color: #FAFAFA !important;
-            }
-
-            /* Pagination panel */
-            .ag-paging-panel {
-                background-color: #0E1117 !important;
-                color: #E5E7EB !important;
-            }
-
-            </style>
-            """, unsafe_allow_html=True)
 
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
                 height=600,
-                theme="dark"
+                custom_css=custom_css
             )
 
 
