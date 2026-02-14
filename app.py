@@ -400,6 +400,10 @@ with tab_post:
             """)
 
             ACCOUNTING_COLS = [
+                "sum insured",
+                "sum at risk",
+                "reins sum insured",
+                "reins sum at risk",
                 "reins premium",
                 "reins em premium",
                 "reins er premium",
