@@ -434,9 +434,9 @@ with tab_post:
                 ".ag-header": {
                     "background-color": "#1F2937",  # lebih terang dari body
                     "color": "#F9FAFB",
-                    "font-weight": "700",
+                    "font-weight": "600",
                     "font-size": "14px",
-                    "border-bottom": "1.5px solid #3B82F6"
+                    "border-bottom": "1px solid #3B82F6"
                 },
 
                 ".ag-header-cell": {
@@ -445,7 +445,7 @@ with tab_post:
                 },
                 ".ag-header-cell-text": {
                     "text-transform": "capitalize",
-                    "font-weight": "700"
+                    "font-weight": "600"
                 }
             }
 
