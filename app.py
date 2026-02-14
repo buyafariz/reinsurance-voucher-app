@@ -515,6 +515,7 @@ with tab_post:
             }
             """)
 
+
             ACCOUNTING_COLS = [
                 "Reins Premium",
                 "Reins Em Premium",
@@ -534,15 +535,17 @@ with tab_post:
                 "Reins Nett Premium"
             ]
 
-
             for col in ACCOUNTING_COLS:
                 if col in preview_df.columns:
                     gb.configure_column(
                         col,
                         type=["numericColumn"],
                         valueFormatter=accounting_formatter,
-                        cellStyle={"textAlign": "right"}  # accounting biasanya rata kanan
+                        cellStyle={
+                            "textAlign": "right"
+                        }
                     )
+
 
             # ==========================
             # RENDER GRID
