@@ -361,7 +361,7 @@ with tab_post:
             )
 
             # ==========================
-            # AGGRID CONFIG (SAFE VERSION)
+            # GRID BUILDER
             # ==========================
 
             gb = GridOptionsBuilder.from_dataframe(preview_df)
@@ -370,9 +370,8 @@ with tab_post:
                 filter=True,
                 sortable=True,
                 resizable=True,
-                minWidth=150,
-                flex=0,
-                headerClass="header-right-icon"
+                minWidth=120,   # aman untuk 54 kolom
+                flex=0
             )
 
             gb.configure_pagination(
@@ -381,22 +380,28 @@ with tab_post:
             )
 
             gb.configure_grid_options(
-                domLayout='normal',
-                suppressHorizontalScroll=False
-            )
+                headerHeight=42,
+                rowHeight=36,
+                domLayout="normal",
+                suppressHorizontalScroll=False,
 
-            gb.configure_grid_options(
-                headerHeight=40,
-                rowHeight=36
+                # AUTO SIZE BERDASARKAN ISI
+                onFirstDataRendered="""
+                function(params) {
+                    params.columnApi.autoSizeAllColumns();
+                }
+                """
             )
 
             grid_options = gb.build()
 
+            # ==========================
+            # CUSTOM CSS
+            # ==========================
+
             custom_css = {
 
-                # =========================
-                # WRAPPER & BACKGROUND
-                # =========================
+                # ---------- WRAPPER ----------
                 ".ag-root-wrapper": {
                     "background-color": "#262730",
                     "border": "1px solid #1f2937",
@@ -415,25 +420,24 @@ with tab_post:
                     "background-color": "#262730",
                 },
 
-                # =========================
-                # HEADER
-                # =========================
+                # ---------- HEADER ----------
                 ".ag-header": {
                     "background-color": "#1F2937",
                     "color": "#F9FAFB",
                     "font-weight": "600",
-                    "font-size": "14px",
+                    "font-size": "13px",
                     "border-bottom": "1px solid #3B82F6"
                 },
 
                 ".ag-header-cell": {
-                    "padding-top": "10px",
-                    "padding-bottom": "10px"
+                    "padding-top": "8px",
+                    "padding-bottom": "8px"
                 },
 
                 ".ag-header-cell-label": {
                     "display": "flex",
                     "align-items": "center",
+                    "justify-content": "center",
                     "width": "100%"
                 },
 
@@ -441,12 +445,10 @@ with tab_post:
                     "flex-grow": "1",
                     "text-transform": "capitalize",
                     "font-weight": "600",
-                    "text-align": "left"
+                    "text-align": "center"
                 },
 
-                # =========================
-                # FORCE ALL ICONS TO RIGHT
-                # =========================
+                # ---------- FORCE ICONS RIGHT ----------
                 ".ag-sort-indicator-container": {
                     "margin-left": "auto"
                 },
@@ -459,9 +461,7 @@ with tab_post:
                     "margin-left": "8px"
                 },
 
-                # =========================
-                # BODY
-                # =========================
+                # ---------- BODY ----------
                 ".ag-row": {
                     "background-color": "#262730",
                     "color": "#F8FAFC",
@@ -479,31 +479,32 @@ with tab_post:
                     "justify-content": "center"
                 },
 
-                # =========================
-                # PAGINATION
-                # =========================
+                # ---------- PAGINATION ----------
                 ".ag-paging-panel": {
                     "background-color": "#262730",
                     "color": "#E2E8F0",
                 },
 
-                # =========================
-                # ICON STYLE
-                # =========================
+                # ---------- ICON STYLE ----------
                 ".ag-icon": {
-                    "font-size": "12px",
-                    "opacity": "0.7"
+                    "font-size": "11px",
+                    "opacity": "0.8"
                 }
+
             }
+
+            # ==========================
+            # RENDER GRID
+            # ==========================
 
             AgGrid(
                 preview_df,
                 gridOptions=grid_options,
                 height=600,
                 theme="dark",
-                custom_css=custom_css
+                custom_css=custom_css,
+                allow_unsafe_jscode=True   # diperlukan untuk autoSizeAllColumns
             )
-
 
         # ==========================
         # PERIOD & LOG
