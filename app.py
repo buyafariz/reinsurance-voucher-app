@@ -66,7 +66,7 @@ def accounting_format(x):
 # CONFIG
 # ==========================
 st.set_page_config(
-    page_title="Retakaful Voucher System",
+    page_title="Retakaful Voucher Tools",
     layout="centered"
 )
 
