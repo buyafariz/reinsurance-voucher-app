@@ -876,6 +876,13 @@ with tab_post:
                         month=month
                     )
 
+                    due_date = calculate_due_date(
+                        account_with=account_with,
+                        year=year,
+                        month=month,
+                        service=service
+                    )
+
 
                     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
                         log_entry = {
@@ -963,6 +970,8 @@ with tab_post:
                             #"ENTRY_TYPE": entry_type,
                             "CREATED_AT": now_wib_naive(),
                             "CREATED_BY": pic,
+                            "Due Date": due_date,
+                            "Subject Email": subject_email
                         }
 
                     log_df = load_log_from_drive(
@@ -971,25 +980,17 @@ with tab_post:
                         parent_id=PERIOD_DRIVE_ID
                     )
 
-
                     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
 
-                    if "Due Date" not in log_df.columns:
-                        log_df["Due Date"] = None
+                    # if "Due Date" not in log_df.columns:
+                    #     log_df["Due Date"] = None
 
-                    if "Subject Email" not in log_df.columns:
-                        log_df["Subject Email"] = None
-                    
+                    # if "Subject Email" not in log_df.columns:
+                    #     log_df["Subject Email"] = None
+                
 
-                    due_date = calculate_due_date(
-                        account_with=account_with,
-                        year=year,
-                        month=month,
-                        service=service
-                    )
-
-                    log_df["Due Date"] = due_date
-                    log_df["Subject Email"] = subject_email
+                    # log_df["Due Date"] = due_date
+                    # log_df["Subject Email"] = subject_email
 
                     # Upload / update log (SATU FILE)
                     service = get_drive_service()
