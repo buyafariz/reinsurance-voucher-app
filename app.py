@@ -926,6 +926,8 @@ with tab_post:
                             #"ENTRY_TYPE": entry_type,
                             "CREATED_AT": now_wib_naive(),
                             "CREATED_BY": pic,
+                            "Due Date": due_date,
+                            "Subject Email": subject_email
                         }
 
                     elif biz_type == "Claim":
