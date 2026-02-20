@@ -136,7 +136,7 @@ def validate_voucher(df, biz_type: str):
     )
 
     biz_type = str(biz_type).strip()
-    allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal"]
+    allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]
 
     if biz_type not in allowed:
         errors.append("BUSINESS TYPE tidak valid")
@@ -145,7 +145,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 1. KOLOM WAJIB
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         missing_cols = set(REQUIRED_COLUMNS) - set(df.columns)
         if missing_cols:
             errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
@@ -160,7 +160,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 2. DATE VALIDATION
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         for col in DATE_COLUMNS:
             converted = pd.to_datetime(df[col], errors="coerce")
             if converted.isna().any():
@@ -180,7 +180,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
 
 
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
 
         for col in NUMERIC_COLUMNS:
 
@@ -203,7 +203,7 @@ def validate_voucher(df, biz_type: str):
                     )
 
             # 🔹 Refund, Retur, Batal → harus negatif
-            if biz_type in ["Refund", "Retur", "Batal"]:
+            if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
                 if col in [
                     "reins total premium",
                     "reins total comm",
@@ -246,7 +246,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 5. INTEGER >= 0 (AGE AT, TERM)
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         for col in INTEGER_COLUMNS:
             numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -294,7 +294,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 7. MEDICAL (M / N)
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
         if not df["medical"].isin(["M", "N"]).all():
@@ -310,7 +310,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 8. CCY CODE (3 HURUF)
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         if not df["ccy code"].str.match(r"^[A-Z]{3}$").all():
             errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
 
@@ -321,7 +321,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 9. EXPIRED DATE > ISSUE DATE
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         if not (df["expired date"] > df["issue date"]).all():
             errors.append("expired date harus lebih besar dari issue date")
 
@@ -332,7 +332,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 10. REINS VS ORIGINAL LIMIT
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         if not (df["reins sum insured"] <= df["sum insured"]).all():
             errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
 
@@ -353,7 +353,7 @@ def validate_voucher(df, biz_type: str):
     # =========================
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)
     # =========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         diff_nett = (
             df["reins total premium"]
             - df["reins total comm"]

@@ -742,7 +742,7 @@ with tab_post:
         # ==========================
         st.subheader("💰 Ringkasan Finansial")
 
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             summary_df = pd.DataFrame({
                 "Keterangan": [
                     "Total Contribution",
@@ -884,7 +884,7 @@ with tab_post:
                     )
 
 
-                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                         log_entry = {
                             "Seq No": seq_no,
                             "Department":department,
