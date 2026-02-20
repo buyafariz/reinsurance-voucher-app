@@ -1,6 +1,5 @@
 # Secrets & credentials
 .streamlit/*
-!.streamlit/config.toml
 credentials/
 *.json
 
