@@ -116,7 +116,7 @@ def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_f
         else:
             next_seq = int(log_df["Seq No"].max()) + 1
 
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
     elif biz_type == "Claim":
@@ -131,7 +131,7 @@ def generate_vin_from_drive_log(log_df, year, month, biz_type):
     else:
         next_seq = int(log_df["Seq No"].max()) + 1
 
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal"]:
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
     elif biz_type == "Claim":
