@@ -370,6 +370,36 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
+def create_log_gsheet(service, parent_id, filename="log_produksi"):
+    from googleapiclient.discovery import build
+
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
+
+    # 1️⃣ Buat spreadsheet kosong
+    spreadsheet = sheets_service.spreadsheets().create(
+        body={
+            "properties": {
+                "title": filename
+            }
+        }
+    ).execute()
+
+    spreadsheet_id = spreadsheet["spreadsheetId"]
+
+    # 2️⃣ Pindahkan ke folder periode
+    service.files().update(
+        fileId=spreadsheet_id,
+        addParents=parent_id,
+        removeParents="root",
+        supportsAllDrives=True
+    ).execute()
+
+    return spreadsheet_id
+
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
     output = io.BytesIO()
