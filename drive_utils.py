@@ -317,28 +317,31 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         credentials=service._http.credentials
     )
 
+    # 🔹 Ambil header dari sheet
+    header_response = sheets_service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range="Sheet1!1:1"
+    ).execute()
+
+    headers = header_response.get("values", [[]])[0]
+
     def clean_value(value):
 
-        # None
         if value is None:
             return None
 
-        # Pandas NaN / NaT
         if pd.isna(value):
             return None
 
-        # Datetime / Date
         if isinstance(value, (datetime, pd.Timestamp)):
             return value.strftime("%Y-%m-%d %H:%M:%S")
 
         if isinstance(value, date):
             return value.strftime("%Y-%m-%d")
 
-        # Decimal
         if isinstance(value, Decimal):
             return float(value)
 
-        # Numpy types
         if isinstance(value, (np.integer,)):
             return int(value)
 
@@ -348,13 +351,16 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         if isinstance(value, (np.bool_,)):
             return bool(value)
 
-        # Fallback (stringify unknown types)
         if not isinstance(value, (str, int, float, bool)):
             return str(value)
 
         return value
 
-    cleaned_row = [clean_value(v) for v in row_dict.values()]
+    # 🔹 Susun row mengikuti urutan header
+    cleaned_row = [
+        clean_value(row_dict.get(col, None))
+        for col in headers
+    ]
 
     sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
