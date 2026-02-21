@@ -1252,10 +1252,8 @@ with tab_cancel:
 
                     update_gsheet(
                         service=service,
-                        df=prod_log_df,
-                        filename="log_produksi",
-                        folder_id=PROD_PERIOD_ID,
-                        file_id=log_drive_id
+                        spreadsheet_id=log_drive_id,
+                        df=prod_log_df
                     )
 
                     # Delete voucher file
