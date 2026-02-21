@@ -276,6 +276,10 @@ def load_log_from_gsheet(service, spreadsheet_id):
     return df
 
 def update_gsheet(service, spreadsheet_id, df):
+    from googleapiclient.discovery import build
+    import pandas as pd
+    import numpy as np
+
     sheets_service = build(
         "sheets",
         "v4",
@@ -284,14 +288,30 @@ def update_gsheet(service, spreadsheet_id, df):
 
     df = df.copy()
 
-    df = df.astype(object).where(pd.notnull(df), None)
+    # 1️⃣ Convert datetime ke string
+    for col in df.columns:
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].astype(str)
+
+    # 2️⃣ Replace NaN / NaT dengan None
+    df = df.where(pd.notnull(df), None)
+
+    # 3️⃣ Convert semua numpy type ke Python native
+    df = df.applymap(
+        lambda x: (
+            int(x) if isinstance(x, (np.integer,)) else
+            float(x) if isinstance(x, (np.floating,)) else
+            str(x) if isinstance(x, (pd.Timestamp,)) else
+            x
+        )
+    )
 
     values = [df.columns.tolist()] + df.values.tolist()
 
     sheets_service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
         range="Sheet1!A1",
-        valueInputOption="RAW",
+        valueInputOption="USER_ENTERED",
         body={
             "values": values
         }
