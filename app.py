@@ -1026,6 +1026,13 @@ with tab_post:
                             filename="log_produksi"
                         )
 
+                        # Tambahkan header pertama kali
+                        append_gsheet(
+                            service=service,
+                            spreadsheet_id=log_drive_id,
+                            row_dict={key: key for key in log_entry.keys()}
+                        )
+
                     # 🔍 DEBUG DI SINI
                     # file_info = service.files().get(
                     #     fileId=log_drive_id,
