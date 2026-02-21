@@ -10,6 +10,7 @@ from googleapiclient.http import MediaIoBaseDownload
 import calendar
 from datetime import datetime
 
+
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
 
@@ -275,8 +276,6 @@ def load_log_from_gsheet(service, spreadsheet_id):
     return df
 
 def update_gsheet(service, spreadsheet_id, df):
-    from googleapiclient.discovery import build
-
     sheets_service = build(
         "sheets",
         "v4",
@@ -285,20 +284,9 @@ def update_gsheet(service, spreadsheet_id, df):
 
     df = df.copy()
 
-    # Convert datetime
-    for col in df.columns:
-        if pd.api.types.is_datetime64_any_dtype(df[col]):
-            df[col] = df[col].astype(str)
-
-    # Replace NaN dengan None
     df = df.astype(object).where(pd.notnull(df), None)
 
     values = [df.columns.tolist()] + df.values.tolist()
-
-    sheets_service.spreadsheets().values().clear(
-        spreadsheetId=spreadsheet_id,
-        range="Sheet1"
-    ).execute()
 
     sheets_service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
