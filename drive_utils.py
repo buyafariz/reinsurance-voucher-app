@@ -374,34 +374,19 @@ def append_gsheet(service, spreadsheet_id, row_dict):
     ).execute()
 
 def create_log_gsheet(service, parent_id, filename="log_produksi"):
-    from googleapiclient.discovery import build
+    file_metadata = {
+        "name": filename,
+        "mimeType": "application/vnd.google-apps.spreadsheet",
+        "parents": [parent_id],
+    }
 
-    sheets_service = build(
-        "sheets",
-        "v4",
-        credentials=service._http.credentials
-    )
-
-    # 1️⃣ Buat spreadsheet kosong
-    spreadsheet = sheets_service.spreadsheets().create(
-        body={
-            "properties": {
-                "title": filename
-            }
-        }
-    ).execute()
-
-    spreadsheet_id = spreadsheet["spreadsheetId"]
-
-    # 2️⃣ Pindahkan ke folder periode
-    service.files().update(
-        fileId=spreadsheet_id,
-        addParents=parent_id,
-        removeParents="root",
+    file = service.files().create(
+        body=file_metadata,
+        fields="id",
         supportsAllDrives=True
     ).execute()
 
-    return spreadsheet_id
+    return file["id"]
 
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
