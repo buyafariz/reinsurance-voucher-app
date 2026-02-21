@@ -971,10 +971,19 @@ with tab_post:
                     #     parent_id=PERIOD_DRIVE_ID
                     # )
 
-                    log_df = load_log_from_gsheet(
+                    log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
                         parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    if not log_drive_id:
+                        st.error("Log Google Sheet tidak ditemukan")
+                        st.stop()
+
+                    log_df = load_log_from_gsheet(
+                        service=service,
+                        spreadsheet_id=log_drive_id
                     )
 
                     log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
@@ -1124,7 +1133,7 @@ with tab_cancel:
         service=service,
         spreadsheet_id=log_drive_id
     )
-    
+
     # Filter hanya yang POSTED
     posted_df = prod_log_df[prod_log_df["STATUS"] == "POSTED"]
 
