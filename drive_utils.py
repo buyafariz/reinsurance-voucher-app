@@ -275,11 +275,25 @@ def load_log_from_gsheet(service, spreadsheet_id):
     return df
 
 def update_gsheet(service, spreadsheet_id, df):
+    from googleapiclient.discovery import build
+
     sheets_service = build(
         "sheets",
         "v4",
         credentials=service._http.credentials
     )
+
+    df = df.copy()
+
+    # Convert datetime
+    for col in df.columns:
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].astype(str)
+
+    # Replace NaN dengan None
+    df = df.astype(object).where(pd.notnull(df), None)
+
+    values = [df.columns.tolist()] + df.values.tolist()
 
     sheets_service.spreadsheets().values().clear(
         spreadsheetId=spreadsheet_id,
@@ -291,7 +305,7 @@ def update_gsheet(service, spreadsheet_id, df):
         range="Sheet1!A1",
         valueInputOption="RAW",
         body={
-            "values": [df.columns.tolist()] + df.values.tolist()
+            "values": values
         }
     ).execute()
 
