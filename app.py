@@ -467,7 +467,7 @@ with tab_post:
                 # ---------- WRAPPER ----------
                 ".ag-root-wrapper": {
                     "background-color": "var(--secondary-background-color)",
-                    "border": "1px solid var(--primary-color)",
+                    # "border": "1px solid var(--primary-color)",
                     "border-radius": "12px",
                 },
 
