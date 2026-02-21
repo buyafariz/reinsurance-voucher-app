@@ -972,23 +972,23 @@ with tab_post:
                     #     parent_id=PERIOD_DRIVE_ID
                     # )
 
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename="log_produksi",
-                        parent_id=PERIOD_DRIVE_ID,
-                        mime_type="application/vnd.google-apps.spreadsheet"
-                    )
+                    # log_drive_id = find_drive_file(
+                    #     service=service,
+                    #     filename="log_produksi",
+                    #     parent_id=PERIOD_DRIVE_ID,
+                    #     mime_type="application/vnd.google-apps.spreadsheet"
+                    # )
 
-                    if not log_drive_id:
-                        st.error("Log Google Sheet tidak ditemukan")
-                        st.stop()
+                    # if not log_drive_id:
+                    #     st.error("Log Google Sheet tidak ditemukan")
+                    #     st.stop()
 
-                    log_df = load_log_from_gsheet(
-                        service=service,
-                        spreadsheet_id=log_drive_id
-                    )
+                    # log_df = load_log_from_gsheet(
+                    #     service=service,
+                    #     spreadsheet_id=log_drive_id
+                    # )
 
-                    log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
+                    # log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
 
                     # if "Due Date" not in log_df.columns:
                     #     log_df["Due Date"] = None
@@ -1019,17 +1019,17 @@ with tab_post:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    # if not log_drive_id:
-                    #     st.error("Log Google Sheet tidak ditemukan")
-                    #     st.stop()
+                    if not log_drive_id:
+                        st.error("Log Google Sheet tidak ditemukan")
+                        st.stop()
 
                     # 🔍 DEBUG DI SINI
-                    file_info = service.files().get(
-                        fileId=log_drive_id,
-                        fields="id,name,mimeType"
-                    ).execute()
+                    # file_info = service.files().get(
+                    #     fileId=log_drive_id,
+                    #     fields="id,name,mimeType"
+                    # ).execute()
 
-                    st.write("DEBUG FILE INFO:", file_info)
+                    # st.write("DEBUG FILE INFO:", file_info)
 
                     append_gsheet(
                         service=service,
@@ -1038,12 +1038,12 @@ with tab_post:
                     )
 
                     # 🔁 Cari ulang file id setelah upload
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename="log_produksi",
-                        parent_id=PERIOD_DRIVE_ID,
-                        mime_type="application/vnd.google-apps.spreadsheet"
-                    )
+                    # log_drive_id = find_drive_file(
+                    #     service=service,
+                    #     filename="log_produksi",
+                    #     parent_id=PERIOD_DRIVE_ID,
+                    #     mime_type="application/vnd.google-apps.spreadsheet"
+                    # )
 
                     # 🔒 Lock hanya jika file benar-benar ada
                     # if log_drive_id:
