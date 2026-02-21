@@ -1026,6 +1026,14 @@ with tab_post:
                         st.error("Log Google Sheet tidak ditemukan")
                         st.stop()
 
+                    # 🔍 DEBUG DI SINI
+                    file_info = service.files().get(
+                        fileId=log_drive_id,
+                        fields="id,name,mimeType"
+                    ).execute()
+
+                    st.write("DEBUG FILE INFO:", file_info)
+
                     append_gsheet(
                         service=service,
                         spreadsheet_id=log_drive_id,
