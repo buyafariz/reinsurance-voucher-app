@@ -303,9 +303,10 @@ def update_gsheet(service, spreadsheet_id, df):
 
 def append_gsheet(service, spreadsheet_id, row_dict):
     from googleapiclient.discovery import build
-    import numpy as np
     import pandas as pd
-    from datetime import datetime
+    import numpy as np
+    from datetime import datetime, date
+    from decimal import Decimal
 
     sheets_service = build(
         "sheets",
@@ -313,28 +314,44 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         credentials=service._http.credentials
     )
 
-    cleaned_row = []
+    def clean_value(value):
 
-    for value in row_dict.values():
+        # None
+        if value is None:
+            return None
 
-        # 🔹 Datetime → string
+        # Pandas NaN / NaT
+        if pd.isna(value):
+            return None
+
+        # Datetime / Date
         if isinstance(value, (datetime, pd.Timestamp)):
-            cleaned_row.append(value.strftime("%Y-%m-%d %H:%M:%S"))
+            return value.strftime("%Y-%m-%d %H:%M:%S")
 
-        # 🔹 numpy integer → python int
-        elif isinstance(value, (np.integer,)):
-            cleaned_row.append(int(value))
+        if isinstance(value, date):
+            return value.strftime("%Y-%m-%d")
 
-        # 🔹 numpy float → python float
-        elif isinstance(value, (np.floating,)):
-            cleaned_row.append(float(value))
+        # Decimal
+        if isinstance(value, Decimal):
+            return float(value)
 
-        # 🔹 NaN / NaT → None
-        elif pd.isna(value):
-            cleaned_row.append(None)
+        # Numpy types
+        if isinstance(value, (np.integer,)):
+            return int(value)
 
-        else:
-            cleaned_row.append(value)
+        if isinstance(value, (np.floating,)):
+            return float(value)
+
+        if isinstance(value, (np.bool_,)):
+            return bool(value)
+
+        # Fallback (stringify unknown types)
+        if not isinstance(value, (str, int, float, bool)):
+            return str(value)
+
+        return value
+
+    cleaned_row = [clean_value(v) for v in row_dict.values()]
 
     sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
