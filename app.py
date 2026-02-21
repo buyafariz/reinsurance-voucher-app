@@ -489,7 +489,7 @@ with tab_post:
                     "color": "var(--text-color)",
                     "font-weight": "600",
                     "font-size": "13px",
-                    "border-bottom": "2px solid var(--primary-color)"
+                    # "border-bottom": "2px solid var(--primary-color)"
                 },
 
                 ".ag-header-cell": {
