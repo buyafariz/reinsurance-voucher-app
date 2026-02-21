@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
-
+from drive_utils import load_log_from_gsheet
 
 
 LOG_COLUMNS = [
@@ -73,49 +73,44 @@ def generate_vin(base_path, year, month):
     vin = f"VIN{year}{month:02d}LST{next_seq:04d}"
     return vin, next_seq, log_path
 
-def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_file, biz_type):
-    """
-    Generate voucher number berdasarkan log yang ada di Google Drive.
-    Tidak tergantung file lokal.
-    """
 
+def generate_vin_from_drive(
+    service,
+    period_folder_id,
+    year,
+    month,
+    find_drive_file,
+    biz_type
+):
     filename = "log_produksi"
 
-    # 🔎 Cek apakah log sudah ada di Drive
     file_id = find_drive_file(
         service=service,
         filename=filename,
-        parent_id=period_folder_id
+        parent_id=period_folder_id,
+        mime_type="application/vnd.google-apps.spreadsheet"
     )
 
     # ==========================
-    # Jika belum ada log sama sekali
+    # Jika belum ada log
     # ==========================
     if not file_id:
         next_seq = 1
 
     else:
-        # ==========================
-        # Download log dari Drive ke memory
-        # ==========================
-        request = service.files().get_media(fileId=file_id)
-        file_buffer = io.BytesIO()
+        log_df = load_log_from_gsheet(
+            service=service,
+            spreadsheet_id=file_id
+        )
 
-        downloader = MediaIoBaseDownload(file_buffer, request)
-
-        done = False
-        while not done:
-            _, done = downloader.next_chunk()
-
-        file_buffer.seek(0)
-
-        log_df = pd.read_excel(file_buffer)
-
-        if log_df.empty:
+        if log_df.empty or "Seq No" not in log_df.columns:
             next_seq = 1
         else:
             next_seq = int(log_df["Seq No"].max()) + 1
 
+    # ==========================
+    # Format Voucher
+    # ==========================
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
