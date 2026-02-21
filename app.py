@@ -1019,9 +1019,6 @@ with tab_post:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    print("ID:", log_drive_id)
-                    print("TYPE:", type(log_drive_id))
-
                     if not log_drive_id:
                         st.error("Log Google Sheet tidak ditemukan")
                         st.stop()
