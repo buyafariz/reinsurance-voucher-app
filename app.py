@@ -466,36 +466,36 @@ with tab_post:
 
                 # ---------- WRAPPER ----------
                 ".ag-root-wrapper": {
-                    "background-color": "#262730",
-                    "border": "1px solid #1f2937",
+                    "background-color": "var(--secondary-background-color)",
+                    "border": "1px solid var(--primary-color)",
                     "border-radius": "12px",
                 },
 
                 ".ag-center-cols-viewport": {
-                    "background-color": "#262730",
+                    "background-color": "var(--secondary-background-color)",
                 },
 
                 ".ag-body-viewport": {
-                    "background-color": "#262730",
+                    "background-color": "var(--secondary-background-color)",
                 },
 
                 ".ag-center-cols-container": {
-                    "background-color": "#262730",
+                    "background-color": "var(--secondary-background-color)",
                 },
 
                 # ---------- HEADER ----------
                 ".ag-header": {
-                    "background-color": "#1F2937",
-                    "color": "#F9FAFB",
+                    "background-color": "var(--background-color)",
+                    "color": "var(--text-color)",
                     "font-weight": "600",
                     "font-size": "13px",
-                    "border-bottom": "1px solid #3B82F6"
+                    "border-bottom": "2px solid var(--primary-color)"
                 },
 
                 ".ag-header-cell": {
                     "padding-top": "8px",
                     "padding-bottom": "8px",
-                    "border-right": "1.5px solid #2f3140"
+                    "border-right": "1px solid var(--secondary-background-color)"
                 },
 
                 ".ag-header-cell-label": {
@@ -511,40 +511,27 @@ with tab_post:
                     "text-transform": "capitalize"
                 },
 
-                # ---------- ICONS RIGHT ----------
-                ".ag-sort-indicator-container": {
-                    "margin-left": "auto"
-                },
-
-                ".ag-header-icon": {
-                    "margin-left": "8px"
-                },
-
-                ".ag-header-cell-menu-button": {
-                    "margin-left": "8px"
-                },
-
                 # ---------- BODY ----------
                 ".ag-row": {
-                    "background-color": "#262730",
-                    "color": "#F8FAFC",
-                    "border-bottom": "1px solid #2f3140"
+                    "background-color": "var(--secondary-background-color)",
+                    "color": "var(--text-color)",
+                    "border-bottom": "1px solid var(--background-color)"
                 },
 
                 ".ag-row-hover": {
-                    "background-color": "#2e2f38",
+                    "background-color": "rgba(128,128,128,0.15)",
                 },
 
                 ".ag-cell": {
-                    "border-color": "#2d2e36",
-                    "border-right": "1px solid #2f3140",
-                    "border-bottom": "1px solid #2f3140"
+                    "border-color": "var(--background-color)",
+                    "border-right": "1px solid var(--background-color)",
+                    "border-bottom": "1px solid var(--background-color)"
                 },
 
                 # ---------- PAGINATION ----------
                 ".ag-paging-panel": {
-                    "background-color": "#262730",
-                    "color": "#E2E8F0",
+                    "background-color": "var(--secondary-background-color)",
+                    "color": "var(--text-color)",
                 },
 
                 # ---------- ICON STYLE ----------
@@ -554,6 +541,7 @@ with tab_post:
                 }
 
             }
+
 
             # ==========================
             # RENDER GRID
