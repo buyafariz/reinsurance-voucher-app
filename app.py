@@ -1019,9 +1019,9 @@ with tab_post:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    if not log_drive_id:
-                        st.error("Log Google Sheet tidak ditemukan")
-                        st.stop()
+                    # if not log_drive_id:
+                    #     st.error("Log Google Sheet tidak ditemukan")
+                    #     st.stop()
 
                     # 🔍 DEBUG DI SINI
                     file_info = service.files().get(
