@@ -1010,12 +1010,20 @@ with tab_post:
                     #     file_id=log_drive_id
                     # )
 
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename="log_produksi",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    if not log_drive_id:
+                        st.error("Log Google Sheet tidak ditemukan")
+                        st.stop()
+
                     update_gsheet(
                         service=service,
-                        df=log_df,
-                        filename="log_produksi",
-                        folder_id=PERIOD_DRIVE_ID,
-                        file_id=log_drive_id
+                        spreadsheet_id=log_drive_id,
+                        df=log_df
                     )
 
                     # 🔁 Cari ulang file id setelah upload
