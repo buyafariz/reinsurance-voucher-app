@@ -1289,6 +1289,18 @@ with tab_cancel:
                         parent_id=CEDING_DRIVE_ID
                     )
 
+                    st.write("CEDING_DRIVE_ID:", CEDING_DRIVE_ID)
+                    st.write("Voucher filename:", voucher_filename)
+
+                    files_in_folder = service.files().list(
+                        q=f"'{CEDING_DRIVE_ID}' in parents and trashed=false",
+                        fields="files(id,name,mimeType)",
+                        supportsAllDrives=True,
+                        includeItemsFromAllDrives=True,
+                    ).execute()
+
+                    st.write("FILES IN FOLDER:", files_in_folder.get("files", []))
+
                     if voucher_file_id:
                         service.files().delete(
                             fileId=voucher_file_id,
