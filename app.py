@@ -1012,7 +1012,7 @@ with tab_post:
                     # 🔁 Cari ulang file id setelah upload
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=PERIOD_DRIVE_ID
                     )
 
@@ -1222,7 +1222,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=PROD_PERIOD_ID
                     )
 
@@ -1286,7 +1286,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=PROD_PERIOD_ID
                     )
 
@@ -1325,7 +1325,7 @@ with tab_cancel:
 
                     current_log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=NOW_PERIOD_ID
                     )
 
