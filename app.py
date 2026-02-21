@@ -843,7 +843,8 @@ with tab_post:
                         service=service,
                         filename="log_produksi",
                         # filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID
+                        parent_id=PERIOD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
                     
                     upload_dataframe_to_drive(
@@ -974,7 +975,8 @@ with tab_post:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=PERIOD_DRIVE_ID
+                        parent_id=PERIOD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     if not log_drive_id:
@@ -1013,7 +1015,8 @@ with tab_post:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=PERIOD_DRIVE_ID
+                        parent_id=PERIOD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     if not log_drive_id:
@@ -1030,7 +1033,8 @@ with tab_post:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=PERIOD_DRIVE_ID
+                        parent_id=PERIOD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     # 🔒 Lock hanya jika file benar-benar ada
@@ -1130,7 +1134,8 @@ with tab_cancel:
     log_drive_id = find_drive_file(
         service=service,
         filename="log_produksi",
-        parent_id=PROD_PERIOD_ID
+        parent_id=PROD_PERIOD_ID,
+        mime_type="application/vnd.google-apps.spreadsheet"
     )
 
     if not log_drive_id:
@@ -1239,7 +1244,8 @@ with tab_cancel:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=PROD_PERIOD_ID
+                        parent_id=PROD_PERIOD_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     # upload_log_dataframe(
@@ -1301,7 +1307,8 @@ with tab_cancel:
                     log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=PROD_PERIOD_ID
+                        parent_id=PROD_PERIOD_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     # upload_log_dataframe(
@@ -1340,7 +1347,8 @@ with tab_cancel:
                     current_log_drive_id = find_drive_file(
                         service=service,
                         filename="log_produksi",
-                        parent_id=NOW_PERIOD_ID
+                        parent_id=NOW_PERIOD_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     # current_log_df = load_log_from_drive(
