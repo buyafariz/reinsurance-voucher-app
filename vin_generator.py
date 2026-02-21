@@ -79,7 +79,7 @@ def generate_vin_from_drive(service, period_folder_id, year, month, find_drive_f
     Tidak tergantung file lokal.
     """
 
-    filename = "log_produksi.xlsx"
+    filename = "log_produksi"
 
     # 🔎 Cek apakah log sudah ada di Drive
     file_id = find_drive_file(
