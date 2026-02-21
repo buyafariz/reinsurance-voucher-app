@@ -373,7 +373,9 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
-def create_log_gsheet(service, parent_id, filename="log_produksi"):
+def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None):
+    from googleapiclient.discovery import build
+
     file_metadata = {
         "name": filename,
         "mimeType": "application/vnd.google-apps.spreadsheet",
@@ -386,7 +388,24 @@ def create_log_gsheet(service, parent_id, filename="log_produksi"):
         supportsAllDrives=True
     ).execute()
 
-    return file["id"]
+    spreadsheet_id = file["id"]
+
+    # 🔥 TULIS HEADER LANGSUNG
+    if columns:
+        sheets_service = build(
+            "sheets",
+            "v4",
+            credentials=service._http.credentials
+        )
+
+        sheets_service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range="Sheet1!A1",
+            valueInputOption="RAW",
+            body={"values": [columns]}
+        ).execute()
+
+    return spreadsheet_id
 
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):

@@ -1023,7 +1023,8 @@ with tab_post:
                         log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=PERIOD_DRIVE_ID,
-                            filename="log_produksi"
+                            filename="log_produksi",
+                            columns=list(log_entry.keys())
                         )
 
                         # Tambahkan header pertama kali
