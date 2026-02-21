@@ -1023,7 +1023,7 @@ with tab_post:
                     append_gsheet(
                         service=service,
                         spreadsheet_id=log_drive_id,
-                        df=log_df
+                        row_dict=log_entry
                     )
 
                     # 🔁 Cari ulang file id setelah upload
