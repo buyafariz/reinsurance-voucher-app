@@ -301,6 +301,25 @@ def update_gsheet(service, spreadsheet_id, df):
         body={"values": values}
     ).execute()
 
+def append_gsheet(service, spreadsheet_id, row_dict):
+    from googleapiclient.discovery import build
+
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
+
+    values = [list(row_dict.values())]
+
+    sheets_service.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id,
+        range="Sheet1!A1",
+        valueInputOption="USER_ENTERED",
+        insertDataOption="INSERT_ROWS",
+        body={"values": values}
+    ).execute()
+
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
     output = io.BytesIO()
