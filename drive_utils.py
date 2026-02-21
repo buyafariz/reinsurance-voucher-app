@@ -11,7 +11,10 @@ import calendar
 from datetime import datetime
 
 
-SCOPES = ["https://www.googleapis.com/auth/drive"]
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets"
+]
 CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
 
 
