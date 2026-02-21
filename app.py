@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -841,7 +841,8 @@ with tab_post:
                     # Upload voucher (selalu CREATE)
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
+                        # filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID
                     )
                     
@@ -964,9 +965,15 @@ with tab_post:
                             "Subject Email": subject_email
                         }
 
-                    log_df = load_log_from_drive(
+                    # log_df = load_log_from_drive(
+                    #     service=service,
+                    #     filename="log_produksi.xlsx",
+                    #     parent_id=PERIOD_DRIVE_ID
+                    # )
+
+                    log_df = load_log_from_gsheet(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=PERIOD_DRIVE_ID
                     )
 
@@ -986,10 +993,18 @@ with tab_post:
                     service = get_drive_service()
 
                     # Upload / update log
-                    upload_log_dataframe(
+                    # upload_log_dataframe(
+                    #     service=service,
+                    #     df=log_df,
+                    #     filename="log_produksi.xlsx",
+                    #     folder_id=PERIOD_DRIVE_ID,
+                    #     file_id=log_drive_id
+                    # )
+
+                    update_gsheet(
                         service=service,
                         df=log_df,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         folder_id=PERIOD_DRIVE_ID,
                         file_id=log_drive_id
                     )
@@ -1095,9 +1110,15 @@ with tab_cancel:
 
     PROD_PERIOD_ID = prod_folders["period_id"]
 
-    prod_log_df = load_log_from_drive(
+    # prod_log_df = load_log_from_drive(
+    #     service=service,
+    #     filename="log_produksi.xlsx",
+    #     parent_id=PROD_PERIOD_ID
+    # )
+
+    prod_log_df = load_log_from_gsheet(
         service=service,
-        filename="log_produksi.xlsx",
+        filename="log_produksi",
         parent_id=PROD_PERIOD_ID
     )
 
@@ -1205,10 +1226,18 @@ with tab_cancel:
                         parent_id=PROD_PERIOD_ID
                     )
 
-                    upload_log_dataframe(
+                    # upload_log_dataframe(
+                    #     service=service,
+                    #     df=prod_log_df,
+                    #     filename="log_produksi.xlsx",
+                    #     folder_id=PROD_PERIOD_ID,
+                    #     file_id=log_drive_id
+                    # )
+
+                    update_gsheet(
                         service=service,
                         df=prod_log_df,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         folder_id=PROD_PERIOD_ID,
                         file_id=log_drive_id
                     )
@@ -1261,10 +1290,18 @@ with tab_cancel:
                         parent_id=PROD_PERIOD_ID
                     )
 
-                    upload_log_dataframe(
+                    # upload_log_dataframe(
+                    #     service=service,
+                    #     df=prod_log_df,
+                    #     filename="log_produksi.xlsx",
+                    #     folder_id=PROD_PERIOD_ID,
+                    #     file_id=log_drive_id
+                    # )
+
+                    update_gsheet(
                         service=service,
                         df=prod_log_df,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         folder_id=PROD_PERIOD_ID,
                         file_id=log_drive_id
                     )
@@ -1292,9 +1329,15 @@ with tab_cancel:
                         parent_id=NOW_PERIOD_ID
                     )
 
-                    current_log_df = load_log_from_drive(
+                    # current_log_df = load_log_from_drive(
+                    #     service=service,
+                    #     filename="log_produksi.xlsx",
+                    #     parent_id=NOW_PERIOD_ID,
+                    # )
+
+                    current_log_df = load_log_from_gsheet(
                         service=service,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         parent_id=NOW_PERIOD_ID,
                     )
 
@@ -1339,10 +1382,18 @@ with tab_cancel:
                         ignore_index=True
                     )
 
-                    upload_log_dataframe(
+                    # upload_log_dataframe(
+                    #     service=service,
+                    #     df=current_log_df,
+                    #     filename="log_produksi.xlsx",
+                    #     folder_id=NOW_PERIOD_ID,
+                    #     file_id=current_log_drive_id
+                    # )
+
+                    update_gsheet(
                         service=service,
                         df=current_log_df,
-                        filename="log_produksi.xlsx",
+                        filename="log_produksi",
                         folder_id=NOW_PERIOD_ID,
                         file_id=current_log_drive_id
                     )

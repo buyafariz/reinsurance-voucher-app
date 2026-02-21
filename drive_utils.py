@@ -254,6 +254,48 @@ def load_log_from_drive(service, filename, parent_id):
     return pd.read_excel(fh)
 
 
+def load_log_from_gsheet(service, spreadsheet_id):
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
+
+    result = sheets_service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range="Sheet1"
+    ).execute()
+
+    values = result.get("values", [])
+
+    if not values:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(values[1:], columns=values[0])
+    return df
+
+def update_gsheet(service, spreadsheet_id, df):
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
+
+    sheets_service.spreadsheets().values().clear(
+        spreadsheetId=spreadsheet_id,
+        range="Sheet1"
+    ).execute()
+
+    sheets_service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id,
+        range="Sheet1!A1",
+        valueInputOption="RAW",
+        body={
+            "values": [df.columns.tolist()] + df.values.tolist()
+        }
+    ).execute()
+
+
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
     output = io.BytesIO()
     df.to_excel(output, index=False)
