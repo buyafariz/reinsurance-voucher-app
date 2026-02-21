@@ -1110,22 +1110,21 @@ with tab_cancel:
 
     PROD_PERIOD_ID = prod_folders["period_id"]
 
-    # prod_log_df = load_log_from_drive(
-    #     service=service,
-    #     filename="log_produksi.xlsx",
-    #     parent_id=PROD_PERIOD_ID
-    # )
-
-    prod_log_df = load_log_from_gsheet(
+    log_drive_id = find_drive_file(
         service=service,
         filename="log_produksi",
         parent_id=PROD_PERIOD_ID
     )
 
-    if prod_log_df.empty:
-        st.info("Tidak ada voucher pada periode tersebut")
+    if not log_drive_id:
+        st.info("Log belum tersedia")
         st.stop()
 
+    prod_log_df = load_log_from_gsheet(
+        service=service,
+        spreadsheet_id=log_drive_id
+    )
+    
     # Filter hanya yang POSTED
     posted_df = prod_log_df[prod_log_df["STATUS"] == "POSTED"]
 
