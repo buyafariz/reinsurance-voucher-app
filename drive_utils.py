@@ -303,6 +303,9 @@ def update_gsheet(service, spreadsheet_id, df):
 
 def append_gsheet(service, spreadsheet_id, row_dict):
     from googleapiclient.discovery import build
+    import numpy as np
+    import pandas as pd
+    from datetime import datetime
 
     sheets_service = build(
         "sheets",
@@ -310,14 +313,35 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         credentials=service._http.credentials
     )
 
-    values = [list(row_dict.values())]
+    cleaned_row = []
+
+    for value in row_dict.values():
+
+        # 🔹 Datetime → string
+        if isinstance(value, (datetime, pd.Timestamp)):
+            cleaned_row.append(value.strftime("%Y-%m-%d %H:%M:%S"))
+
+        # 🔹 numpy integer → python int
+        elif isinstance(value, (np.integer,)):
+            cleaned_row.append(int(value))
+
+        # 🔹 numpy float → python float
+        elif isinstance(value, (np.floating,)):
+            cleaned_row.append(float(value))
+
+        # 🔹 NaN / NaT → None
+        elif pd.isna(value):
+            cleaned_row.append(None)
+
+        else:
+            cleaned_row.append(value)
 
     sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
         range="Sheet1!A1",
         valueInputOption="USER_ENTERED",
         insertDataOption="INSERT_ROWS",
-        body={"values": values}
+        body={"values": [cleaned_row]}
     ).execute()
 
 
