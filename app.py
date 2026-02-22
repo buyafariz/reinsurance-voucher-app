@@ -801,7 +801,7 @@ with tab_post:
 
         if save_clicked:
             st.session_state.processing = True
-            st.rerun()
+            # st.rerun()
             start_time = time.time()
 
             if not product.strip() or not remarks.strip() or not subject_email.strip():
