@@ -270,7 +270,7 @@ def load_log_from_gsheet(service, spreadsheet_id):
 
     result = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Sheet1"
+        range="Log Produksi"
     ).execute()
 
     values = result.get("values", [])
@@ -296,13 +296,13 @@ def update_gsheet(service, spreadsheet_id, df):
     # 1️⃣ CLEAR DULU
     sheets_service.spreadsheets().values().clear(
         spreadsheetId=spreadsheet_id,
-        range="Sheet1"
+        range="Log Produksi"
     ).execute()
 
     # 2️⃣ UPDATE ULANG
     sheets_service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
-        range="Sheet1!A1",
+        range="Log Produksi!A1",
         valueInputOption="USER_ENTERED",
         body={"values": values}
     ).execute()
@@ -323,7 +323,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
     # 🔹 Ambil header dari sheet
     header_response = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Sheet1!1:1"
+        range="Log Produksi!1:1"
     ).execute()
 
     headers = header_response.get("values", [[]])[0]
@@ -367,7 +367,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
     sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
-        range="Sheet1!A1",
+        range="Log Produksi!A1",
         valueInputOption="USER_ENTERED",
         insertDataOption="INSERT_ROWS",
         body={"values": [cleaned_row]}
@@ -400,7 +400,7 @@ def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None)
 
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
-            range="Sheet1!A1",
+            range="Log Produksi!A1",
             valueInputOption="RAW",
             body={"values": [columns]}
         ).execute()
