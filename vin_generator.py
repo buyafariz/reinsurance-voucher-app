@@ -106,7 +106,13 @@ def generate_vin_from_drive(
         if log_df.empty or "Seq No" not in log_df.columns:
             next_seq = 1
         else:
-            next_seq = int(log_df["Seq No"].max()) + 1
+            seq_series = pd.to_numeric(log_df["Seq No"], errors="coerce")
+            seq_series = seq_series.dropna()
+
+            if seq_series.empty:
+                next_seq = 1
+            else:
+                next_seq = int(seq_series.max()) + 1
 
     # ==========================
     # Format Voucher
