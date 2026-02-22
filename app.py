@@ -112,6 +112,19 @@ tab_post, tab_cancel = st.tabs([
 
 
 # ==========================
+# STATE MANAGEMENT
+# ==========================
+if "voucher_saved" not in st.session_state:
+    st.session_state.voucher_saved = False
+
+if "processing" not in st.session_state:
+    st.session_state.processing = False
+
+if "last_uploaded_name" not in st.session_state:
+    st.session_state.last_uploaded_name = None
+
+
+# ==========================
 # SIMPAN VOUCHER
 # ==========================
 
@@ -153,6 +166,12 @@ with tab_post:
         type=["xlsx"],
         key="upload_post"
     )
+
+    if uploaded_file is not None:
+        if uploaded_file.name != st.session_state.last_uploaded_name:
+            st.session_state.voucher_saved = False
+            st.session_state.processing = False
+            st.session_state.last_uploaded_name = uploaded_file.name
 
     if uploaded_file:
 
@@ -772,7 +791,14 @@ with tab_post:
         # ==========================
         # POST VOUCHER (LOCKED)
         # ==========================
-        if st.button("💾 Simpan Voucher"):
+        save_clicked = st.button(
+            "💾 Simpan Voucher",
+            disabled=st.session_state.processing or st.session_state.voucher_saved,
+            type="primary"
+        )
+
+        if save_clicked:
+            st.session_state.processing = True
             start_time = time.time()
 
             if not product.strip() or not remarks.strip() or not subject_email.strip():
@@ -1076,6 +1102,8 @@ with tab_post:
 
                     st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
                     st.code(voucher)
+                    st.session_state.voucher_saved = True
+                    st.session_state.processing = False
 
                 except RuntimeError as e:
                         st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
