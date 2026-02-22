@@ -83,7 +83,7 @@ def generate_vin_from_drive(
     find_drive_file,
     biz_type
 ):
-    filename = "log_produksi"
+    filename = get_log_filename(year,month)
 
     file_id = find_drive_file(
         service=service,
