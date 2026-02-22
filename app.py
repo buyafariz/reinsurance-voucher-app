@@ -57,6 +57,14 @@ def accounting_format(x):
         return f"({abs(x):,.2f})"
     return f"{x:,.2f}"
 
+MONTH_ID = [
+    "", "Januari", "Februari", "Maret", "April",
+    "Mei", "Juni", "Juli", "Agustus",
+    "September", "Oktober", "November", "Desember"
+]
+
+def get_log_filename(year, month):
+    return f"Log Produksi {MONTH_ID[month]} {year}"
 
 
 # ==========================
@@ -838,7 +846,7 @@ with tab_post:
                     # Upload voucher (selalu CREATE)
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         # filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
@@ -1011,7 +1019,7 @@ with tab_post:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         parent_id=PERIOD_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1020,7 +1028,7 @@ with tab_post:
                         log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=PERIOD_DRIVE_ID,
-                            filename="log_produksi",
+                            filename=get_log_filename(oby, obm),
                             columns=list(log_entry.keys())
                         )
 
@@ -1149,7 +1157,7 @@ with tab_cancel:
 
     log_drive_id = find_drive_file(
         service=service,
-        filename="log_produksi",
+        filename=get_log_filename(oby, obm),
         parent_id=PROD_PERIOD_ID,
         mime_type="application/vnd.google-apps.spreadsheet"
     )
@@ -1259,7 +1267,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         parent_id=PROD_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1329,7 +1337,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         parent_id=PROD_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1345,7 +1353,7 @@ with tab_cancel:
                     update_gsheet(
                         service=service,
                         df=prod_log_df,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         folder_id=PROD_PERIOD_ID,
                         file_id=log_drive_id
                     )
@@ -1369,7 +1377,7 @@ with tab_cancel:
 
                     current_log_drive_id = find_drive_file(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         parent_id=NOW_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1382,7 +1390,7 @@ with tab_cancel:
 
                     current_log_df = load_log_from_gsheet(
                         service=service,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         parent_id=NOW_PERIOD_ID,
                     )
 
@@ -1438,7 +1446,7 @@ with tab_cancel:
                     update_gsheet(
                         service=service,
                         df=current_log_df,
-                        filename="log_produksi",
+                        filename=get_log_filename(oby, obm),
                         folder_id=NOW_PERIOD_ID,
                         file_id=current_log_drive_id
                     )
