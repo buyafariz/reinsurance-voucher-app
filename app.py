@@ -799,7 +799,7 @@ with tab_post:
             # type="primary"
         )
 
-        if save_clicked:
+        if save_clicked and not st.session_state.processing:
             st.session_state.processing = True
             # st.rerun()
             start_time = time.time()
@@ -1103,17 +1103,19 @@ with tab_post:
                     end_time = time.time()
                     duration = end_time - start_time
 
+                    st.session_state.voucher_saved = True
                     st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
                     st.code(voucher)
-                    st.session_state.voucher_saved = True
 
                 except RuntimeError as e:
-                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
-                        st.stop()
+                    st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                    st.session_state.processing = False
+                    st.stop()
+
 
                 finally:
                     release_drive_lock(service, PERIOD_DRIVE_ID)
-                    st.session_state.processing = False
+                    
 
 
 with tab_cancel:
