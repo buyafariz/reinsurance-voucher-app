@@ -168,10 +168,12 @@ with tab_post:
     )
 
     if uploaded_file is not None:
-        if uploaded_file.name != st.session_state.last_uploaded_name:
+        file_id = id(uploaded_file)
+
+        if file_id != st.session_state.last_uploaded_name:
             st.session_state.voucher_saved = False
             st.session_state.processing = False
-            st.session_state.last_uploaded_name = uploaded_file.name
+            st.session_state.last_uploaded_name = file_id
 
     if uploaded_file:
 
@@ -799,6 +801,7 @@ with tab_post:
 
         if save_clicked:
             st.session_state.processing = True
+            st.rerun()
             start_time = time.time()
 
             if not product.strip() or not remarks.strip() or not subject_email.strip():
