@@ -112,19 +112,6 @@ tab_post, tab_cancel = st.tabs([
 
 
 # ==========================
-# STATE MANAGEMENT
-# ==========================
-if "voucher_saved" not in st.session_state:
-    st.session_state.voucher_saved = False
-
-if "processing" not in st.session_state:
-    st.session_state.processing = False
-
-if "last_uploaded_name" not in st.session_state:
-    st.session_state.last_uploaded_name = None
-
-
-# ==========================
 # SIMPAN VOUCHER
 # ==========================
 
@@ -166,14 +153,6 @@ with tab_post:
         type=["xlsx"],
         key="upload_post"
     )
-
-    if uploaded_file is not None:
-        file_id = id(uploaded_file)
-
-        if file_id != st.session_state.last_uploaded_name:
-            st.session_state.voucher_saved = False
-            st.session_state.processing = False
-            st.session_state.last_uploaded_name = file_id
 
     if uploaded_file:
 
@@ -793,15 +772,7 @@ with tab_post:
         # ==========================
         # POST VOUCHER (LOCKED)
         # ==========================
-        save_clicked = st.button(
-            "💾 Simpan Voucher",
-            disabled=st.session_state.processing or st.session_state.voucher_saved,
-            # type="primary"
-        )
-
-        if save_clicked and not st.session_state.processing:
-            st.session_state.processing = True
-            # st.rerun()
+        if st.button("💾 Simpan Voucher"):
             start_time = time.time()
 
             if not product.strip() or not remarks.strip() or not subject_email.strip():
@@ -1103,19 +1074,15 @@ with tab_post:
                     end_time = time.time()
                     duration = end_time - start_time
 
-                    st.session_state.voucher_saved = True
                     st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
                     st.code(voucher)
 
                 except RuntimeError as e:
-                    st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
-                    st.session_state.processing = False
-                    st.stop()
-
+                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                        st.stop()
 
                 finally:
                     release_drive_lock(service, PERIOD_DRIVE_ID)
-                    
 
 
 with tab_cancel:
