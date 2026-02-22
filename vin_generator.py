@@ -5,6 +5,7 @@ from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
 from drive_utils import load_log_from_gsheet
+from app import get_log_filename
 
 
 LOG_COLUMNS = [
@@ -52,7 +53,7 @@ def get_log_path(base_path, year, month):
     period = f"{year}_{month:02d}"
     period_path = os.path.join(base_path, period)
     os.makedirs(period_path, exist_ok=True)
-    return os.path.join(period_path, "log_produksi.xlsx")
+    return os.path.join(period_path, get_log_filename(year,month))
 
 
 def load_or_create_log(log_path):
