@@ -794,7 +794,7 @@ with tab_post:
         save_clicked = st.button(
             "💾 Simpan Voucher",
             disabled=st.session_state.processing or st.session_state.voucher_saved,
-            type="primary"
+            # type="primary"
         )
 
         if save_clicked:
