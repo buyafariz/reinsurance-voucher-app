@@ -1106,7 +1106,6 @@ with tab_post:
                     st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
                     st.code(voucher)
                     st.session_state.voucher_saved = True
-                    st.session_state.processing = False
 
                 except RuntimeError as e:
                         st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
@@ -1114,6 +1113,7 @@ with tab_post:
 
                 finally:
                     release_drive_lock(service, PERIOD_DRIVE_ID)
+                    st.session_state.processing = False
 
 
 with tab_cancel:
