@@ -689,10 +689,10 @@ with tab_post:
 
                 cby = st.selectbox("Ceding Book Year (CBY)", years, index=years.index(year))
                 cbm = st.selectbox("Ceding Book Month (CBM)", months)#, index=months.index(month))
-                oby = st.selectbox("Our Book Year (OBY)", years, index=years.index(year))
-                obm = st.selectbox("Our Book Month (OBM)", months)#, index=months.index(month))
-                # oby = st.text_input("Our Book Year (OBY)", value=year, disabled=True)
-                # obm = st.text_input("Our Book Month (OBM)", value=month, disabled=True)
+                # oby = st.selectbox("Our Book Year (OBY)", years, index=years.index(year))
+                # obm = st.selectbox("Our Book Month (OBM)", months)#, index=months.index(month))
+                oby = st.text_input("Our Book Year (OBY)", value=year, disabled=True)
+                obm = st.text_input("Our Book Month (OBM)", value=month, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
