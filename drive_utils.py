@@ -376,6 +376,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None):
     from googleapiclient.discovery import build
 
+    # 1️⃣ CREATE FILE
     file_metadata = {
         "name": filename,
         "mimeType": "application/vnd.google-apps.spreadsheet",
@@ -390,14 +391,32 @@ def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None)
 
     spreadsheet_id = file["id"]
 
-    # 🔥 TULIS HEADER LANGSUNG
-    if columns:
-        sheets_service = build(
-            "sheets",
-            "v4",
-            credentials=service._http.credentials
-        )
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
 
+    # 2️⃣ RENAME Sheet1 → Log Produksi
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={
+            "requests": [
+                {
+                    "updateSheetProperties": {
+                        "properties": {
+                            "sheetId": 0,  # default sheet always id 0
+                            "title": "Log Produksi"
+                        },
+                        "fields": "title"
+                    }
+                }
+            ]
+        }
+    ).execute()
+
+    # 3️⃣ TULIS HEADER
+    if columns:
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
             range="Log Produksi!A1",
