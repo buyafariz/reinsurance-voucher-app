@@ -1157,7 +1157,7 @@ with tab_cancel:
 
     log_drive_id = find_drive_file(
         service=service,
-        filename=get_log_filename(oby, obm),
+        filename=get_log_filename(prod_year, prod_month),
         parent_id=PROD_PERIOD_ID,
         mime_type="application/vnd.google-apps.spreadsheet"
     )
@@ -1267,7 +1267,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(prod_year, prod_month),
                         parent_id=PROD_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1337,7 +1337,7 @@ with tab_cancel:
 
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(prod_year, prod_month),
                         parent_id=PROD_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1353,7 +1353,7 @@ with tab_cancel:
                     update_gsheet(
                         service=service,
                         df=prod_log_df,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(prod_year, prod_month),
                         folder_id=PROD_PERIOD_ID,
                         file_id=log_drive_id
                     )
@@ -1377,7 +1377,7 @@ with tab_cancel:
 
                     current_log_drive_id = find_drive_file(
                         service=service,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(now_year, now_month),
                         parent_id=NOW_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
@@ -1390,7 +1390,7 @@ with tab_cancel:
 
                     current_log_df = load_log_from_gsheet(
                         service=service,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(now_year, now_month),
                         parent_id=NOW_PERIOD_ID,
                     )
 
@@ -1446,7 +1446,7 @@ with tab_cancel:
                     update_gsheet(
                         service=service,
                         df=current_log_df,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(now_year, now_month),
                         folder_id=NOW_PERIOD_ID,
                         file_id=current_log_drive_id
                     )
