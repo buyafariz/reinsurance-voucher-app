@@ -5,8 +5,16 @@ from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
 from drive_utils import load_log_from_gsheet
-from app import get_log_filename
 
+
+MONTH_ID = [
+    "", "Januari", "Februari", "Maret", "April",
+    "Mei", "Juni", "Juli", "Agustus",
+    "September", "Oktober", "November", "Desember"
+]
+
+def get_log_filename(year, month):
+    return f"Log Produksi {MONTH_ID[month]} {year}"
 
 LOG_COLUMNS = [
     "Seq No",
