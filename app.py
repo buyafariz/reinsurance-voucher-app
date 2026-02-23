@@ -846,7 +846,7 @@ with tab_post:
                     # Upload voucher (selalu CREATE)
                     log_drive_id = find_drive_file(
                         service=service,
-                        filename=get_log_filename(oby, obm),
+                        filename=get_log_filename(int(oby), int(obm)),
                         # filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
