@@ -130,7 +130,7 @@ def generate_vin_from_drive(
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
     elif biz_type == "Claim":
-        voucher = f"VCL{year}{month:02d}LST{next_seq:04d}"
+        voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq
 
@@ -145,7 +145,7 @@ def generate_vin_from_drive_log(log_df, year, month, biz_type):
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
     elif biz_type == "Claim":
-        voucher = f"VCL{year}{month:02d}LST{next_seq:04d}"
+        voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq
 
