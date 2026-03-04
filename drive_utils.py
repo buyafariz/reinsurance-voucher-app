@@ -494,20 +494,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
                     "endIndex": col_count
                 }
             }
-        },
-
-        # autofit rows
-        {
-            "autoResizeDimensions": {
-                "dimensions": {
-                    "sheetId": sheet_id,
-                    "dimension": "ROWS",
-                    "startIndex": 0,
-                    "endIndex": 1000
-                }
-            }
         }
-
     ]
 
     sheets_service.spreadsheets().batchUpdate(
@@ -674,7 +661,53 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         body=pivot_request
     ).execute()
 
-    return spreadsheet_id
+    return spreadsheet_id, sheet_id
+
+
+def autofit_columns(sheets_service, spreadsheet_id, sheet_id, col_count):
+
+    request = {
+        "requests": [
+            {
+                "autoResizeDimensions": {
+                    "dimensions": {
+                        "sheetId": sheet_id,
+                        "dimension": "COLUMNS",
+                        "startIndex": 0,
+                        "endIndex": col_count
+                    }
+                }
+            }
+        ]
+    }
+
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body=request
+    ).execute()
+
+def get_sheet_id(service, spreadsheet_id, sheet_name=None):
+    
+    sheets_service = build(
+        "sheets",
+        "v4",
+        credentials=service._http.credentials
+    )
+
+    spreadsheet = sheets_service.spreadsheets().get(
+        spreadsheetId=spreadsheet_id
+    ).execute()
+
+    # jika tidak menentukan nama sheet → ambil sheet pertama
+    if sheet_name is None:
+        return spreadsheet["sheets"][0]["properties"]["sheetId"]
+
+    # jika menentukan nama sheet
+    for sheet in spreadsheet["sheets"]:
+        if sheet["properties"]["title"] == sheet_name:
+            return sheet["properties"]["sheetId"]
+
+    return None
 
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
