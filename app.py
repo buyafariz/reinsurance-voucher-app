@@ -96,25 +96,6 @@ tab_post, tab_cancel = st.tabs([
     "🔄 Update Voucher",
 ])
 
-# ==========================
-# CLAIM
-# ==========================
-
-# with tab_claim:
-#     st.subheader("📄 Klaim")
-
-#     uploaded_claim = st.file_uploader(
-#         "Upload File Klaim (.xlsx)",
-#         type=["xlsx"],
-#         key="upload_claim"
-#     )
-
-#     if uploaded_claim is None:
-#         st.info("Silakan upload file klaim")
-#     else:
-#         df_claim = pd.read_excel(uploaded_claim)
-#         st.success("File klaim berhasil dibaca")
-#         st.dataframe(df_claim, use_container_width=True)
 
 
 # ==========================
@@ -150,9 +131,6 @@ with tab_post:
             key="biz_type"
         )
 
-   
-    #business_event = st.radio("Jenis Transaksi", options=["NEW BUSINESS", "TERMINATED"], horizontal=True)
-    #business_event_code = ("NEW" if business_event == "NEW BUSINESS" else "TERMINATED")
 
     uploaded_file = st.file_uploader(
         "Upload Voucher (.xlsx)",
@@ -215,100 +193,6 @@ with tab_post:
 
             filtered_df = df.copy()
 
-            # valid_columns = get_non_empty_columns(filtered_df)
-
-            # col1, col2 = st.columns([2, 4])
-
-            # with col1:
-            #     filter_col = st.selectbox(
-            #         "Filter berdasarkan kolom",
-            #         options=valid_columns
-            #     )
-
-            # col_series = filtered_df[filter_col]
-
-            # with col2:
-
-            #     # TEXT FILTER
-            #     if col_series.dtype == "object":
-            #         keyword = st.text_input(
-            #             f"Cari pada kolom `{filter_col}`"
-            #         )
-
-            #         if keyword:
-            #             filtered_df = filtered_df[
-            #                 col_series.astype(str)
-            #                 .str.contains(keyword, case=False, na=False)
-            #             ]
-
-            #     # NUMERIC FILTER
-            #     elif pd.api.types.is_numeric_dtype(col_series):
-            #         numeric_series = col_series.dropna()
-
-            #         if numeric_series.empty:
-            #             st.info(f"Kolom `{filter_col}` kosong")
-
-            #         else:
-            #             unique_vals = numeric_series.unique()
-
-            #             # 🚫 HANYA 1 NILAI UNIK → TIDAK BOLEH SLIDER
-            #             if len(unique_vals) == 1:
-            #                 st.info(
-            #                     f"Kolom `{filter_col}` hanya memiliki satu nilai: "
-            #                     f"**{unique_vals[0]}**"
-            #                 )
-
-            #             else:
-            #                 is_integer = pd.api.types.is_integer_dtype(numeric_series)
-
-            #                 if is_integer:
-            #                     min_val = int(numeric_series.min())
-            #                     max_val = int(numeric_series.max())
-
-            #                     selected_range = st.slider(
-            #                         f"Range `{filter_col}`",
-            #                         min_value=min_val,
-            #                         max_value=max_val,
-            #                         value=(min_val, max_val),
-            #                         step=1
-            #                     )
-            #                 else:
-            #                     min_val = float(numeric_series.min())
-            #                     max_val = float(numeric_series.max())
-
-            #                     selected_range = st.slider(
-            #                         f"Range `{filter_col}`",
-            #                         min_value=min_val,
-            #                         max_value=max_val,
-            #                         value=(min_val, max_val)
-            #                     )
-
-            #                 filtered_df = filtered_df[
-            #                     col_series.between(*selected_range)
-            #                 ]
-
-
-            #     # DATETIME FILTER
-            #     elif pd.api.types.is_datetime64_any_dtype(col_series):
-            #         valid_dates = col_series.dropna()
-
-            #         start_date, end_date = st.date_input(
-            #             f"Range tanggal `{filter_col}`",
-            #             value=(valid_dates.min(), valid_dates.max())
-            #         )
-
-            #         filtered_df = filtered_df[
-            #             col_series.between(
-            #                 pd.to_datetime(start_date),
-            #                 pd.to_datetime(end_date)
-            #             )
-            #         ]
-
-            # #st.caption(f"Menampilkan {len(filtered_df):,} baris")
-            # # ==========================
-            # # DISPLAY DF (ACCOUNTING VIEW)
-            # # ==========================
-
             MAX_PREVIEW_ROWS = 2000
 
             display_df = filtered_df.copy()
@@ -349,24 +233,6 @@ with tab_post:
                     preview_df[col] = preview_df[col].astype(str)
 
             preview_df = preview_df.fillna("")
-
-            # # ==========================
-            # # DOWNLOAD BUTTON (FULL DATA)
-            # # ==========================
-
-            # def convert_df_to_excel(df):
-            #     output = BytesIO()
-            #     df.to_excel(output, index=False, engine='openpyxl')
-            #     return output.getvalue()
-
-            # excel_data = convert_df_to_excel(display_df)
-
-            # st.download_button(
-            #     label="📥 Download Full Data (Excel)",
-            #     data=excel_data,
-            #     file_name="filtered_data.xlsx",
-            #     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            # )
 
             # ==========================
             # GRID BUILDER
@@ -568,13 +434,6 @@ with tab_post:
         # ==========================
         year = st.session_state["log_period"]["year"]
         month = st.session_state["log_period"]["month"]
-
-        # log_path = get_log_path(BASE_PATH, year, month)
-
-        # if os.path.exists(log_path):
-        #     log_df = pd.read_excel(log_path)
-        # else:
-        #     log_df = pd.DataFrame()
 
 
         # ==========================
@@ -821,18 +680,6 @@ with tab_post:
 
                     ceding_folder_name = normalize_folder_name(account_with)
 
-                    # local_folder = os.path.join(
-                    #     f"{year}_{month:02d}",
-                    #     ceding_folder_name
-                    #     #"vouchers"
-                    # )
-
-                    # os.makedirs(os.path.join(BASE_PATH, local_folder), exist_ok=True)
-
-                    # voucher_path = os.path.join(BASE_PATH, local_folder, f"{voucher}.xlsx")
-                    # df.to_excel(voucher_path, index=False)
-
-
                     service = get_drive_service()
 
                     ceding_folder_name = normalize_folder_name(account_with)
@@ -861,11 +708,6 @@ with tab_post:
                         filename=f"{voucher}.xlsx",
                         folder_id=CEDING_DRIVE_ID
                     )
-
-                    #if business_event_code == "NEW":
-                    #    entry_type = "POST"
-                    #elif business_event_code == "TERMINATED":
-                    #    entry_type = "TERMINATE"
 
                     rate_exchange = get_exchange_rate(
                         service=service,
@@ -976,51 +818,7 @@ with tab_post:
                             "Email Date": email_date
                         }
 
-                    # log_df = load_log_from_drive(
-                    #     service=service,
-                    #     filename="log_produksi.xlsx",
-                    #     parent_id=PERIOD_DRIVE_ID
-                    # )
-
-                    # log_drive_id = find_drive_file(
-                    #     service=service,
-                    #     filename="log_produksi",
-                    #     parent_id=PERIOD_DRIVE_ID,
-                    #     mime_type="application/vnd.google-apps.spreadsheet"
-                    # )
-
-                    # if not log_drive_id:
-                    #     st.error("Log Google Sheet tidak ditemukan")
-                    #     st.stop()
-
-                    # log_df = load_log_from_gsheet(
-                    #     service=service,
-                    #     spreadsheet_id=log_drive_id
-                    # )
-
-                    # log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
-
-                    # if "Due Date" not in log_df.columns:
-                    #     log_df["Due Date"] = None
-
-                    # if "Subject Email" not in log_df.columns:
-                    #     log_df["Subject Email"] = None
-                
-
-                    # log_df["Due Date"] = due_date
-                    # log_df["Subject Email"] = subject_email
-
-                    # Upload / update log (SATU FILE)
                     service = get_drive_service()
-
-                    # Upload / update log
-                    # upload_log_dataframe(
-                    #     service=service,
-                    #     df=log_df,
-                    #     filename="log_produksi.xlsx",
-                    #     folder_id=PERIOD_DRIVE_ID,
-                    #     file_id=log_drive_id
-                    # )
 
                     log_drive_id = find_drive_file(
                         service=service,
@@ -1037,49 +835,11 @@ with tab_post:
                             columns=list(log_entry.keys())
                         )
 
-                        # # Tambahkan header pertama kali
-                        # append_gsheet(
-                        #     service=service,
-                        #     spreadsheet_id=log_drive_id,
-                        #     row_dict={key: key for key in log_entry.keys()}
-                        # )
-
-                    # 🔍 DEBUG DI SINI
-                    # file_info = service.files().get(
-                    #     fileId=log_drive_id,
-                    #     fields="id,name,mimeType"
-                    # ).execute()
-
-                    # st.write("DEBUG FILE INFO:", file_info)
-
                     append_gsheet(
                         service=service,
                         spreadsheet_id=log_drive_id,
                         row_dict=log_entry
                     )
-
-                    # 🔁 Cari ulang file id setelah upload
-                    # log_drive_id = find_drive_file(
-                    #     service=service,
-                    #     filename="log_produksi",
-                    #     parent_id=PERIOD_DRIVE_ID,
-                    #     mime_type="application/vnd.google-apps.spreadsheet"
-                    # )
-
-                    # 🔒 Lock hanya jika file benar-benar ada
-                    # if log_drive_id:
-                    #     service.files().update(
-                    #         fileId=log_drive_id,
-                    #         body={
-                    #             "contentRestrictions": [
-                    #                 {
-                    #                     "readOnly": True,
-                    #                     "reason": "Managed by Voucher System"
-                    #                 }
-                    #             ]
-                    #         },
-                    #         supportsAllDrives=True
-                    #     ).execute()
 
                     end_time = time.time()
                     duration = end_time - start_time
@@ -1277,14 +1037,6 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    # upload_log_dataframe(
-                    #     service=service,
-                    #     df=prod_log_df,
-                    #     filename="log_produksi.xlsx",
-                    #     folder_id=PROD_PERIOD_ID,
-                    #     file_id=log_drive_id
-                    # )
-
                     update_gsheet(
                         service=service,
                         spreadsheet_id=log_drive_id,
@@ -1347,14 +1099,6 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    # upload_log_dataframe(
-                    #     service=service,
-                    #     df=prod_log_df,
-                    #     filename="log_produksi.xlsx",
-                    #     folder_id=PROD_PERIOD_ID,
-                    #     file_id=log_drive_id
-                    # )
-
                     update_gsheet(
                         service=service,
                         df=prod_log_df,
@@ -1387,33 +1131,11 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    # current_log_df = load_log_from_drive(
-                    #     service=service,
-                    #     filename="log_produksi.xlsx",
-                    #     parent_id=NOW_PERIOD_ID,
-                    # )
-
                     current_log_df = load_log_from_gsheet(
                         service=service,
                         filename=get_log_filename(int(now_year), int(now_month)),
                         parent_id=NOW_PERIOD_ID,
                     )
-
-                    # if not current_log_drive_id:
-                    #     upload_log_dataframe(
-                    #         service=service,
-                    #         df=current_log_df,
-                    #         filename="log_produksi.xlsx",
-                    #         folder_id=NOW_PERIOD_ID
-                    #     )
-                    # else:
-                    #     upload_log_dataframe(
-                    #         service=service,
-                    #         df=current_log_df,
-                    #         filename="log_produksi.xlsx",
-                    #         folder_id=NOW_PERIOD_ID,
-                    #         file_id=current_log_drive_id
-                    #     )
 
 
                     # =============================
@@ -1439,14 +1161,6 @@ with tab_cancel:
                         [current_log_df, pd.DataFrame([cancel_row])],
                         ignore_index=True
                     )
-
-                    # upload_log_dataframe(
-                    #     service=service,
-                    #     df=current_log_df,
-                    #     filename="log_produksi.xlsx",
-                    #     folder_id=NOW_PERIOD_ID,
-                    #     file_id=current_log_drive_id
-                    # )
 
                     update_gsheet(
                         service=service,
