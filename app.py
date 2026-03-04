@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, autofit_columns, get_sheet_id
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -836,27 +836,17 @@ with tab_post:
                     )
 
                     if not log_drive_id:
-                        log_drive_id, sheet_id = create_log_gsheet(
+                        log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=PERIOD_DRIVE_ID,
                             filename=get_log_filename(int(oby), int(obm)),
                             columns=list(log_entry.keys())
                         )
-                    else:
-                        sheet_id = get_sheet_id(service, log_drive_id, "Log Produksi")
-
 
                     append_gsheet(
                         service=service,
                         spreadsheet_id=log_drive_id,
                         row_dict=log_entry
-                    )
-
-                    autofit_columns(
-                        service=service,
-                        spreadsheet_id=log_drive_id,
-                        sheet_id=sheet_id,
-                        col_count=len(log_entry.keys())
                     )
 
                     end_time = time.time()
@@ -1160,14 +1150,12 @@ with tab_cancel:
                     )
 
                     if not current_log_drive_id:
-                        current_log_drive_id, sheet_id = create_log_gsheet(
+                        current_log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=NOW_PERIOD_ID,
                             filename=get_log_filename(int(now_year), int(now_month)),
                             columns=list(prod_log_df.columns)
                         )
-                    else:
-                        sheet_id = get_sheet_id(service, current_log_drive_id, "Log Produksi")
                     
 
                     current_log_df = load_log_from_gsheet(
@@ -1206,13 +1194,6 @@ with tab_cancel:
                         service=service,
                         spreadsheet_id=current_log_drive_id,
                         df=current_log_df
-                    )
-
-                    autofit_columns(
-                        service=service,
-                        spreadsheet_id=current_log_drive_id,
-                        sheet_id=sheet_id,
-                        col_count=len(prod_log_df.columns)
                     )
 
                     st.success("Log berhasil diupdate")

@@ -9,7 +9,6 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 import calendar
 from datetime import datetime
-from googleapiclient.errors import HttpError
 
 
 SCOPES = [
@@ -378,24 +377,21 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
-from googleapiclient.discovery import build
 
-
+template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
 def create_log_gsheet(service, parent_id, filename, columns=None):
 
-    # ===============================
-    # 1️⃣ CREATE FILE
-    # ===============================
+    # 1️⃣ COPY TEMPLATE FILE
     file_metadata = {
         "name": filename,
-        "mimeType": "application/vnd.google-apps.spreadsheet",
-        "parents": [parent_id],
+        "parents": [parent_id]
     }
 
-    file = service.files().create(
+    file = service.files().copy(
+        fileId="1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw",
         body=file_metadata,
-        fields="id",
-        supportsAllDrives=True
+        supportsAllDrives=True,
+        fields="id"
     ).execute()
 
     spreadsheet_id = file["id"]
@@ -406,38 +402,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         credentials=service._http.credentials
     )
 
-    # ===============================
-    # 2️⃣ GET DEFAULT SHEET
-    # ===============================
-    spreadsheet = sheets_service.spreadsheets().get(
-        spreadsheetId=spreadsheet_id
-    ).execute()
-
-    sheet_id = spreadsheet["sheets"][0]["properties"]["sheetId"]
-
-    # ===============================
-    # 3️⃣ RENAME SHEET
-    # ===============================
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body={
-            "requests": [
-                {
-                    "updateSheetProperties": {
-                        "properties": {
-                            "sheetId": sheet_id,
-                            "title": "Log Produksi"
-                        },
-                        "fields": "title"
-                    }
-                }
-            ]
-        }
-    ).execute()
-
-    # ===============================
-    # 4️⃣ WRITE HEADER
-    # ===============================
+    # 2️⃣ OPTIONAL: update header jika ingin override
     if columns:
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
@@ -446,269 +411,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             body={"values": [columns]}
         ).execute()
 
-    col_count = len(columns) if columns else 40
-
-    # ===============================
-    # 5️⃣ FORMAT SHEET
-    # ===============================
-    requests = [
-
-        # freeze header
-        {
-            "updateSheetProperties": {
-                "properties": {
-                    "sheetId": sheet_id,
-                    "gridProperties": {
-                        "frozenRowCount": 1
-                    }
-                },
-                "fields": "gridProperties.frozenRowCount"
-            }
-        },
-
-        # font Calibri 10
-        {
-            "repeatCell": {
-                "range": {
-                    "sheetId": sheet_id
-                },
-                "cell": {
-                    "userEnteredFormat": {
-                        "textFormat": {
-                            "fontFamily": "Calibri",
-                            "fontSize": 10
-                        }
-                    }
-                },
-                "fields": "userEnteredFormat.textFormat"
-            }
-        },
-
-        # autofit columns
-        {
-            "autoResizeDimensions": {
-                "dimensions": {
-                    "sheetId": sheet_id,
-                    "dimension": "COLUMNS",
-                    "startIndex": 0,
-                    "endIndex": col_count
-                }
-            }
-        }
-    ]
-
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body={"requests": requests}
-    ).execute()
-
-    # ===============================
-    # 6️⃣ ACCOUNTING FORMAT
-    # ===============================
-    accounting_format = '#,##0.00;(#,##0.00)'
-
-    format_requests = [
-        {
-            "repeatCell": {
-                "range": {
-                    "sheetId": sheet_id,
-                    "startRowIndex": 1,
-                    "startColumnIndex": 16,
-                    "endColumnIndex": 25
-                },
-                "cell": {
-                    "userEnteredFormat": {
-                        "numberFormat": {
-                            "type": "NUMBER",
-                            "pattern": accounting_format
-                        }
-                    }
-                },
-                "fields": "userEnteredFormat.numberFormat"
-            }
-        }
-    ]
-
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body={"requests": format_requests}
-    ).execute()
-
-    # ===============================
-    # 7️⃣ CONDITIONAL FORMAT NEGATIVE
-    # ===============================
-    conditional_request = {
-        "requests": [
-            {
-                "addConditionalFormatRule": {
-                    "rule": {
-                        "ranges": [
-                            {
-                                "sheetId": sheet_id,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 16,
-                                "endColumnIndex": 25
-                            }
-                        ],
-                        "booleanRule": {
-                            "condition": {
-                                "type": "NUMBER_LESS",
-                                "values": [{"userEnteredValue": "0"}]
-                            },
-                            "format": {
-                                "textFormat": {
-                                    "foregroundColor": {
-                                        "red": 1
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "index": 0
-                }
-            }
-        ]
-    }
-
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body=conditional_request
-    ).execute()
-
-    # ===============================
-    # 8️⃣ CREATE PIVOT SHEET
-    # ===============================
-    pivot_response = sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body={
-            "requests": [
-                {
-                    "addSheet": {
-                        "properties": {
-                            "title": "Pivot Report"
-                        }
-                    }
-                }
-            ]
-        }
-    ).execute()
-
-    pivot_sheet_id = pivot_response["replies"][0]["addSheet"]["properties"]["sheetId"]
-
-    # ===============================
-    # 9️⃣ CREATE PIVOT TABLE
-    # ===============================
-    pivot_request = {
-        "requests": [
-            {
-                "updateCells": {
-                    "start": {
-                        "sheetId": pivot_sheet_id
-                    },
-                    "rows": [
-                        {
-                            "values": [
-                                {
-                                    "pivotTable": {
-                                        "source": {
-                                            "sheetId": sheet_id,
-                                            "startRowIndex": 0,
-                                            "startColumnIndex": 0,
-                                            "endColumnIndex": col_count
-                                        },
-                                        "rows": [
-                                            {
-                                                "sourceColumnOffset": 4,
-                                                "showTotals": True,
-                                                "sortOrder": "ASCENDING"
-                                            }
-                                        ],
-                                        "values": [
-                                            {
-                                                "summarizeFunction": "SUM",
-                                                "sourceColumnOffset": 30
-                                            },
-                                            {
-                                                "summarizeFunction": "SUM",
-                                                "sourceColumnOffset": 31
-                                            },
-                                            {
-                                                "summarizeFunction": "SUM",
-                                                "sourceColumnOffset": 32
-                                            },
-                                            {
-                                                "summarizeFunction": "SUM",
-                                                "sourceColumnOffset": 33
-                                            },
-                                            {
-                                                "summarizeFunction": "SUM",
-                                                "sourceColumnOffset": 34
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "fields": "pivotTable"
-                }
-            }
-        ]
-    }
-
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body=pivot_request
-    ).execute()
-
-    return spreadsheet_id, sheet_id
-
-
-def autofit_columns(sheets_service, spreadsheet_id, sheet_id, col_count):
-
-    request = {
-        "requests": [
-            {
-                "autoResizeDimensions": {
-                    "dimensions": {
-                        "sheetId": sheet_id,
-                        "dimension": "COLUMNS",
-                        "startIndex": 0,
-                        "endIndex": col_count
-                    }
-                }
-            }
-        ]
-    }
-
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body=request
-    ).execute()
-
-def get_sheet_id(service, spreadsheet_id, sheet_name=None):
-    
-    sheets_service = build(
-        "sheets",
-        "v4",
-        credentials=service._http.credentials
-    )
-
-    spreadsheet = sheets_service.spreadsheets().get(
-        spreadsheetId=spreadsheet_id,
-        fields="sheets.properties(sheetId,title)"
-    ).execute()
-
-    # jika tidak menentukan nama sheet → ambil sheet pertama
-    if sheet_name is None:
-        return spreadsheet["sheets"][0]["properties"]["sheetId"]
-
-    # jika menentukan nama sheet
-    for sheet in spreadsheet["sheets"]:
-        if sheet["properties"]["title"] == sheet_name:
-            return sheet["properties"]["sheetId"]
-
-    return None
+    return spreadsheet_id
 
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
