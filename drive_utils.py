@@ -484,21 +484,6 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             }
         },
 
-        # wrap text
-        {
-            "repeatCell": {
-                "range": {
-                    "sheetId": sheet_id
-                },
-                "cell": {
-                    "userEnteredFormat": {
-                        "wrapStrategy": "WRAP"
-                    }
-                },
-                "fields": "userEnteredFormat.wrapStrategy"
-            }
-        },
-
         # autofit columns
         {
             "autoResizeDimensions": {
@@ -524,7 +509,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         }
 
     ]
-    
+
     sheets_service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
         body={"requests": requests}
