@@ -240,7 +240,8 @@ def create_cancel_row(original_row, new_voucher, seq_no, year, month, user, reas
         "Gross Premium Income (IDR)",
         "Tabarru (IDR)",
         "Ujrah (IDR)",
-        "Claim (IDR)"
+        "Claim (IDR)",
+        "Balance (IDR)"
         ]
 
     for col in numeric_cols:
