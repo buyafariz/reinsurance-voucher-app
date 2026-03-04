@@ -695,7 +695,8 @@ def get_sheet_id(service, spreadsheet_id, sheet_name=None):
     )
 
     spreadsheet = sheets_service.spreadsheets().get(
-        spreadsheetId=spreadsheet_id
+        spreadsheetId=spreadsheet_id,
+        fields="sheets.properties(sheetId,title)"
     ).execute()
 
     # jika tidak menentukan nama sheet → ambil sheet pertama
