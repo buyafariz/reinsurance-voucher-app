@@ -1101,7 +1101,7 @@ with tab_cancel:
 
                     mask = prod_log_df["Voucher No"].astype(str).str.strip() == str(selected_voucher).strip()
 
-                    now_wib_naive = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    now_wib_naive = datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
 
                     prod_log_df.loc[mask, ["STATUS", "CANCELED AT", "CANCELED BY"]] = [
                         "CANCELED",
