@@ -1151,7 +1151,7 @@ with tab_cancel:
                     )
 
                     if not current_log_drive_id:
-                        log_drive_id = create_log_gsheet(
+                        current_log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=PERIOD_DRIVE_ID,
                             filename=get_log_filename(int(oby), int(obm)),
