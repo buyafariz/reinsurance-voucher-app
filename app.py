@@ -1150,13 +1150,11 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write(current_log_drive_id)
-
                     if not current_log_drive_id:
                         current_log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=NOW_PERIOD_ID,
-                            filename=get_log_filename(int(oby), int(obm)),
+                            filename=get_log_filename(int(now_year), int(now_month)),
                             columns=list(log_entry.keys())
                         )
 
