@@ -1176,9 +1176,9 @@ with tab_cancel:
 
                     cancel_voucher, cancel_seq = generate_vin_from_drive_log(
                         log_df=current_log_df,
-                        year=now_year,
-                        month=now_month,
-                        biz_type=biz_type
+                        year=int(now_year),
+                        month=int(now_month),
+                        biz_type = prod_log_df.loc[mask, "Biz Type"].iloc[0]
                     )
 
                     cancel_row = create_cancel_row(
