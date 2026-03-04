@@ -216,8 +216,8 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     #cancel["ENTRY_TYPE"] = "CANCEL"
     cancel["CANCEL OF VOUCHER"] = original_row["Voucher No"]
     cancel["STATUS"] = "CANCELED"
-    cancel["CREATED_AT"] = datetime.now()
-    cancel["CREATED_BY"] = user
+    cancel["CREATED AT"] = datetime.now()
+    cancel["CREATED BY"] = user
     cancel["CANCEL REASON"] = reason
 
     numeric_cols = [
