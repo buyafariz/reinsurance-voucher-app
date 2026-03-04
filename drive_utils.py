@@ -517,12 +517,14 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
                                         "source": {
                                             "sheetId": sheet_id,
                                             "startRowIndex": 0,
-                                            "startColumnIndex": 0
+                                            "startColumnIndex": 0,
+                                            "endColumnIndex": len(columns)
                                         },
                                         "rows": [
                                             {
                                                 "sourceColumnOffset": 4,
-                                                "showTotals": True
+                                                "showTotals": True,
+                                                "sortOrder": "ASCENDING"
                                             }
                                         ],
                                         "values": [
