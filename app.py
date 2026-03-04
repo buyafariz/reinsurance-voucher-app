@@ -144,6 +144,7 @@ with tab_post:
         # READ FILE
         # ==========================
         df = pd.read_excel(uploaded_file)
+        original_columns = df.columns.tolist()
         df.columns = df.columns.str.strip().str.lower()
 
         for col in ["certificate no", "pol holder no"]:
@@ -705,6 +706,7 @@ with tab_post:
                     upload_dataframe_to_drive(
                         service=service,
                         df=df,
+                        original_columns=original_columns,
                         voucher_id=voucher,
                         filename=f"{voucher}.xlsx",
                         folder_id=CEDING_DRIVE_ID
