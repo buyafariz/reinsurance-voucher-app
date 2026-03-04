@@ -702,15 +702,6 @@ with tab_post:
                         parent_id=PERIOD_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
-                    
-                    upload_dataframe_to_drive(
-                        service=service,
-                        df=df,
-                        original_columns=original_columns,
-                        voucher_id=voucher,
-                        filename=f"{voucher}.xlsx",
-                        folder_id=CEDING_DRIVE_ID
-                    )
 
                     rate_exchange = get_exchange_rate(
                         service=service,
@@ -850,6 +841,15 @@ with tab_post:
                         service=service,
                         spreadsheet_id=log_drive_id,
                         row_dict=log_entry
+                    )
+
+                    upload_dataframe_to_drive(
+                        service=service,
+                        df=df,
+                        original_columns=original_columns,
+                        voucher_id=voucher,
+                        filename=f"{voucher}.xlsx",
+                        folder_id=CEDING_DRIVE_ID
                     )
 
                     end_time = time.time()
