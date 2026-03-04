@@ -378,7 +378,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
     ).execute()
 
 
-template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
+template_id = "16t2vrEc1UMQt71I4GpPmSKtYrMbB6vXKxS44jLc16yo"
 def create_log_gsheet(service, parent_id, filename, columns=None):
 
     # 1️⃣ COPY TEMPLATE FILE
@@ -388,7 +388,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
     }
 
     file = service.files().copy(
-        fileId="1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw",
+        fileId="16t2vrEc1UMQt71I4GpPmSKtYrMbB6vXKxS44jLc16yo",
         body=file_metadata,
         supportsAllDrives=True,
         fields="id"
