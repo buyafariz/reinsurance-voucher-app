@@ -1107,6 +1107,7 @@ with tab_cancel:
                         pic
                     ]
 
+                    st.write(prod_log_df)
                     log_drive_id = find_drive_file(
                         service=service,
                         filename=get_log_filename(int(prod_year), int(prod_month)),

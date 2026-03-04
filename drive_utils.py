@@ -288,9 +288,6 @@ def update_gsheet(service, spreadsheet_id, df):
         credentials=service._http.credentials
     )
 
-    print("Rows:", len(df))
-    print("Columns:", df.columns.tolist())
-
     df = df.copy()
     df = df.where(pd.notnull(df), None)
 
