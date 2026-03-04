@@ -1140,7 +1140,6 @@ with tab_cancel:
                     )
 
                     NOW_PERIOD_ID = now_folders["period_id"]
-                    st.write("Now Period ID: ", NOW_PERIOD_ID)
 
                     #acquire_drive_lock(service, NOW_PERIOD_ID)
 
@@ -1151,8 +1150,6 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write("Current Log ID: ", current_log_drive_id)
-
                     if not current_log_drive_id:
                         current_log_drive_id = create_log_gsheet(
                             service=service,
@@ -1160,8 +1157,6 @@ with tab_cancel:
                             filename=get_log_filename(int(now_year), int(now_month)),
                             columns=list(prod_log_df.columns)
                         )
-
-                        st.write("Current Log ID (2):", current_log_drive_id)
                     
 
                     current_log_df = load_log_from_gsheet(
@@ -1180,6 +1175,9 @@ with tab_cancel:
                         month=int(now_month),
                         biz_type = prod_log_df.loc[mask, "Biz Type"].iloc[0]
                     )
+
+                    st.write("Cancel Voucher", cancel_voucher)
+                    st.write("Cancel Seq", cancel_seq)
 
                     cancel_row = create_cancel_row(
                         original_row=original_row,
