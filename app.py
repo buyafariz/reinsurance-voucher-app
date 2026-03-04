@@ -1141,8 +1141,6 @@ with tab_cancel:
 
                     NOW_PERIOD_ID = now_folders["period_id"]
 
-                    st.write(NOW_PERIOD_ID)
-
                     acquire_drive_lock(service, NOW_PERIOD_ID)
 
                     current_log_drive_id = find_drive_file(
@@ -1151,6 +1149,8 @@ with tab_cancel:
                         parent_id=NOW_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
+
+                    st.write(NOW_PERIOD_ID)
 
                     if not current_log_drive_id:
                         current_log_drive_id = create_log_gsheet(
