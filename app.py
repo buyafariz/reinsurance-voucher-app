@@ -1199,10 +1199,8 @@ with tab_cancel:
 
                     update_gsheet(
                         service=service,
-                        df=current_log_df,
-                        filename=get_log_filename(int(now_year), int(now_month)),
-                        folder_id=NOW_PERIOD_ID,
-                        file_id=current_log_drive_id
+                        spreadsheet_id=current_log_drive_id,
+                        df=current_log_df
                     )
 
                     # =============================
