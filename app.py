@@ -1141,7 +1141,7 @@ with tab_cancel:
 
                     NOW_PERIOD_ID = now_folders["period_id"]
 
-                    acquire_drive_lock(service, NOW_PERIOD_ID)
+                    #acquire_drive_lock(service, NOW_PERIOD_ID)
 
                     current_log_drive_id = find_drive_file(
                         service=service,
