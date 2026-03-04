@@ -303,7 +303,7 @@ def update_gsheet(service, spreadsheet_id, df):
     try:
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
-            range="'Log Produksi'!A1",
+            range="'Log Produksi'!A1:ZZ",
             valueInputOption="USER_ENTERED",
             body={"values": values}
         ).execute()
