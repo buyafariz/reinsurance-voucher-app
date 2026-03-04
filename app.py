@@ -549,10 +549,10 @@ with tab_post:
 
                 cby = st.selectbox("Ceding Book Year (CBY)", years, index=years.index(year))
                 cbm = st.selectbox("Ceding Book Month (CBM)", months)#, index=months.index(month))
-                # oby = st.selectbox("Our Book Year (OBY)", years, index=years.index(year))
-                # obm = st.selectbox("Our Book Month (OBM)", months)#, index=months.index(month))
-                oby = st.text_input("Our Book Year (OBY)", value=year, disabled=True)
-                obm = st.text_input("Our Book Month (OBM)", value=month, disabled=True)
+                oby = st.selectbox("Our Book Year (OBY)", years, index=years.index(year))
+                obm = st.selectbox("Our Book Month (OBM)", months)#, index=months.index(month))
+                #oby = st.text_input("Our Book Year (OBY)", value=year, disabled=True)
+                #obm = st.text_input("Our Book Month (OBM)", value=month, disabled=True)
 
             kob = st.selectbox(
                 "Kind of Business (KOB)",
@@ -768,7 +768,9 @@ with tab_post:
                             "CREATED_BY": pic,
                             "Due Date": due_date,
                             "Subject Email": subject_email,
-                            "Email Date": email_date
+                            "Email Date": email_date,
+                            "CANCEL OF VOUCHER": "",
+                            "CANCEL REASON":""
                         }
 
                     elif biz_type == "Claim":
@@ -815,7 +817,9 @@ with tab_post:
                             "CREATED_BY": pic,
                             "Due Date": due_date,
                             "Subject Email": subject_email,
-                            "Email Date": email_date
+                            "Email Date": email_date,
+                            "CANCEL OF VOUCHER": "",
+                            "CANCEL REASON": ""
                         }
 
                     service = get_drive_service()

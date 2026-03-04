@@ -218,7 +218,7 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     cancel["STATUS"] = "CANCELED"
     cancel["CREATED_AT"] = datetime.now()
     cancel["CREATED_BY"] = user
-    cancel["CANCEL_REASON"] = reason
+    cancel["CANCEL REASON"] = reason
 
     numeric_cols = [
         "Total Contribution",
