@@ -1105,7 +1105,7 @@ with tab_cancel:
 
                     prod_log_df.loc[mask, ["STATUS", "CANCELED AT", "CANCELED BY"]] = [
                         "CANCELED",
-                        now_wib_naive,
+                        now_wib,
                         str(pic)
                     ]
 
