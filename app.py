@@ -1122,7 +1122,7 @@ with tab_cancel:
                             spreadsheet_id=log_drive_id,
                             df=prod_log_df
                         )
-                        st.success("Log periode lama berhasil diupdate")
+                        st.success("Log berhasil diupdate")
                     except Exception as e:
                         st.error(e)
 
