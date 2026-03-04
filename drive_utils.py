@@ -377,19 +377,21 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
+
+template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
 def create_log_gsheet(service, parent_id, filename, columns=None):
 
-    # 1️⃣ CREATE FILE
+    # 1️⃣ COPY TEMPLATE FILE
     file_metadata = {
         "name": filename,
-        "mimeType": "application/vnd.google-apps.spreadsheet",
-        "parents": [parent_id],
+        "parents": [parent_id]
     }
 
-    file = service.files().create(
+    file = service.files().copy(
+        fileId="1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw",
         body=file_metadata,
-        fields="id",
-        supportsAllDrives=True
+        supportsAllDrives=True,
+        fields="id"
     ).execute()
 
     spreadsheet_id = file["id"]
@@ -400,32 +402,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         credentials=service._http.credentials
     )
 
-    # ambil sheetId asli
-    spreadsheet = sheets_service.spreadsheets().get(
-        spreadsheetId=spreadsheet_id
-    ).execute()
-
-    sheet_id = spreadsheet["sheets"][0]["properties"]["sheetId"]
-
-    # 2️⃣ RENAME sheet
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body={
-            "requests": [
-                {
-                    "updateSheetProperties": {
-                        "properties": {
-                            "sheetId": sheet_id,
-                            "title": "Log Produksi"
-                        },
-                        "fields": "title"
-                    }
-                }
-            ]
-        }
-    ).execute()
-
-    # 3️⃣ TULIS HEADER
+    # 2️⃣ OPTIONAL: update header jika ingin override
     if columns:
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
