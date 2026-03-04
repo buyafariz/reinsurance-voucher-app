@@ -728,7 +728,7 @@ with tab_post:
 
             subject_email = st.text_area("Subject Email")
 
-            subject_date = st.date_input("Subject Date",value=date.today())
+            email_date = st.date_input("Email Date",value=date.today())
 
             remarks = st.text_area("Remarks")
 
@@ -925,7 +925,8 @@ with tab_post:
                             "CREATED_AT": now_wib_naive(),
                             "CREATED_BY": pic,
                             "Due Date": due_date,
-                            "Subject Email": subject_email
+                            "Subject Email": subject_email,
+                            "Email Date": email_date
                         }
 
                     elif biz_type == "Claim":
@@ -971,7 +972,8 @@ with tab_post:
                             "CREATED_AT": now_wib_naive(),
                             "CREATED_BY": pic,
                             "Due Date": due_date,
-                            "Subject Email": subject_email
+                            "Subject Email": subject_email,
+                            "Email Date": email_date
                         }
 
                     # log_df = load_log_from_drive(
