@@ -1161,8 +1161,7 @@ with tab_cancel:
 
                     current_log_df = load_log_from_gsheet(
                         service=service,
-                        filename=get_log_filename(int(now_year), int(now_month)),
-                        parent_id=NOW_PERIOD_ID,
+                        spreadsheet_id=current_log_drive_id,
                     )
 
                     # =============================
