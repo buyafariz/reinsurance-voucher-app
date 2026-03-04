@@ -379,7 +379,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
-def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None):
+def create_log_gsheet(service, parent_id, filename, columns=None):
 
     # 1️⃣ CREATE FILE
     file_metadata = {
