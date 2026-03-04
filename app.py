@@ -1158,7 +1158,7 @@ with tab_cancel:
                             service=service,
                             parent_id=NOW_PERIOD_ID,
                             filename=get_log_filename(int(now_year), int(now_month)),
-                            columns=list(log_entry.keys())
+                            columns=list(prod_log_df.columns)
                         )
 
                         st.write("Current Log ID (2):", current_log_drive_id)
