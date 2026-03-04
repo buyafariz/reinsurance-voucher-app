@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
 from io import BytesIO
 from st_aggrid import JsCode
+from datetime import date
 
 
 
@@ -726,6 +727,8 @@ with tab_post:
             )
 
             subject_email = st.text_area("Subject Email")
+
+            subject_date = st.date_input("Subject Date",value=date.today())
 
             remarks = st.text_area("Remarks")
 
