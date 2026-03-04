@@ -1091,11 +1091,10 @@ with tab_cancel:
                     # 1️⃣ UPDATE LOG PERIODE LAMA
                     # =============================
 
-                    mask = prod_log_df["Voucher No"] == selected_voucher
-
-                    st.write("Voucher ditemukan:", mask.sum())
-
-                    prod_log_df.loc[mask, "STATUS"] = "CANCELED"
+                    prod_log_df.loc[
+                        prod_log_df["Voucher No"] == selected_voucher,
+                        "STATUS"
+                    ] = "CANCELED"
 
                     log_drive_id = find_drive_file(
                         service=service,
@@ -1103,6 +1102,8 @@ with tab_cancel:
                         parent_id=PROD_PERIOD_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
+
+                    st.write("Log file id:", log_drive_id)
 
                     update_gsheet(
                         service=service,
