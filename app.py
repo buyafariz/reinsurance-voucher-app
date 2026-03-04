@@ -1114,6 +1114,9 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
+                    st.write("Rows:", len(prod_log_df))
+                    st.write("Columns:", prod_log_df.columns.tolist())
+
                     try:
                         update_gsheet(
                             service=service,
