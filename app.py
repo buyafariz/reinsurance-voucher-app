@@ -1153,10 +1153,12 @@ with tab_cancel:
                     if not current_log_drive_id:
                         current_log_drive_id = create_log_gsheet(
                             service=service,
-                            parent_id=PERIOD_DRIVE_ID,
+                            parent_id=NOW_PERIOD_ID,
                             filename=get_log_filename(int(oby), int(obm)),
                             columns=list(log_entry.keys())
                         )
+
+                    st.write(current_log_drive_id)
 
                     current_log_df = load_log_from_gsheet(
                         service=service,
