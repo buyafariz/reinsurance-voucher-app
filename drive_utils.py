@@ -282,7 +282,6 @@ def load_log_from_gsheet(service, spreadsheet_id):
     return df
 
 def update_gsheet(service, spreadsheet_id, df):
-
     sheets_service = build(
         "sheets",
         "v4",
@@ -294,23 +293,25 @@ def update_gsheet(service, spreadsheet_id, df):
 
     values = [df.columns.tolist()] + df.values.tolist()
 
-    # proteksi agar tidak menghapus sheet jika df kosong
-    if len(values) <= 1:
-        raise ValueError("DataFrame kosong, update dibatalkan")
-
-    # CLEAR seluruh sheet
+    # 1️⃣ CLEAR DULU
     sheets_service.spreadsheets().values().clear(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi"
     ).execute()
 
-    # WRITE ulang
-    sheets_service.spreadsheets().values().update(
-        spreadsheetId=spreadsheet_id,
-        range="Log Produksi!A1",
-        valueInputOption="USER_ENTERED",
-        body={"values": values}
-    ).execute()
+    # 2️⃣ UPDATE ULANG
+    try:
+        sheets_service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range="'Log Produksi'!A1",
+            valueInputOption="USER_ENTERED",
+            body={"values": values}
+        ).execute()
+
+        st.success("Update berhasil")
+
+    except Exception as e:
+        st.error(e)
 
 def append_gsheet(service, spreadsheet_id, row_dict):
     from googleapiclient.discovery import build
