@@ -377,21 +377,21 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
-
-template_id = "16t2vrEc1UMQt71I4GpPmSKtYrMbB6vXKxS44jLc16yo"
 def create_log_gsheet(service, parent_id, filename, columns=None):
 
-    # 1️⃣ COPY TEMPLATE FILE
+    # ===============================
+    # 1️⃣ CREATE FILE
+    # ===============================
     file_metadata = {
         "name": filename,
-        "parents": [parent_id]
+        "mimeType": "application/vnd.google-apps.spreadsheet",
+        "parents": [parent_id],
     }
 
-    file = service.files().copy(
-        fileId="16t2vrEc1UMQt71I4GpPmSKtYrMbB6vXKxS44jLc16yo",
+    file = service.files().create(
         body=file_metadata,
-        supportsAllDrives=True,
-        fields="id"
+        fields="id",
+        supportsAllDrives=True
     ).execute()
 
     spreadsheet_id = file["id"]
@@ -402,7 +402,38 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         credentials=service._http.credentials
     )
 
-    # 2️⃣ OPTIONAL: update header jika ingin override
+    # ===============================
+    # 2️⃣ GET DEFAULT SHEET
+    # ===============================
+    spreadsheet = sheets_service.spreadsheets().get(
+        spreadsheetId=spreadsheet_id
+    ).execute()
+
+    sheet_id = spreadsheet["sheets"][0]["properties"]["sheetId"]
+
+    # ===============================
+    # 3️⃣ RENAME SHEET → Log Produksi
+    # ===============================
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={
+            "requests": [
+                {
+                    "updateSheetProperties": {
+                        "properties": {
+                            "sheetId": sheet_id,
+                            "title": "Log Produksi"
+                        },
+                        "fields": "title"
+                    }
+                }
+            ]
+        }
+    ).execute()
+
+    # ===============================
+    # 4️⃣ WRITE HEADER
+    # ===============================
     if columns:
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
@@ -410,6 +441,126 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             valueInputOption="RAW",
             body={"values": [columns]}
         ).execute()
+
+    # ===============================
+    # 5️⃣ FORMAT LOG PRODUKSI
+    # ===============================
+    format_requests = [
+        {
+            "autoResizeDimensions": {
+                "dimensions": {
+                    "sheetId": sheet_id,
+                    "dimension": "COLUMNS",
+                    "startIndex": 0,
+                    "endIndex": 40
+                }
+            }
+        },
+        {
+            "updateSheetProperties": {
+                "properties": {
+                    "sheetId": sheet_id,
+                    "gridProperties": {
+                        "frozenRowCount": 1
+                    }
+                },
+                "fields": "gridProperties.frozenRowCount"
+            }
+        }
+    ]
+
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={"requests": format_requests}
+    ).execute()
+
+    # ===============================
+    # 6️⃣ CREATE PIVOT REPORT SHEET
+    # ===============================
+    pivot_request = {
+        "requests": [
+            {
+                "addSheet": {
+                    "properties": {
+                        "title": "Pivot Report"
+                    }
+                }
+            }
+        ]
+    }
+
+    response = sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body=pivot_request
+    ).execute()
+
+    pivot_sheet_id = response["replies"][0]["addSheet"]["properties"]["sheetId"]
+
+    # ===============================
+    # 7️⃣ CREATE PIVOT TABLE
+    # ===============================
+    pivot_table_request = {
+        "requests": [
+            {
+                "updateCells": {
+                    "start": {
+                        "sheetId": pivot_sheet_id,
+                        "rowIndex": 0,
+                        "columnIndex": 0
+                    },
+                    "rows": [
+                        {
+                            "values": [
+                                {
+                                    "pivotTable": {
+                                        "source": {
+                                            "sheetId": sheet_id,
+                                            "startRowIndex": 0,
+                                            "startColumnIndex": 0
+                                        },
+                                        "rows": [
+                                            {
+                                                "sourceColumnOffset": 4,
+                                                "showTotals": True
+                                            }
+                                        ],
+                                        "values": [
+                                            {
+                                                "summarizeFunction": "SUM",
+                                                "sourceColumnOffset": 30
+                                            },
+                                            {
+                                                "summarizeFunction": "SUM",
+                                                "sourceColumnOffset": 31
+                                            },
+                                            {
+                                                "summarizeFunction": "SUM",
+                                                "sourceColumnOffset": 32
+                                            },
+                                            {
+                                                "summarizeFunction": "SUM",
+                                                "sourceColumnOffset": 33
+                                            },
+                                            {
+                                                "summarizeFunction": "SUM",
+                                                "sourceColumnOffset": 34
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "fields": "pivotTable"
+                }
+            }
+        ]
+    }
+
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body=pivot_table_request
+    ).execute()
 
     return spreadsheet_id
 
