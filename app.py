@@ -1101,10 +1101,12 @@ with tab_cancel:
 
                     mask = prod_log_df["Voucher No"].astype(str).str.strip() == str(selected_voucher).strip()
 
+                    now_wib_naive = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
                     prod_log_df.loc[mask, ["STATUS", "CANCELED AT", "CANCELED BY"]] = [
                         "CANCELED",
                         now_wib_naive,
-                        pic
+                        str(pic)
                     ]
 
                     log_drive_id = find_drive_file(
