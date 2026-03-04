@@ -944,6 +944,10 @@ with tab_cancel:
         spreadsheet_id=log_drive_id
     )
 
+    if "STATUS" not in prod_log_df.columns:
+        st.error("Kolom STATUS tidak ditemukan di log produksi")
+        st.stop()
+
     # Filter hanya yang POSTED
     posted_df = prod_log_df[prod_log_df["STATUS"] == "POSTED"]
 
