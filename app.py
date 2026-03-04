@@ -1091,10 +1091,11 @@ with tab_cancel:
                     # 1️⃣ UPDATE LOG PERIODE LAMA
                     # =============================
 
-                    prod_log_df.loc[
-                        prod_log_df["Voucher No"] == selected_voucher,
-                        "STATUS"
-                    ] = "CANCELED"
+                    mask = prod_log_df["Voucher No"] == selected_voucher
+
+                    st.write("Voucher ditemukan:", mask.sum())
+
+                    prod_log_df.loc[mask, "STATUS"] = "CANCELED"
 
                     log_drive_id = find_drive_file(
                         service=service,
