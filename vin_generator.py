@@ -151,7 +151,7 @@ def generate_vin_from_drive_log(log_df, year, month, biz_type):
     return voucher, next_seq
 
 
-def create_negative_excel(original_df, voucher_id):
+def create_negative_excel(original_df, original_voucher_id, voucher_id):
 
     negative_cols = [
         "reins premium",
@@ -180,6 +180,9 @@ def create_negative_excel(original_df, voucher_id):
     
     if "voucher id" in df_negative.columns:
             df_negative["voucher id"] = voucher_id
+
+    if "ref voucher id" in df_negative.columns:
+            df_negative["ref voucher id"] = f"Cancel of {original_voucher_id}"
 
     return df_negative
 

@@ -1196,6 +1196,8 @@ with tab_cancel:
                         df=current_log_df
                     )
 
+                    st.success("Log berhasil diupdate")
+
                     # =============================
                     # 4️⃣ BUAT FILE REVERSAL
                     # =============================
@@ -1230,7 +1232,7 @@ with tab_cancel:
                         ceding_folder_id=OLD_CEDING_DRIVE_ID
                     )
 
-                    reversal_df = create_negative_excel(original_file_df, cancel_voucher)
+                    reversal_df = create_negative_excel(original_file_df, row["Voucher No"].iloc[0], cancel_voucher)
 
                     file_bytes = dataframe_to_excel_bytes(reversal_df)
 

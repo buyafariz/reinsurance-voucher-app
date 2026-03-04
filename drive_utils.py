@@ -308,8 +308,6 @@ def update_gsheet(service, spreadsheet_id, df):
             body={"values": values}
         ).execute()
 
-        st.success("Log berhasil diupdate")
-
     except Exception as e:
         st.error(e)
 
