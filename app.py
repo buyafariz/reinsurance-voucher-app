@@ -1150,7 +1150,7 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write(NOW_PERIOD_ID)
+                    st.write(current_log_drive_id)
 
                     if not current_log_drive_id:
                         current_log_drive_id = create_log_gsheet(
