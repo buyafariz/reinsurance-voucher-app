@@ -945,7 +945,7 @@ with tab_cancel:
     )
 
     if "STATUS" not in prod_log_df.columns:
-        st.error("Kolom STATUS tidak ditemukan di log produksi")
+        st.error("Tidak ada voucher")
         st.stop()
 
     # Filter hanya yang POSTED
