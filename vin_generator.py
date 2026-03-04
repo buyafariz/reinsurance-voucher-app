@@ -208,12 +208,14 @@ def upload_excel_bytes(service, file_bytes, filename, parent_id):
 
 
 
-def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
+def create_cancel_row(original_row, new_voucher, seq_no, year, month, user, reason):
     cancel = original_row.copy()
 
     cancel["Biz Type"] = "Cancel"
     cancel["Seq No"] = seq_no
     cancel["Voucher No"] = new_voucher
+    cancel["OBY"] = year
+    cancel["OBM"] = month
     #cancel["ENTRY_TYPE"] = "CANCEL"
     cancel["CANCEL OF VOUCHER"] = original_row["Voucher No"]
     cancel["STATUS"] = "CANCELED"

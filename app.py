@@ -1186,6 +1186,8 @@ with tab_cancel:
                         original_row=original_row,
                         new_voucher=cancel_voucher,
                         seq_no=cancel_seq,
+                        year = int(now_year),
+                        month = int(now_month),
                         user=pic,
                         reason=cancel_reason
                     )
