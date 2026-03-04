@@ -1168,12 +1168,13 @@ with tab_cancel:
                     # =============================
                     # 3️⃣ GENERATE NOMOR BARU
                     # =============================
+                    row = prod_log_df.loc[mask]
 
                     cancel_voucher, cancel_seq = generate_vin_from_drive_log(
                         log_df=current_log_df,
                         year=int(now_year),
                         month=int(now_month),
-                        biz_type = prod_log_df.loc[mask]["Biz Type"].iloc[0]
+                        biz_type = row["Biz Type"].iloc[0]
                     )
 
                     st.write("Cancel Voucher", cancel_voucher)
