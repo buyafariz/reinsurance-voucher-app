@@ -380,7 +380,6 @@ def append_gsheet(service, spreadsheet_id, row_dict):
     ).execute()
 
 def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None):
-    from googleapiclient.discovery import build
 
     # 1️⃣ CREATE FILE
     file_metadata = {
@@ -403,7 +402,14 @@ def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None)
         credentials=service._http.credentials
     )
 
-    # 2️⃣ RENAME Sheet1 → Log Produksi
+    # ambil sheetId asli
+    spreadsheet = sheets_service.spreadsheets().get(
+        spreadsheetId=spreadsheet_id
+    ).execute()
+
+    sheet_id = spreadsheet["sheets"][0]["properties"]["sheetId"]
+
+    # 2️⃣ RENAME sheet
     sheets_service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
         body={
@@ -411,7 +417,7 @@ def create_log_gsheet(service, parent_id, filename="log_produksi", columns=None)
                 {
                     "updateSheetProperties": {
                         "properties": {
-                            "sheetId": 0,  # default sheet always id 0
+                            "sheetId": sheet_id,
                             "title": "Log Produksi"
                         },
                         "fields": "title"
