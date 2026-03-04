@@ -378,6 +378,9 @@ def append_gsheet(service, spreadsheet_id, row_dict):
         body={"values": [cleaned_row]}
     ).execute()
 
+from googleapiclient.discovery import build
+
+
 def create_log_gsheet(service, parent_id, filename, columns=None):
 
     # ===============================
@@ -413,7 +416,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
     sheet_id = spreadsheet["sheets"][0]["properties"]["sheetId"]
 
     # ===============================
-    # 3️⃣ RENAME SHEET → Log Produksi
+    # 3️⃣ RENAME SHEET
     # ===============================
     sheets_service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
@@ -443,20 +446,14 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             body={"values": [columns]}
         ).execute()
 
+    col_count = len(columns) if columns else 40
+
     # ===============================
-    # 5️⃣ FORMAT LOG PRODUKSI
+    # 5️⃣ FORMAT SHEET
     # ===============================
-    format_requests = [
-        {
-            "autoResizeDimensions": {
-                "dimensions": {
-                    "sheetId": sheet_id,
-                    "dimension": "COLUMNS",
-                    "startIndex": 0,
-                    "endIndex": 40
-                }
-            }
-        },
+    requests = [
+
+        # freeze header
         {
             "updateSheetProperties": {
                 "properties": {
@@ -467,6 +464,69 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
                 },
                 "fields": "gridProperties.frozenRowCount"
             }
+        },
+
+        # font calibri 10
+        {
+            "repeatCell": {
+                "range": {
+                    "sheetId": sheet_id
+                },
+                "cell": {
+                    "userEnteredFormat": {
+                        "textFormat": {
+                            "fontFamily": "Calibri",
+                            "fontSize": 10
+                        }
+                    }
+                },
+                "fields": "userEnteredFormat.textFormat"
+            }
+        },
+
+        # autofit columns
+        {
+            "autoResizeDimensions": {
+                "dimensions": {
+                    "sheetId": sheet_id,
+                    "dimension": "COLUMNS",
+                    "startIndex": 0,
+                    "endIndex": col_count
+                }
+            }
+        }
+
+    ]
+
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={"requests": requests}
+    ).execute()
+
+    # ===============================
+    # 6️⃣ ACCOUNTING FORMAT
+    # ===============================
+    accounting_format = '#,##0.00;(#,##0.00)'
+
+    format_requests = [
+        {
+            "repeatCell": {
+                "range": {
+                    "sheetId": sheet_id,
+                    "startRowIndex": 1,
+                    "startColumnIndex": 16,
+                    "endColumnIndex": 25
+                },
+                "cell": {
+                    "userEnteredFormat": {
+                        "numberFormat": {
+                            "type": "NUMBER",
+                            "pattern": accounting_format
+                        }
+                    }
+                },
+                "fields": "userEnteredFormat.numberFormat"
+            }
         }
     ]
 
@@ -476,38 +536,75 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
     ).execute()
 
     # ===============================
-    # 6️⃣ CREATE PIVOT REPORT SHEET
+    # 7️⃣ CONDITIONAL FORMAT NEGATIVE
     # ===============================
-    pivot_request = {
+    conditional_request = {
         "requests": [
             {
-                "addSheet": {
-                    "properties": {
-                        "title": "Pivot Report"
-                    }
+                "addConditionalFormatRule": {
+                    "rule": {
+                        "ranges": [
+                            {
+                                "sheetId": sheet_id,
+                                "startRowIndex": 1,
+                                "startColumnIndex": 16,
+                                "endColumnIndex": 25
+                            }
+                        ],
+                        "booleanRule": {
+                            "condition": {
+                                "type": "NUMBER_LESS",
+                                "values": [{"userEnteredValue": "0"}]
+                            },
+                            "format": {
+                                "textFormat": {
+                                    "foregroundColor": {
+                                        "red": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "index": 0
                 }
             }
         ]
     }
 
-    response = sheets_service.spreadsheets().batchUpdate(
+    sheets_service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
-        body=pivot_request
+        body=conditional_request
     ).execute()
 
-    pivot_sheet_id = response["replies"][0]["addSheet"]["properties"]["sheetId"]
+    # ===============================
+    # 8️⃣ CREATE PIVOT SHEET
+    # ===============================
+    pivot_response = sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={
+            "requests": [
+                {
+                    "addSheet": {
+                        "properties": {
+                            "title": "Pivot Report"
+                        }
+                    }
+                }
+            ]
+        }
+    ).execute()
+
+    pivot_sheet_id = pivot_response["replies"][0]["addSheet"]["properties"]["sheetId"]
 
     # ===============================
-    # 7️⃣ CREATE PIVOT TABLE
+    # 9️⃣ CREATE PIVOT TABLE
     # ===============================
-    pivot_table_request = {
+    pivot_request = {
         "requests": [
             {
                 "updateCells": {
                     "start": {
-                        "sheetId": pivot_sheet_id,
-                        "rowIndex": 0,
-                        "columnIndex": 0
+                        "sheetId": pivot_sheet_id
                     },
                     "rows": [
                         {
@@ -518,7 +615,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
                                             "sheetId": sheet_id,
                                             "startRowIndex": 0,
                                             "startColumnIndex": 0,
-                                            "endColumnIndex": len(columns)
+                                            "endColumnIndex": col_count
                                         },
                                         "rows": [
                                             {
@@ -560,16 +657,10 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         ]
     }
 
-    try:
-        sheets_service.spreadsheets().batchUpdate(
-            spreadsheetId=spreadsheet_id,
-            body=pivot_table_request
-        ).execute()
-
-    except HttpError as error:
-        print("Google API Error:")
-        print(error)
-        raise
+    sheets_service.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body=pivot_request
+    ).execute()
 
     return spreadsheet_id
 
