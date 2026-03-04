@@ -177,8 +177,9 @@ def create_negative_excel(original_df, voucher_id):
     for col in negative_cols:
         if col in df_negative.columns:
             df_negative[col] = -1 * df_negative[col]
-        elif col == "voucher id":
-            df_negative[col] = voucher_id
+    
+    if "voucher id" in df_negative.columns:
+            df_negative["voucher id"] = voucher_id
 
     return df_negative
 
