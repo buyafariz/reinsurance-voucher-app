@@ -294,10 +294,10 @@ def update_gsheet(service, spreadsheet_id, df):
     values = [df.columns.tolist()] + df.values.tolist()
 
     # 1️⃣ CLEAR DULU
-    sheets_service.spreadsheets().values().clear(
-        spreadsheetId=spreadsheet_id,
-        range="Log Produksi"
-    ).execute()
+    # sheets_service.spreadsheets().values().clear(
+    #     spreadsheetId=spreadsheet_id,
+    #     range="Log Produksi"
+    # ).execute()
 
     # 2️⃣ UPDATE ULANG
     sheets_service.spreadsheets().values().update(
