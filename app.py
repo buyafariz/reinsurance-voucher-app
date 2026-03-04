@@ -1180,6 +1180,7 @@ with tab_cancel:
 
                     st.write("Cancel Voucher", cancel_voucher)
                     st.write("Cancel Seq", cancel_seq)
+                    st.write("Original Row", original_row)
 
                     cancel_row = create_cancel_row(
                         original_row=original_row,
