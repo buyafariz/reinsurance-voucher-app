@@ -282,6 +282,7 @@ def load_log_from_gsheet(service, spreadsheet_id):
     return df
 
 def update_gsheet(service, spreadsheet_id, df):
+
     sheets_service = build(
         "sheets",
         "v4",
@@ -293,13 +294,17 @@ def update_gsheet(service, spreadsheet_id, df):
 
     values = [df.columns.tolist()] + df.values.tolist()
 
-    # 1️⃣ CLEAR DULU
-    # sheets_service.spreadsheets().values().clear(
-    #     spreadsheetId=spreadsheet_id,
-    #     range="Log Produksi"
-    # ).execute()
+    # proteksi agar tidak menghapus sheet jika df kosong
+    if len(values) <= 1:
+        raise ValueError("DataFrame kosong, update dibatalkan")
 
-    # 2️⃣ UPDATE ULANG
+    # CLEAR seluruh sheet
+    sheets_service.spreadsheets().values().clear(
+        spreadsheetId=spreadsheet_id,
+        range="Log Produksi"
+    ).execute()
+
+    # WRITE ulang
     sheets_service.spreadsheets().values().update(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!A1",
