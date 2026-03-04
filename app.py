@@ -1230,7 +1230,7 @@ with tab_cancel:
                         ceding_folder_id=OLD_CEDING_DRIVE_ID
                     )
 
-                    reversal_df = create_negative_excel(original_file_df)
+                    reversal_df = create_negative_excel(original_file_df, cancel_voucher)
 
                     file_bytes = dataframe_to_excel_bytes(reversal_df)
 
