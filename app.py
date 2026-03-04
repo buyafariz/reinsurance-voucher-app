@@ -764,11 +764,13 @@ with tab_post:
                             "REMARKS": remarks,
                             "STATUS": "POSTED",
                             #"ENTRY_TYPE": entry_type,
-                            "CREATED_AT": now_wib_naive(),
-                            "CREATED_BY": pic,
+                            "CREATED AT": now_wib_naive(),
+                            "CREATED BY": pic,
                             "Due Date": due_date,
                             "Subject Email": subject_email,
                             "Email Date": email_date,
+                            "CANCELED AT": "-",
+                            "CANCELED BY": "-",
                             "CANCEL OF VOUCHER": "-",
                             "CANCEL REASON":"-"
                         }
@@ -818,6 +820,8 @@ with tab_post:
                             "Due Date": due_date,
                             "Subject Email": subject_email,
                             "Email Date": email_date,
+                            "CANCELED AT": "-",
+                            "CANCELED BY": "-",
                             "CANCEL OF VOUCHER": "-",
                             "CANCEL REASON": "-"
                         }
@@ -1091,10 +1095,13 @@ with tab_cancel:
                     # 1️⃣ UPDATE LOG PERIODE LAMA
                     # =============================
 
-                    prod_log_df.loc[
-                        prod_log_df["Voucher No"] == selected_voucher,
-                        "STATUS"
-                    ] = "CANCELED"
+                    mask = prod_log_df["Voucher No"].astype(str).str.strip() == str(selected_voucher).strip()
+
+                    prod_log_df.loc[mask, ["STATUS", "CANCELED AT", "CANCELED BY"]] = [
+                        "CANCELED",
+                        now_wib_naive,
+                        pic
+                    ]
 
                     log_drive_id = find_drive_file(
                         service=service,
