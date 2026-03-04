@@ -9,6 +9,7 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 import calendar
 from datetime import datetime
+from googleapiclient.errors import HttpError
 
 
 SCOPES = [
@@ -557,10 +558,16 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
         ]
     }
 
-    sheets_service.spreadsheets().batchUpdate(
-        spreadsheetId=spreadsheet_id,
-        body=pivot_table_request
-    ).execute()
+    try:
+        sheets_service.spreadsheets().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body=pivot_table_request
+        ).execute()
+
+    except HttpError as error:
+        print("Google API Error:")
+        print(error)
+        raise
 
     return spreadsheet_id
 
