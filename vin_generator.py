@@ -5,6 +5,7 @@ from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
 from drive_utils import load_log_from_gsheet
+from zoneinfo import ZoneInfo
 
 
 MONTH_ID = [
@@ -216,7 +217,7 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
     #cancel["ENTRY_TYPE"] = "CANCEL"
     cancel["CANCEL OF VOUCHER"] = original_row["Voucher No"]
     cancel["STATUS"] = "CANCELED"
-    cancel["CREATED AT"] = datetime.now()
+    cancel["CREATED AT"] = datetime.now(ZoneInfo("Asia/Jakarta"))
     cancel["CREATED BY"] = user
     cancel["CANCEL REASON"] = reason
 
@@ -241,7 +242,11 @@ def create_cancel_row(original_row, new_voucher, seq_no, user, reason):
         ]
 
     for col in numeric_cols:
-        cancel[col] = -1 * float(original_row.get(col, 0))
+        value = original_row.get(col, 0)
+        try:
+            cancel[col] = -1 * float(value)
+        except:
+            cancel[col] = 0
 
     cancel["REMARKS"] = f"Cancel voucher {original_row['Voucher No']}"
 
