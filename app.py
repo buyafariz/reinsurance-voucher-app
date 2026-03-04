@@ -1143,6 +1143,8 @@ with tab_cancel:
 
                     #acquire_drive_lock(service, NOW_PERIOD_ID)
 
+                    service = get_drive_service()
+
                     current_log_drive_id = find_drive_file(
                         service=service,
                         filename=get_log_filename(int(now_year), int(now_month)),
