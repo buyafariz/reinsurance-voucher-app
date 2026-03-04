@@ -1168,8 +1168,6 @@ with tab_cancel:
                     # 3️⃣ GENERATE NOMOR BARU
                     # =============================
                     row = prod_log_df.loc[mask]
-                    st.write("Mask sum:", mask.sum())
-                    st.write("Biz Type:", row["Biz Type"].iloc[0])
 
                     cancel_voucher, cancel_seq = generate_vin_from_drive_log(
                         log_df=current_log_df,
@@ -1177,11 +1175,7 @@ with tab_cancel:
                         month=int(now_month),
                         biz_type = row["Biz Type"].iloc[0]
                     )
-
-                    st.write("Cancel Voucher", cancel_voucher)
-                    st.write("Cancel Seq", cancel_seq)
                     
-
                     cancel_row = create_cancel_row(
                         original_row=original_row,
                         new_voucher=cancel_voucher,
@@ -1191,8 +1185,6 @@ with tab_cancel:
                         user=pic,
                         reason=cancel_reason
                     )
-
-                    st.write("Cancel Row", cancel_row)
 
                     current_log_df = pd.concat(
                         [current_log_df, pd.DataFrame([cancel_row])],
