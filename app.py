@@ -769,8 +769,8 @@ with tab_post:
                             "Due Date": due_date,
                             "Subject Email": subject_email,
                             "Email Date": email_date,
-                            "CANCEL OF VOUCHER": "",
-                            "CANCEL REASON":""
+                            "CANCEL OF VOUCHER": "-",
+                            "CANCEL REASON":"-"
                         }
 
                     elif biz_type == "Claim":
@@ -818,8 +818,8 @@ with tab_post:
                             "Due Date": due_date,
                             "Subject Email": subject_email,
                             "Email Date": email_date,
-                            "CANCEL OF VOUCHER": "",
-                            "CANCEL REASON": ""
+                            "CANCEL OF VOUCHER": "-",
+                            "CANCEL REASON": "-"
                         }
 
                     service = get_drive_service()
