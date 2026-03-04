@@ -466,7 +466,7 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             }
         },
 
-        # font calibri 10
+        # font Calibri 10
         {
             "repeatCell": {
                 "range": {
@@ -484,6 +484,21 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
             }
         },
 
+        # wrap text
+        {
+            "repeatCell": {
+                "range": {
+                    "sheetId": sheet_id
+                },
+                "cell": {
+                    "userEnteredFormat": {
+                        "wrapStrategy": "WRAP"
+                    }
+                },
+                "fields": "userEnteredFormat.wrapStrategy"
+            }
+        },
+
         # autofit columns
         {
             "autoResizeDimensions": {
@@ -494,10 +509,22 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
                     "endIndex": col_count
                 }
             }
+        },
+
+        # autofit rows
+        {
+            "autoResizeDimensions": {
+                "dimensions": {
+                    "sheetId": sheet_id,
+                    "dimension": "ROWS",
+                    "startIndex": 0,
+                    "endIndex": 1000
+                }
+            }
         }
 
     ]
-
+    
     sheets_service.spreadsheets().batchUpdate(
         spreadsheetId=spreadsheet_id,
         body={"requests": requests}
