@@ -1103,15 +1103,17 @@ with tab_cancel:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write("Log file id:", log_drive_id)
-
-                    update_gsheet(
-                        service=service,
-                        df=prod_log_df,
-                        filename=get_log_filename(int(prod_year), int(prod_month)),
-                        folder_id=PROD_PERIOD_ID,
-                        file_id=log_drive_id
-                    )
+                    try:
+                        update_gsheet(
+                            service=service,
+                            df=prod_log_df,
+                            filename=get_log_filename(int(prod_year), int(prod_month)),
+                            folder_id=PROD_PERIOD_ID,
+                            file_id=log_drive_id
+                        )
+                        st.success("Log periode lama berhasil diupdate")
+                    except Exception as e:
+                        st.error(e)
 
                     # =============================
                     # 2️⃣ LOAD LOG BULAN SEKARANG
