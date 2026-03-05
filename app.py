@@ -655,15 +655,11 @@ with tab_post:
                 try:
                     service = get_drive_service()                    
 
-                    acquire_drive_lock(service, ROOT_DRIVE_FOLDER_ID)
-
                     drive_folders = get_period_drive_folders(
                         year=int(oby),
                         month=int(obm),
                         root_folder_id=ROOT_DRIVE_FOLDER_ID
                     )
-
-                    release_drive_lock(service, ROOT_DRIVE_FOLDER_ID)
 
                     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
