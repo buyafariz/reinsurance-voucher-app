@@ -823,12 +823,12 @@ with tab_post:
 
                     service = get_drive_service()
 
-                    log_drive_id = find_drive_file(
-                        service=service,
-                        filename=get_log_filename(int(oby), int(obm)),
-                        parent_id=PERIOD_DRIVE_ID,
-                        mime_type="application/vnd.google-apps.spreadsheet"
-                    )
+                    # log_drive_id = find_drive_file(
+                    #     service=service,
+                    #     filename=get_log_filename(int(oby), int(obm)),
+                    #     parent_id=PERIOD_DRIVE_ID,
+                    #     mime_type="application/vnd.google-apps.spreadsheet"
+                    # )
 
                     if not log_drive_id:
                         log_drive_id = create_log_gsheet(
