@@ -653,6 +653,10 @@ with tab_post:
             with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
 
                 try:
+                    service = get_drive_service()                    
+
+                    acquire_drive_lock(service, ROOT_DRIVE_FOLDER_ID)
+
                     drive_folders = get_period_drive_folders(
                         year=int(oby),
                         month=int(obm),
@@ -661,7 +665,6 @@ with tab_post:
 
                     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
-                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                     # reload log terbaru setelah lock
                     # if os.path.exists(log_path):
@@ -677,8 +680,6 @@ with tab_post:
                         find_drive_file=find_drive_file,
                         biz_type = biz_type
                     )
-
-                    service = get_drive_service()
 
                     ceding_folder_name = normalize_folder_name(account_with)
 
