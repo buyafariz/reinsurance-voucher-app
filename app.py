@@ -661,7 +661,7 @@ with tab_post:
 
                     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
-                    acquire_drive_lock(service, ROOT_DRIVE_FOLDER_ID)
+                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                     # reload log terbaru setelah lock
                     # if os.path.exists(log_path):
