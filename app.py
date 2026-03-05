@@ -821,8 +821,6 @@ with tab_post:
                             "CANCEL REASON": "-"
                         }
 
-                    service = get_drive_service()
-
                     # log_drive_id = find_drive_file(
                     #     service=service,
                     #     filename=get_log_filename(int(oby), int(obm)),
