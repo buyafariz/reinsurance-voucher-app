@@ -218,10 +218,11 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 
 
 
-def upload_dataframe_to_drive(service, df, original_columns, voucher_id, filename, folder_id):
+def upload_dataframe_to_drive(service, df, original_columns, voucher_id, subject_email, product, filename, folder_id):
     buffer = BytesIO()
 
     df["voucher id"] = voucher_id
+    df["references no"] = f"{subject_email} - {product}"
     df.columns = original_columns
 
     df.to_excel(buffer, index=False)
