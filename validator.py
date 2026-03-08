@@ -552,7 +552,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
         elif biz_type == "Claim":
             df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
-            if not df["medicalcategory"].isin(["M", "N"]).all():
+            if not df["medical"].isin(["M", "N"]).all():
                 errors.append("Kolom medical hanya boleh bernilai M atau N")
 
     # =========================
