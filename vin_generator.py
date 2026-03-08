@@ -92,8 +92,7 @@ def generate_vin_from_drive(
     period_folder_id,
     year,
     month,
-    find_drive_file,
-    biz_type
+    find_drive_file
 ):
     filename = get_log_filename(year,month)
 
