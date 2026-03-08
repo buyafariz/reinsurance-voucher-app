@@ -156,7 +156,7 @@ def get_or_create_outward_folders(
     # )
 
     return {
-        "outeard_id": outward_id
+        "outward_id": outward_id
         #"voucher_id": voucher_id
     }
 

@@ -105,28 +105,29 @@ tab_post, tab_cancel = st.tabs([
 with tab_post:
     st.subheader("📥 Create Voucher")
     
-    col1, col2 = st.columns(2)
+    # ===== ROW 1 =====
+    row1_col1, row1_col2 = st.columns(2)
 
-    with col1:
-        department = st.selectbox(
-                "Department",
-                [
-                    "ADMIN",
-                    "CLAIM"
-                ]
-        )
-
+    with row1_col1:
         reins_type = st.selectbox(
-                "Reinsurance Type",
-                [
-                    "Inward",
-                    "Outward"
-                ],
-                key="reins_type"
+            "Reinsurance Type",
+            ["INWARD", "OUTWARD"],
+            key="reins_type"
         )
 
-        
-    with col2:
+    # row1_col2 sengaja dikosongkan
+
+
+    # ===== ROW 2 =====
+    row2_col1, row2_col2 = st.columns(2)
+
+    with row2_col1:
+        department = st.selectbox(
+            "Department",
+            ["ADMIN", "CLAIM"]
+        )
+
+    with row2_col2:
         biz_type = st.selectbox(
             "Biz Type",
             [
@@ -142,7 +143,6 @@ with tab_post:
             key="biz_type"
         )
 
-
     uploaded_file = st.file_uploader(
         "Upload Voucher (.xlsx)",
         type=["xlsx"],
@@ -150,7 +150,7 @@ with tab_post:
     )
 
     if uploaded_file:
-        if reins_type == "Inward":
+        if reins_type == "INWARD":
             # ==========================
             # READ FILE
             # ==========================
@@ -878,7 +878,7 @@ with tab_post:
                         release_drive_lock(service, PERIOD_DRIVE_ID)
 
 
-        elif reins_type == "Outward":
+        elif reins_type == "OUTWARD":
             # ==========================
             # READ FILE
             # ==========================
@@ -1444,6 +1444,7 @@ with tab_post:
                                 "Seq No": seq_no,
                                 "Department":department,
                                 "Biz Type": biz_type,
+                                "Inward VIN Ref": inward_vin,
                                 "Voucher No": voucher,
                                 "Account With": account_with,
                                 "Cedant Company": cedant_company,
@@ -1497,6 +1498,7 @@ with tab_post:
                                 "Seq No": seq_no,
                                 "Department":department,
                                 "Biz Type": biz_type,
+                                "Inward VIN Ref": inward_vin,
                                 "Voucher No": voucher,
                                 "Account With": account_with,
                                 "Cedant Company": cedant_company,
