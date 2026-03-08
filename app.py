@@ -1363,6 +1363,10 @@ with tab_post:
             if st.button("💾 Simpan Voucher"):
                 start_time = time.time()
 
+                if not inward_vin.strip() or not product.strip() or not remarks.strip():
+                    st.error("Inward Vin Ref, Product, dan Remarks wajib diisi")
+                    st.stop()
+
                 #lock_path = log_path + ".lock"
                 service = get_drive_service()
 
