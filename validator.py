@@ -131,7 +131,7 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
     "curr",
     "reins claim",
     "your share",
-    "reinsurer name"
+    "reinsurer name",
     "voucher id",
     "voucher desc"
 ]
