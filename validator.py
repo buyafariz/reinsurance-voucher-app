@@ -196,7 +196,7 @@ NUMERIC_COLUMNS_CLAIM_INWARD = [
 ]
 
 NUMERIC_COLUMNS_CLAIM_OUTWARD = [
-    "reins claim idr",
+    "reins claim",
     "your share"
 ]
 
