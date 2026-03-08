@@ -17,6 +17,9 @@ MONTH_ID = [
 def get_log_filename(year, month):
     return f"Log Produksi {MONTH_ID[month]} {year}"
 
+def get_log_filename_outward(year, month):
+    return f"Log Produksi {MONTH_ID[month]} {year} - Outward"
+
 LOG_COLUMNS = [
     "Seq No",
     "Department",
@@ -124,14 +127,55 @@ def generate_vin_from_drive(
             else:
                 next_seq = int(seq_series.max()) + 1
 
+
+def generate_vou_from_drive(
+    service,
+    outward_folder_id,
+    year,
+    month,
+    find_drive_file,
+    biz_type
+):
+    filename = get_log_filename_outward(year,month)
+
+    file_id = find_drive_file(
+        service=service,
+        filename=filename,
+        parent_id=outward_folder_id,
+        mime_type="application/vnd.google-apps.spreadsheet"
+    )
+
+    # ==========================
+    # Jika belum ada log
+    # ==========================
+    if not file_id:
+        next_seq = 1
+
+    else:
+        log_df = load_log_from_gsheet(
+            service=service,
+            spreadsheet_id=file_id
+        )
+
+        if log_df.empty or "Seq No" not in log_df.columns:
+            next_seq = 1
+        else:
+            seq_series = pd.to_numeric(log_df["Seq No"], errors="coerce")
+            seq_series = seq_series.dropna()
+
+            if seq_series.empty:
+                next_seq = 1
+            else:
+                next_seq = int(seq_series.max()) + 1
+
     # ==========================
     # Format Voucher
     # ==========================
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-        voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+        voucher = f"VOU{year}{month:02d}LST{next_seq:04d}"
 
     elif biz_type == "Claim":
-        voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
+        voucher = f"VCR{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq
 

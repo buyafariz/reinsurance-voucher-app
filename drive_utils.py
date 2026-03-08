@@ -116,6 +116,7 @@ def get_period_drive_folders(year, month, root_folder_id):
         "period_id": period_id,
     }
 
+
 def get_or_create_ceding_folders(
     service,
     period_folder_id: str,
@@ -137,6 +138,28 @@ def get_or_create_ceding_folders(
         "ceding_id": ceding_id
         #"voucher_id": voucher_id
     }
+
+def get_or_create_outward_folders(
+    service,
+    period_folder_id: str
+):
+    outward_id = get_or_create_folder(
+        service,
+        folder_name="OUTWARD",
+        parent_id=period_folder_id
+    )
+
+    # voucher_id = get_or_create_folder(
+    #     service,
+    #     folder_name="vouchers",
+    #     parent_id=ceding_id
+    # )
+
+    return {
+        "outeard_id": outward_id
+        #"voucher_id": voucher_id
+    }
+
 
 
 def find_drive_file(service, filename, parent_id, mime_type=None):
