@@ -271,6 +271,37 @@ def upload_dataframe_to_drive(service, df, original_columns, voucher_id, subject
 
     return file.get("id")
 
+
+def upload_dataframe_to_drive_outward(service, df, original_columns, voucher_id, filename, folder_id):
+    buffer = BytesIO()
+
+    df["out vouc id"] = voucher_id
+    df.columns = original_columns
+
+    df.to_excel(buffer, index=False)
+    buffer.seek(0)
+
+    media = MediaIoBaseUpload(
+        buffer,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        resumable=True
+    )
+
+    file_metadata = {
+        "name": filename,
+        "parents": [folder_id]
+    }
+
+    file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id",
+        supportsAllDrives=True
+    ).execute()
+
+    return file.get("id")
+
+
 def load_log_from_drive(service, filename, parent_id):
     file_id = find_drive_file(service, filename, parent_id)
 
