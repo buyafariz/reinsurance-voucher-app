@@ -1531,6 +1531,7 @@ with tab_post:
                                 "Gross Premium Income (IDR)": 0,
                                 "Tabarru (IDR)": 0,
                                 "Ujrah (IDR)": 0,
+                                "Ujrah Spc (IDR)": "",
                                 "Claim (IDR)": (df["your share"].sum() if "your share" in df.columns else 0)*rate_exchange,
                                 "Balance (IDR)": 0 - (df["your share"].sum() if "your share" in df.columns else 0)*rate_exchange,
                                 "Check Balance (IDR)": "",
