@@ -687,7 +687,8 @@ with tab_post:
                             period_folder_id=PERIOD_DRIVE_ID,
                             year=int(oby),
                             month=int(obm),
-                            find_drive_file=find_drive_file
+                            find_drive_file=find_drive_file,
+                            biz_type = biz_type
                         )
 
                         ceding_folder_name = normalize_folder_name(account_with)
@@ -1399,7 +1400,8 @@ with tab_post:
                             outward_folder_id=OUTWARD_DRIVE_ID,
                             year=int(oby),
                             month=int(obm),
-                            find_drive_file=find_drive_file
+                            find_drive_file=find_drive_file,
+                            biz_type = biz_type
                         )
 
                         ceding_folder_name = normalize_folder_name(account_with)
