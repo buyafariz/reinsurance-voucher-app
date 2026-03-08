@@ -1573,7 +1573,8 @@ with tab_post:
                             original_columns=original_columns,
                             voucher_id=voucher,
                             filename=f"{voucher}.xlsx",
-                            folder_id=CEDING_DRIVE_ID
+                            folder_id=CEDING_DRIVE_ID,
+                            biz_type=biz_type
                         )
 
                         end_time = time.time()

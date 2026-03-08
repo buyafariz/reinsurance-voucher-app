@@ -272,10 +272,15 @@ def upload_dataframe_to_drive(service, df, original_columns, voucher_id, subject
     return file.get("id")
 
 
-def upload_dataframe_to_drive_outward(service, df, original_columns, voucher_id, filename, folder_id):
+def upload_dataframe_to_drive_outward(service, df, original_columns, voucher_id, filename, folder_id, biz_type):
     buffer = BytesIO()
 
-    df["out vouc id"] = voucher_id
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        df["out vouc id"] = voucher_id
+    
+    elif biz_type == "Claim":
+        df["voucher id"] = voucher_id
+ 
     df.columns = original_columns
 
     df.to_excel(buffer, index=False)
