@@ -55,7 +55,7 @@ REQUIRED_COLUMNS_OUTWARD = [
     "reins sum at risk",
     "retro sum insured",
     "retro sum at risk",
-    "pay period type",
+    "out pay period type",
     "retro total premium",
     "retro total comm",
     "retro tabarru",
