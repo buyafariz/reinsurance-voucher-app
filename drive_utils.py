@@ -241,12 +241,48 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 
 
 
-def upload_dataframe_to_drive(service, df, original_columns, voucher_id, subject_email, product, filename, folder_id):
+def upload_dataframe_to_drive(service, df, original_columns,
+                               voucher_id, subject_email,
+                               product, filename, folder_id):
+
     buffer = BytesIO()
 
-    df["voucher id"] = voucher_id
-    df["references no"] = f"{subject_email} - {product}"
-    df.columns = original_columns
+    # ==============================
+    # PREPARE VALUES
+    # ==============================
+    ref_value = f"{subject_email} - {product}"
+
+    # ==============================
+    # ADD OR UPDATE COLUMNS SAFELY
+    # ==============================
+
+    if "voucher id" in df.columns:
+        df["voucher id"] = voucher_id
+    else:
+        df.insert(len(df.columns), "voucher id", voucher_id)
+
+    if "references no" in df.columns:
+        df["references no"] = ref_value
+    else:
+        df.insert(len(df.columns), "references no", ref_value)
+
+    # ==============================
+    # RESTORE ORIGINAL COLUMN NAMES SAFELY
+    # ==============================
+
+    # hanya restore jika jumlah kolom sama
+    if len(original_columns) == len(df.columns):
+        df.columns = original_columns
+    else:
+        # jika ada kolom tambahan, tambahkan ke original list
+        updated_columns = original_columns + [
+            col for col in df.columns if col not in original_columns
+        ]
+        df.columns = updated_columns
+
+    # ==============================
+    # EXPORT
+    # ==============================
 
     df.to_excel(buffer, index=False)
     buffer.seek(0)
