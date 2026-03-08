@@ -1572,7 +1572,6 @@ with tab_post:
                             df=df,
                             original_columns=original_columns,
                             voucher_id=voucher,
-                            product=product,
                             filename=f"{voucher}.xlsx",
                             folder_id=CEDING_DRIVE_ID
                         )
