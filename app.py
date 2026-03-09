@@ -1207,7 +1207,7 @@ with tab_post:
                         ]
                     )
 
-                    inward_vin = st.text_input("Inward Vin Ref")
+                    inward_vin = st.text_input("Inward Vin Ref", value=str(df.loc[0, "Inw Vouc ID"]))
 
                     account_with = st.selectbox(
                         "Account With",
