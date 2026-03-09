@@ -141,7 +141,8 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
 DATE_COLUMNS = [
     "birth date", 
     "issue date",
-    "expired date",
+    "ri period from",
+    "ri period until",
     "valuation date"
 ]
 
