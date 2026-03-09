@@ -44,8 +44,8 @@ REQUIRED_COLUMNS_OUTWARD = [
     "issue date",
     "term year",
     "term month",
-    "ri period from",
-    "ri period until",
+    # "ri period from",
+    # "ri period until",
     "medical",
     "ced product code",
     "ced coverage code",
@@ -141,8 +141,8 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
 DATE_COLUMNS = [
     "birth date", 
     "issue date",
-    "ri period from",
-    "ri period until",
+    # "ri period from",
+    # "ri period until",
     "valuation date"
 ]
 
@@ -590,10 +590,10 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             if not (df["end date policy"] > df["issue date"]).all():
                 errors.append("end date policy harus lebih besar dari issue date")      
 
-    elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-            if not (df["ri period until"] > df["issue date"]).all():
-                errors.append("ri period until harus lebih besar dari issue date")
+    # elif reins_type == "OUTWARD":
+    #     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    #         if not (df["ri period until"] > df["issue date"]).all():
+    #             errors.append("ri period until harus lebih besar dari issue date")
 
         # elif biz_type == "Claim":
         #     if not (df["end date policy"] > df["issue date"]).all():
