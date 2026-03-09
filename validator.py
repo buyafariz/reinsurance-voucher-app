@@ -592,8 +592,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
 
     elif reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-            if not (df["expired date"] > df["issue date"]).all():
-                errors.append("expired date harus lebih besar dari issue date")
+            if not (df["ri period until"] > df["issue date"]).all():
+                errors.append("ri period until harus lebih besar dari issue date")
 
         # elif biz_type == "Claim":
         #     if not (df["end date policy"] > df["issue date"]).all():
