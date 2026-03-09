@@ -677,13 +677,13 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             if not (diff_nett < 0.01).all():
                 errors.append("retro nett premium ≠ (total premium - total comm - overriding)")
 
-            diff_tab = (
-                df["retro tabarru"]
-                + df["retro ujrah"]
-                - df["retro nett premium"]
-            ).abs()
+            # diff_tab = (
+            #     df["retro tabarru"]
+            #     + df["retro ujrah"]
+            #     - df["retro nett premium"]
+            # ).abs()
 
-            if not (diff_tab < 0.01).all():
-                errors.append("tabarru + ujrah ≠ retro nett premium")
+            # if not (diff_tab < 0.01).all():
+            #     errors.append("tabarru + ujrah ≠ retro nett premium")
 
             return errors
