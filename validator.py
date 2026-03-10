@@ -99,7 +99,9 @@ REQUIRED_COLUMNS_CLAIM_INWARD = [
     "amount of claim idr",
     "reins claim idr",
     "marein share idr",
-    "cause of claim"
+    "cause of claim",
+    "voucher id",
+    "references no"
 ]
 
 # Claim
