@@ -64,7 +64,7 @@ REQUIRED_COLUMNS_OUTWARD = [
     "retro overriding",
     "retro nett premium",
     "valuation date",
-    "inward vouc id"
+    "inw vouc id"
 ]
 
 # Claim
@@ -138,7 +138,7 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
     "reinsurer name",
     "voucher id",
     "voucher desc",
-    "inward vouc id"
+    "inw vouc id"
 ]
 
 # Admin
