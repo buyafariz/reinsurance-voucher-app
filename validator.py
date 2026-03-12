@@ -528,9 +528,9 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     # =========================
     # 6. TERM YEAR & TERM MONTH
     # =========================
-    both_zero = (df["term year"] == 0) & (df["term month"] == 0)
-    if both_zero.any():
-        errors.append("term year dan term month tidak boleh keduanya bernilai 0")
+    # both_zero = (df["term year"] == 0) & (df["term month"] == 0)
+    # if both_zero.any():
+    #     errors.append("term year dan term month tidak boleh keduanya bernilai 0")
 
     # =========================
     # 7. MEDICAL (M / N)
