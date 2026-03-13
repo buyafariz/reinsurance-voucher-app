@@ -440,8 +440,14 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     # =========================
     # 4. GENDER
     # =========================
-    if not df["gender"].isin(["M", "F", "U"]).all():
-        errors.append("Kolom gender hanya boleh M, F, atau U")
+    if reins_type == "INWARD":
+        if not df["gender"].isin(["M", "F", "U"]).all():
+            errors.append("Kolom gender hanya boleh M, F, atau U")
+
+    if reins_type == "OUTWARD":
+        if not df["gender"].isin(["M", "F", "U"]).all():
+            errors.append("Kolom gender hanya boleh M, F, atau U")
+
 
     # =========================
     # 5. INTEGER >= 0 (AGE AT, TERM)
