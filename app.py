@@ -556,7 +556,7 @@ with tab_post:
                     product = st.text_input("Product")
 
                 with col2:
-                    years = list(range(2015, year + 1))
+                    years = list(range(2010, year + 1))
                     months = list(range(1, 13))
 
                     cby = st.selectbox("Ceding Book Year (CBY)", years, index=years.index(year))
