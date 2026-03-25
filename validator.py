@@ -29,7 +29,9 @@ REQUIRED_COLUMNS_INWARD = [
     "reins tabarru",
     "reins ujrah",
     "reins nett premium",
-    "valuation date"
+    "valuation date",
+    "voucher id",
+    "references no"
 ]
 
 # Admin
