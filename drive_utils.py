@@ -335,19 +335,42 @@ def execute_with_retry(request, retries=3):
             time.sleep(2 ** i)
 
 import httplib2
+from google_auth_httplib2 import AuthorizedHttp
+# def load_log_from_gsheet(service, spreadsheet_id):
+#     http = httplib2.Http(timeout=60)
+#     sheets_service = build(
+#         "sheets",
+#         "v4",
+#         credentials=service._http.credentials,
+#         http=http
+#     )
+
+#     request = sheets_service.spreadsheets().values().get(
+#         spreadsheetId=spreadsheet_id,
+#         range="Log Produksi!A1:AX500"
+#     ).execute()
+
+#     result = execute_with_retry(request)
+
+#     values = result.get("values", [])
+
+#     if not values:
+#         return pd.DataFrame()
+
+#     df = pd.DataFrame(values[1:], columns=values[0])
+#     return df
+
 def load_log_from_gsheet(service, spreadsheet_id):
-    http = httplib2.Http(timeout=60)
-    sheets_service = build(
-        "sheets",
-        "v4",
-        credentials=service._http.credentials,
-        http=http
-    )
+    credentials = service._http.credentials
+
+    http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
+
+    sheets_service = build("sheets", "v4", http=http)
 
     request = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!A1:AX500"
-    ).execute()
+    )
 
     result = execute_with_retry(request)
 
@@ -356,8 +379,7 @@ def load_log_from_gsheet(service, spreadsheet_id):
     if not values:
         return pd.DataFrame()
 
-    df = pd.DataFrame(values[1:], columns=values[0])
-    return df
+    return pd.DataFrame(values[1:], columns=values[0])
 
 def update_gsheet(service, spreadsheet_id, df):
     sheets_service = build(
