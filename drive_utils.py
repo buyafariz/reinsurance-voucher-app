@@ -381,6 +381,29 @@ def load_log_from_gsheet(service, spreadsheet_id):
 
     return pd.DataFrame(values[1:], columns=values[0])
 
+def load_log_from_gsheet_to_local(service, spreadsheet_id, force_refresh=False):
+    import os
+    CACHE_FILE = "log_cache.parquet"
+
+    try:
+        if os.path.exists(CACHE_FILE) and not force_refresh:
+            print("LOAD FROM LOCAL CACHE")
+            return pd.read_parquet(CACHE_FILE)
+
+        print("FETCH FROM GOOGLE SHEETS")
+        df = load_log_from_gsheet(service, spreadsheet_id)
+        df.to_parquet(CACHE_FILE, index=False)
+        return df
+
+    except Exception as e:
+        print("ERROR → fallback to cache:", e)
+
+        if os.path.exists(CACHE_FILE):
+            return pd.read_parquet(CACHE_FILE)
+
+        raise e
+
+
 def update_gsheet(service, spreadsheet_id, df):
     sheets_service = build(
         "sheets",
@@ -451,32 +474,17 @@ def get_headers(service, spreadsheet_id):
 
 def append_gsheet(service, spreadsheet_id, row_dict):
     import httplib2
+    import pandas as pd
+    import numpy as np
+    from datetime import datetime, date
+    from decimal import Decimal
     from google_auth_httplib2 import AuthorizedHttp
     from googleapiclient.discovery import build
 
-    credentials = service._http.credentials
-    http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
-
-    sheets_service = build("sheets", "v4", http=http)
-
-    # ✅ ambil header dari cache (BUKAN API tiap kali)
-    headers = get_headers(service, spreadsheet_id)
-
-    # mapping sesuai urutan header
-    row = [row_dict.get(col, "") for col in headers]
-
-    request = sheets_service.spreadsheets().values().append(
-        spreadsheetId=spreadsheet_id,
-        range="Log Produksi!A:AX",
-        valueInputOption="USER_ENTERED",
-        insertDataOption="INSERT_ROWS",
-        body={"values": [row]}
-    )
-
-    return execute_with_retry(request)
-
+    # =========================
+    # CLEAN VALUE FUNCTION
+    # =========================
     def clean_value(value):
-
         if value is None:
             return None
 
@@ -506,19 +514,126 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
         return value
 
-    # 🔹 Susun row mengikuti urutan header
+    # =========================
+    # BUILD SERVICE (WITH TIMEOUT)
+    # =========================
+    credentials = service._http.credentials
+    http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
+
+    sheets_service = build("sheets", "v4", http=http)
+
+    # =========================
+    # GET HEADERS (CACHE)
+    # =========================
+    headers = get_headers(service, spreadsheet_id)
+
+    # =========================
+    # CLEAN & ORDER ROW
+    # =========================
     cleaned_row = [
         clean_value(row_dict.get(col, None))
         for col in headers
     ]
 
-    sheets_service.spreadsheets().values().append(
+    # =========================
+    # APPEND
+    # =========================
+    request = sheets_service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
-        range="Log Produksi!A1",
+        range="Log Produksi!A:AX",
         valueInputOption="USER_ENTERED",
         insertDataOption="INSERT_ROWS",
         body={"values": [cleaned_row]}
-    ).execute()
+    )
+
+    return execute_with_retry(request)
+
+def update_local_cache(row_dict):
+    import pandas as pd
+    import os
+
+    CACHE_FILE = "log_cache.parquet"
+
+    new_row_df = pd.DataFrame([row_dict])
+
+    if os.path.exists(CACHE_FILE):
+        df = pd.read_parquet(CACHE_FILE)
+        df = pd.concat([df, new_row_df], ignore_index=True)
+    else:
+        df = new_row_df
+
+    df.to_parquet(CACHE_FILE, index=False)
+
+# def append_gsheet(service, spreadsheet_id, row_dict):
+#     import httplib2
+#     from google_auth_httplib2 import AuthorizedHttp
+#     from googleapiclient.discovery import build
+
+#     credentials = service._http.credentials
+#     http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
+
+#     sheets_service = build("sheets", "v4", http=http)
+
+#     # ✅ ambil header dari cache (BUKAN API tiap kali)
+#     headers = get_headers(service, spreadsheet_id)
+
+#     # mapping sesuai urutan header
+#     row = [row_dict.get(col, "") for col in headers]
+
+#     request = sheets_service.spreadsheets().values().append(
+#         spreadsheetId=spreadsheet_id,
+#         range="Log Produksi!A:AX",
+#         valueInputOption="USER_ENTERED",
+#         insertDataOption="INSERT_ROWS",
+#         body={"values": [row]}
+#     )
+
+#     return execute_with_retry(request)
+
+#     def clean_value(value):
+
+#         if value is None:
+#             return None
+
+#         if pd.isna(value):
+#             return None
+
+#         if isinstance(value, (datetime, pd.Timestamp)):
+#             return value.strftime("%Y-%m-%d %H:%M:%S")
+
+#         if isinstance(value, date):
+#             return value.strftime("%Y-%m-%d")
+
+#         if isinstance(value, Decimal):
+#             return float(value)
+
+#         if isinstance(value, (np.integer,)):
+#             return int(value)
+
+#         if isinstance(value, (np.floating,)):
+#             return float(value)
+
+#         if isinstance(value, (np.bool_,)):
+#             return bool(value)
+
+#         if not isinstance(value, (str, int, float, bool)):
+#             return str(value)
+
+#         return value
+
+#     # 🔹 Susun row mengikuti urutan header
+#     cleaned_row = [
+#         clean_value(row_dict.get(col, None))
+#         for col in headers
+#     ]
+
+#     sheets_service.spreadsheets().values().append(
+#         spreadsheetId=spreadsheet_id,
+#         range="Log Produksi!A1",
+#         valueInputOption="USER_ENTERED",
+#         insertDataOption="INSERT_ROWS",
+#         body={"values": [cleaned_row]}
+#     ).execute()
 
 
 template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
