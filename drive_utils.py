@@ -324,18 +324,32 @@ def load_log_from_drive(service, filename, parent_id):
     fh.seek(0)
     return pd.read_excel(fh)
 
+import time
+def execute_with_retry(request, retries=3):
+    for i in range(retries):
+        try:
+            return request.execute()
+        except Exception as e:
+            if i == retries - 1:
+                raise e
+            time.sleep(2 ** i)
 
+import httplib2
 def load_log_from_gsheet(service, spreadsheet_id):
+    http = httplib2.Http(timeout=60)
     sheets_service = build(
         "sheets",
         "v4",
-        credentials=service._http.credentials
+        credentials=service._http.credentials,
+        http=http
     )
 
-    result = sheets_service.spreadsheets().values().get(
+    request = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!A1:AX500"
     ).execute()
+
+    result = execute_with_retry(request)
 
     values = result.get("values", [])
 
