@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename_outward, generate_vou_from_drive
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet_to_local, update_gsheet, append_gsheet, update_local_cache, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -853,8 +853,6 @@ with tab_post:
                             row_dict=log_entry
                         )
 
-                        update_local_cache(log_entry)                  
-
                         upload_dataframe_to_drive(
                             service=service,
                             df=df,
@@ -1576,8 +1574,6 @@ with tab_post:
                             row_dict=log_entry
                         )
 
-                        update_local_cache(log_entry)
-
                         upload_dataframe_to_drive_outward(
                             service=service,
                             df=df,
@@ -1678,16 +1674,10 @@ with tab_cancel:
         st.info("Log belum tersedia")
         st.stop()
 
-    prod_log_df = load_log_from_gsheet_to_local(
+    prod_log_df = load_log_from_gsheet(
         service=service,
         spreadsheet_id=log_drive_id
     )
-
-    prod_log_df.to_parquet("log_cache.parquet")
-    prod_log_df = pd.read_parquet("log_cache.parquet")
-
-    prod_log_df.to_parquet("log_cache.parquet")
-    prod_log_df = pd.read_parquet("log_cache.parquet")
 
     if "STATUS" not in prod_log_df.columns:
         st.error("Tidak ada voucher")
@@ -1903,13 +1893,10 @@ with tab_cancel:
                         )
                     
 
-                    current_log_df = load_log_from_gsheet_to_local(
+                    current_log_df = load_log_from_gsheet(
                         service=service,
                         spreadsheet_id=current_log_drive_id,
                     )
-
-                    current_log_df.to_parquet("log_cache.parquet")
-                    current_log_df = pd.read_parquet("log_cache.parquet")
 
                     # =============================
                     # 3️⃣ GENERATE NOMOR BARU

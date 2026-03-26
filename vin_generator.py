@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
-from drive_utils import load_log_from_gsheet, load_log_from_gsheet_to_local
+from drive_utils import load_log_from_gsheet
 from zoneinfo import ZoneInfo
 
 
@@ -139,6 +139,7 @@ def generate_vin_from_drive(
     return voucher, next_seq
 
 
+
 def generate_vou_from_drive(
     service,
     outward_folder_id,
@@ -163,7 +164,7 @@ def generate_vou_from_drive(
         next_seq = 1
 
     else:
-        log_df = load_log_from_gsheet_to_local(
+        log_df = load_log_from_gsheet(
             service=service,
             spreadsheet_id=file_id
         )
