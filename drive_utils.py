@@ -411,26 +411,69 @@ def update_gsheet(service, spreadsheet_id, df):
     except Exception as e:
         st.error(e)
 
-def append_gsheet(service, spreadsheet_id, row_dict):
-    from googleapiclient.discovery import build
-    import pandas as pd
-    import numpy as np
-    from datetime import datetime, date
-    from decimal import Decimal
+# def append_gsheet(service, spreadsheet_id, row_dict):
+#     from googleapiclient.discovery import build
+#     import pandas as pd
+#     import numpy as np
+#     from datetime import datetime, date
+#     from decimal import Decimal
 
+#     sheets_service = build(
+#         "sheets",
+#         "v4",
+#         credentials=service._http.credentials
+#     )
+
+#     # 🔹 Ambil header dari sheet
+#     header_response = sheets_service.spreadsheets().values().get(
+#         spreadsheetId=spreadsheet_id,
+#         range="Log Produksi!1:1"
+#     ).execute()
+
+#     headers = header_response.get("values", [[]])[0]
+
+import streamlit as st
+
+@st.cache_data(ttl=3600)
+def get_headers(service, spreadsheet_id):
     sheets_service = build(
         "sheets",
         "v4",
         credentials=service._http.credentials
     )
 
-    # 🔹 Ambil header dari sheet
-    header_response = sheets_service.spreadsheets().values().get(
+    response = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!1:1"
     ).execute()
 
-    headers = header_response.get("values", [[]])[0]
+    return response.get("values", [[]])[0]
+
+def append_gsheet(service, spreadsheet_id, row_dict):
+    import httplib2
+    from google_auth_httplib2 import AuthorizedHttp
+    from googleapiclient.discovery import build
+
+    credentials = service._http.credentials
+    http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
+
+    sheets_service = build("sheets", "v4", http=http)
+
+    # ✅ ambil header dari cache (BUKAN API tiap kali)
+    headers = get_headers(service, spreadsheet_id)
+
+    # mapping sesuai urutan header
+    row = [row_dict.get(col, "") for col in headers]
+
+    request = sheets_service.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id,
+        range="Log Produksi!A:AX",
+        valueInputOption="USER_ENTERED",
+        insertDataOption="INSERT_ROWS",
+        body={"values": [row]}
+    )
+
+    return execute_with_retry(request)
 
     def clean_value(value):
 
