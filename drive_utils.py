@@ -335,18 +335,19 @@ def execute_with_retry(request, retries=3):
             time.sleep(2 ** i)
 
 import httplib2
+from google_auth_httplib2 import AuthorizedHttp
 def load_log_from_gsheet(service, spreadsheet_id):
-    http = httplib2.Http(timeout=60)
+    credentials = service._http.credentials
+    http = AuthorizedHttp(credentials, http=httplib2.Http(timeout=60))
     sheets_service = build(
         "sheets",
         "v4",
-        credentials=service._http.credentials,
         http=http
     )
 
     request = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Log Produksi!A1:AX500"
+        range="Log Produksi!A1:AX"
     ).execute()
 
     result = execute_with_retry(request)
