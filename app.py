@@ -1679,6 +1679,12 @@ with tab_cancel:
         spreadsheet_id=log_drive_id
     )
 
+    prod_log_df.to_parquet("log_cache.parquet")
+    prod_log_df = pd.read_parquet("log_cache.parquet")
+
+    prod_log_df.to_parquet("log_cache.parquet")
+    prod_log_df = pd.read_parquet("log_cache.parquet")
+
     if "STATUS" not in prod_log_df.columns:
         st.error("Tidak ada voucher")
         st.stop()
@@ -1897,6 +1903,9 @@ with tab_cancel:
                         service=service,
                         spreadsheet_id=current_log_drive_id,
                     )
+
+                    current_log_df.to_parquet("log_cache.parquet")
+                    current_log_df = pd.read_parquet("log_cache.parquet")
 
                     # =============================
                     # 3️⃣ GENERATE NOMOR BARU
