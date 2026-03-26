@@ -334,7 +334,7 @@ def load_log_from_gsheet(service, spreadsheet_id):
 
     result = sheets_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Log Produksi"
+        range="Log Produksi!A1:AX500"
     ).execute()
 
     values = result.get("values", [])
