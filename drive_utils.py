@@ -458,7 +458,9 @@ def update_gsheet(service, spreadsheet_id, df):
 import streamlit as st
 
 @st.cache_data(ttl=3600)
-def get_headers(service, spreadsheet_id):
+def get_headers(spreadsheet_id):
+    service = get_drive_service()  # buat ulang di dalam
+
     sheets_service = build(
         "sheets",
         "v4",
@@ -525,7 +527,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
     # =========================
     # GET HEADERS (CACHE)
     # =========================
-    headers = get_headers(service, spreadsheet_id)
+    headers = get_headers(spreadsheet_id)
 
     # =========================
     # CLEAN & ORDER ROW
