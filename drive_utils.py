@@ -377,11 +377,14 @@ def update_gsheet(service, spreadsheet_id, df):
 
 #Update
 import httplib2
+from google_auth_httplib2 import AuthorizedHttp
 from googleapiclient.discovery import build
 
 def init_sheets_service(creds):
-    http = httplib2.Http(timeout=60)  # ⬅️ penting untuk hindari timeout
-    return build("sheets", "v4", credentials=creds, http=http)
+    http = httplib2.Http(timeout=60)
+    authed_http = AuthorizedHttp(creds, http=http)
+
+    return build("sheets", "v4", http=authed_http)
 
 @st.cache_data(ttl=600)
 def get_headers(_service, spreadsheet_id):
