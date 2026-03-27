@@ -1412,8 +1412,8 @@ with tab_post:
                             st.success("Voucher berhasil dibuat!")
 
                         except Exception as e:
-                            st.error("Mohon maaf, terjadi kendala. Silakan coba lagi.")
-                            
+                            st.error("Mohon maaf, terjadi kendala saat generate voucher. Silakan coba lagi.")
+
                         ceding_folder_name = normalize_folder_name(account_with)
 
                         ceding_drive = get_or_create_ceding_folders(
@@ -1573,12 +1573,16 @@ with tab_post:
                                 filename=get_log_filename_outward(int(oby), int(obm)),
                                 columns=list(log_entry.keys())
                             )
+                        
+                        try:
+                            append_gsheet(
+                                service=service,
+                                spreadsheet_id=log_drive_id,
+                                row_dict=log_entry
+                            )
 
-                        append_gsheet(
-                            service=service,
-                            spreadsheet_id=log_drive_id,
-                            row_dict=log_entry
-                        )
+                        except Exception as e:
+                            st.error("Mohon maaf, terjadi kendala saat update log. Silakan coba lagi.")
 
                         upload_dataframe_to_drive_outward(
                             service=service,
