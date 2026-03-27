@@ -1581,8 +1581,10 @@ with tab_post:
                                 columns=list(log_entry.keys())
                             )
 
+                        sheets_service = init_sheets_service(creds)
+
                         append_gsheet(
-                            service=service,
+                            service=sheets_service,
                             spreadsheet_id=log_drive_id,
                             row_dict=log_entry
                         )
