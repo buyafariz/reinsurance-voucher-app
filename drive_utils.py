@@ -384,8 +384,8 @@ def init_sheets_service(creds):
     return build("sheets", "v4", credentials=creds, http=http)
 
 @st.cache_data(ttl=600)
-def get_headers(service, spreadsheet_id):
-    result = service.spreadsheets().values().get(
+def get_headers(_service, spreadsheet_id):
+    result = _service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!1:1"
     ).execute()
