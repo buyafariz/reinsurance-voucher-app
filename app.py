@@ -1399,15 +1399,21 @@ with tab_post:
                         # else:
                         #     log_df = pd.DataFrame()
 
-                        voucher, seq_no = generate_vou_from_drive(
-                            service=service,
-                            outward_folder_id=OUTWARD_DRIVE_ID,
-                            year=int(oby),
-                            month=int(obm),
-                            find_drive_file=find_drive_file,
-                            biz_type = biz_type
-                        )
+                        try:
+                            voucher, seq_no = generate_vou_from_drive(
+                                service=service,
+                                outward_folder_id=OUTWARD_DRIVE_ID,
+                                year=int(oby),
+                                month=int(obm),
+                                find_drive_file=find_drive_file,
+                                biz_type=biz_type
+                            )
 
+                            st.success("Voucher berhasil dibuat!")
+
+                        except Exception as e:
+                            st.error("Mohon maaf, terjadi kendala. Silakan coba lagi.")
+                            
                         ceding_folder_name = normalize_folder_name(account_with)
 
                         ceding_drive = get_or_create_ceding_folders(
