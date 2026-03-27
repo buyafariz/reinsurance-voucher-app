@@ -1399,21 +1399,17 @@ with tab_post:
                         # else:
                         #     log_df = pd.DataFrame()
 
-                        try:
-                            voucher, seq_no = generate_vou_from_drive(
-                                service=service,
-                                outward_folder_id=OUTWARD_DRIVE_ID,
-                                year=int(oby),
-                                month=int(obm),
-                                find_drive_file=find_drive_file,
-                                biz_type=biz_type
-                            )
+                        voucher, seq_no = generate_vou_from_drive(
+                            service=service,
+                            outward_folder_id=OUTWARD_DRIVE_ID,
+                            year=int(oby),
+                            month=int(obm),
+                            find_drive_file=find_drive_file,
+                            biz_type=biz_type
+                        )
 
-                            st.success("Voucher berhasil dibuat!")
-
-                        except Exception as e:
-                            st.error("Mohon maaf, terjadi kendala saat generate voucher. Silakan coba lagi.")
-
+                        st.success("Voucher berhasil dibuat!")
+                            
                         ceding_folder_name = normalize_folder_name(account_with)
 
                         ceding_drive = get_or_create_ceding_folders(
@@ -1573,16 +1569,12 @@ with tab_post:
                                 filename=get_log_filename_outward(int(oby), int(obm)),
                                 columns=list(log_entry.keys())
                             )
-                        
-                        try:
-                            append_gsheet(
-                                service=service,
-                                spreadsheet_id=log_drive_id,
-                                row_dict=log_entry
-                            )
 
-                        except Exception as e:
-                            st.error("Mohon maaf, terjadi kendala saat update log. Silakan coba lagi.")
+                        append_gsheet(
+                            service=service,
+                            spreadsheet_id=log_drive_id,
+                            row_dict=log_entry
+                        )
 
                         upload_dataframe_to_drive_outward(
                             service=service,
