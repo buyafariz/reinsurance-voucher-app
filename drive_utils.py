@@ -402,7 +402,7 @@ def execute_with_retry(request, max_retries=3):
                 raise e
             time.sleep(2 ** i)  # exponential backoff
 
-def append_gsheet(service, spreadsheet_id, row_dict, headers):
+def append_gsheet(service, spreadsheet_id, row_dict):
     import pandas as pd
     import numpy as np
     from datetime import datetime, date
@@ -434,6 +434,8 @@ def append_gsheet(service, spreadsheet_id, row_dict, headers):
             return str(value)
 
         return value
+
+    headers = get_headers(service, spreadsheet_id)
 
     cleaned_row = [
         clean_value(row_dict.get(col, None))
