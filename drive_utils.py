@@ -375,33 +375,41 @@ def update_gsheet(service, spreadsheet_id, df):
     except Exception as e:
         st.error(e)
 
-def append_gsheet(service, spreadsheet_id, row_dict):
-    from googleapiclient.discovery import build
+#Update
+import httplib2
+from googleapiclient.discovery import build
+
+def init_sheets_service(creds):
+    http = httplib2.Http(timeout=60)  # ⬅️ penting untuk hindari timeout
+    return build("sheets", "v4", credentials=creds, http=http)
+
+@st.cache_data(ttl=600)
+def get_headers(service, spreadsheet_id):
+    result = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range="Log Produksi!1:1"
+    ).execute()
+    return result.get("values", [[]])[0]
+
+import time
+
+def execute_with_retry(request, max_retries=3):
+    for i in range(max_retries):
+        try:
+            return request.execute()
+        except Exception as e:
+            if i == max_retries - 1:
+                raise e
+            time.sleep(2 ** i)  # exponential backoff
+
+def append_gsheet(service, spreadsheet_id, row_dict, headers):
     import pandas as pd
     import numpy as np
     from datetime import datetime, date
     from decimal import Decimal
 
-    sheets_service = build(
-        "sheets",
-        "v4",
-        credentials=service._http.credentials
-    )
-
-    # 🔹 Ambil header dari sheet
-    header_response = sheets_service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
-        range="Log Produksi!1:1"
-    ).execute()
-
-    headers = header_response.get("values", [[]])[0]
-
     def clean_value(value):
-
-        if value is None:
-            return None
-
-        if pd.isna(value):
+        if value is None or pd.isna(value):
             return None
 
         if isinstance(value, (datetime, pd.Timestamp)):
@@ -427,19 +435,86 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
         return value
 
-    # 🔹 Susun row mengikuti urutan header
     cleaned_row = [
         clean_value(row_dict.get(col, None))
         for col in headers
     ]
 
-    sheets_service.spreadsheets().values().append(
+    request = service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
         range="Log Produksi!A1",
         valueInputOption="USER_ENTERED",
         insertDataOption="INSERT_ROWS",
         body={"values": [cleaned_row]}
-    ).execute()
+    )
+
+    return execute_with_retry(request)
+
+# def append_gsheet(service, spreadsheet_id, row_dict):
+#     from googleapiclient.discovery import build
+#     import pandas as pd
+#     import numpy as np
+#     from datetime import datetime, date
+#     from decimal import Decimal
+
+#     sheets_service = build(
+#         "sheets",
+#         "v4",
+#         credentials=service._http.credentials
+#     )
+
+    # 🔹 Ambil header dari sheet
+    # header_response = sheets_service.spreadsheets().values().get(
+    #     spreadsheetId=spreadsheet_id,
+    #     range="Log Produksi!1:1"
+    # ).execute()
+
+    # headers = header_response.get("values", [[]])[0]
+
+    # def clean_value(value):
+
+    #     if value is None:
+    #         return None
+
+    #     if pd.isna(value):
+    #         return None
+
+    #     if isinstance(value, (datetime, pd.Timestamp)):
+    #         return value.strftime("%Y-%m-%d %H:%M:%S")
+
+    #     if isinstance(value, date):
+    #         return value.strftime("%Y-%m-%d")
+
+    #     if isinstance(value, Decimal):
+    #         return float(value)
+
+    #     if isinstance(value, (np.integer,)):
+    #         return int(value)
+
+    #     if isinstance(value, (np.floating,)):
+    #         return float(value)
+
+    #     if isinstance(value, (np.bool_,)):
+    #         return bool(value)
+
+    #     if not isinstance(value, (str, int, float, bool)):
+    #         return str(value)
+
+    #     return value
+
+    # # 🔹 Susun row mengikuti urutan header
+    # cleaned_row = [
+    #     clean_value(row_dict.get(col, None))
+    #     for col in headers
+    # ]
+
+    # sheets_service.spreadsheets().values().append(
+    #     spreadsheetId=spreadsheet_id,
+    #     range="Log Produksi!A1",
+    #     valueInputOption="USER_ENTERED",
+    #     insertDataOption="INSERT_ROWS",
+    #     body={"values": [cleaned_row]}
+    # ).execute()
 
 
 template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
