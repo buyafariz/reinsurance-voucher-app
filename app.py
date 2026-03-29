@@ -134,7 +134,8 @@ with tab_upload:
     with row2_col1:
         department = st.selectbox(
             "Department",
-            ["ADMIN", "CLAIM"]
+            ["ADMIN", "CLAIM"],
+            key="department_upload"
         )
 
     with row2_col2:
@@ -918,7 +919,8 @@ with tab_post:
     with row2_col1:
         department = st.selectbox(
             "Department",
-            ["ADMIN", "CLAIM"]
+            ["ADMIN", "CLAIM"],
+            key="department"
         )
 
     with row2_col2:
