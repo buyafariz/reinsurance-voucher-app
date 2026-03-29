@@ -122,7 +122,7 @@ with tab_upload:
         reins_type = st.selectbox(
             "Reinsurance Type",
             ["INWARD", "OUTWARD"],
-            key="reins_type"
+            key="reins_type_upload"
         )
 
     # row1_col2 sengaja dikosongkan
@@ -150,7 +150,7 @@ with tab_upload:
                 "Batal",
                 "Cancel"
             ],
-            key="biz_type"
+            key="biz_type_upload"
         )
 
     uploaded_file = st.file_uploader(
@@ -175,7 +175,7 @@ with tab_upload:
             # ==========================
             # VALIDATION
             # ==========================
-            errors = validate_voucher(df, st.session_state["biz_type"], st.session_state["reins_type"])
+            errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
 
             if errors:
                 st.error("❌ VALIDASI GAGAL")
