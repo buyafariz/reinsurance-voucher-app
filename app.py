@@ -100,11 +100,796 @@ CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
 st.title("📄 Retakaful Voucher Tools")
 st.write("")
 
-tab_post, tab_cancel = st.tabs([
+tab_upload, tab_calc, tab_post, tab_cancel = st.tabs([
+    "📤 Upload & Validation",
+    "🧮 Calculate",
     "📥 Create Voucher",
     "🔄 Update Voucher",
 ])
 
+
+# ==========================
+# SIMPAN VOUCHER
+# ==========================
+
+with tab_upload:
+    st.subheader("📤 Upload & Validation")
+    
+    # ===== ROW 1 =====
+    row1_col1, row1_col2 = st.columns(2)
+
+    with row1_col1:
+        reins_type = st.selectbox(
+            "Reinsurance Type",
+            ["INWARD", "OUTWARD"],
+            key="reins_type"
+        )
+
+    # row1_col2 sengaja dikosongkan
+
+
+    # ===== ROW 2 =====
+    row2_col1, row2_col2 = st.columns(2)
+
+    with row2_col1:
+        department = st.selectbox(
+            "Department",
+            ["ADMIN", "CLAIM"]
+        )
+
+    with row2_col2:
+        biz_type = st.selectbox(
+            "Biz Type",
+            [
+                "Kontribusi",
+                "Claim",
+                "Refund",
+                "Alteration",
+                "Retur",
+                "Revise",
+                "Batal",
+                "Cancel"
+            ],
+            key="biz_type"
+        )
+
+    uploaded_file = st.file_uploader(
+        "Upload Voucher (.xlsx)",
+        type=["xlsx"],
+        key="upload_post"
+    )
+
+    if uploaded_file:
+        if reins_type == "INWARD":
+            # ==========================
+            # READ FILE
+            # ==========================
+            df = pd.read_excel(uploaded_file)
+            original_columns = df.columns.tolist()
+            df.columns = df.columns.str.strip().str.lower()
+
+            for col in ["certificate no", "pol holder no"]:
+                if col in df.columns:
+                    df[col] = df[col].astype(str).str.strip()
+
+            # ==========================
+            # VALIDATION
+            # ==========================
+            errors = validate_voucher(df, st.session_state["biz_type"], st.session_state["reins_type"])
+
+            if errors:
+                st.error("❌ VALIDASI GAGAL")
+                for err in errors:
+                    st.write(f"- {err}")
+                st.stop()
+
+            st.success("✅ Validasi berhasil")
+
+
+            # ==========================
+            # PREVIEW + FILTER (DINAMIS)
+            # ==========================
+
+            def get_non_empty_columns(df: pd.DataFrame):
+                valid_cols = []
+                for col in df.columns:
+                    series = df[col]
+                    non_na = series.dropna()
+
+                    if non_na.empty:
+                        continue
+
+                    if series.dtype == "object":
+                        if non_na.astype(str).str.strip().ne("").any():
+                            valid_cols.append(col)
+                    else:
+                        valid_cols.append(col)
+
+                return valid_cols
+
+
+            # ==========================
+            # PREVIEW + FILTER
+            # ==========================
+            with st.expander("📊 Preview Data Voucher", expanded=True):
+
+                filtered_df = df.copy()
+
+                MAX_PREVIEW_ROWS = 2000
+
+                display_df = filtered_df.copy()
+                total_rows = len(display_df)
+
+                # # ==========================
+                # # LIMIT PREVIEW ROWS
+                # # ==========================
+
+                if total_rows > MAX_PREVIEW_ROWS:
+                    st.warning(
+                        f"⚠️ Data sangat besar ({total_rows:,} baris). "
+                        f"Hanya menampilkan {MAX_PREVIEW_ROWS:,} baris pertama untuk preview."
+                    )
+                    preview_df = display_df.head(MAX_PREVIEW_ROWS)
+                else:
+                    preview_df = display_df
+
+                st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
+
+                # ==========================
+                # SANITIZE DATA (ANTI-CRASH)
+                # ==========================
+
+                preview_df = preview_df.copy()
+
+                for col in preview_df.columns:
+                    # Convert datetime (including timezone) to string
+                    if pd.api.types.is_datetime64_any_dtype(preview_df[col]):
+                        preview_df[col] = preview_df[col].astype(str)
+
+                    # Convert Period
+                    elif "period" in str(preview_df[col].dtype):
+                        preview_df[col] = preview_df[col].astype(str)
+
+                    # Convert object that might contain mixed types
+                    elif preview_df[col].dtype == "object":
+                        preview_df[col] = preview_df[col].astype(str)
+
+                preview_df = preview_df.fillna("")
+
+                # ==========================
+                # GRID BUILDER
+                # ==========================
+
+                gb = GridOptionsBuilder.from_dataframe(preview_df)
+
+                gb.configure_default_column(
+                    filter=True,
+                    sortable=True,
+                    resizable=True,
+                    minWidth=120,
+                    flex=0
+                )
+
+                # ==========================
+                # ACCOUNTING FORMATTER (INTERNATIONAL)
+                # ==========================
+
+                accounting_formatter = JsCode("""
+                function(params) {
+                    if (params.value == null || params.value === '') return '';
+
+                    let value = Number(params.value);
+
+                    let formatted = Math.abs(value).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    if (value < 0) {
+                        return '(' + formatted + ')';
+                    }
+
+                    return formatted;
+                }
+                """)
+
+                ACCOUNTING_COLS = [
+                    "sum insured",
+                    "sum at risk",
+                    "reins sum insured",
+                    "reins sum at risk",
+                    "reins premium",
+                    "reins em premium",
+                    "reins er premium",
+                    "reins oth premium",
+                    "reins total premium",
+                    "reins comm",
+                    "reins em comm",
+                    "reins er comm",
+                    "reins oth comm",
+                    "reins profit share",
+                    "reins overriding",
+                    "reins broker fee",
+                    "reins total comm",
+                    "reins tabarru",
+                    "reins ujrah",
+                    "reins nett premium"
+                ]
+
+                for col in ACCOUNTING_COLS:
+                    if col in preview_df.columns:
+                        gb.configure_column(
+                            col,
+                            type=["numericColumn"],
+                            valueFormatter=accounting_formatter,
+                            cellStyle={"textAlign": "right"}
+                        )
+
+                # ==========================
+                # GRID OPTIONS
+                # ==========================
+
+                gb.configure_pagination(
+                    paginationAutoPageSize=False,
+                    paginationPageSize=50
+                )
+
+                gb.configure_grid_options(
+                    headerHeight=42,
+                    rowHeight=36,
+                    domLayout="normal",
+                    suppressHorizontalScroll=False,
+                    onFirstDataRendered="""
+                    function(params) {
+                        const allColumnIds = [];
+                        params.columnApi.getAllColumns().forEach(function(col) {
+                            allColumnIds.push(col.getId());
+                        });
+                        params.columnApi.autoSizeColumns(allColumnIds, false);
+                    }
+                    """
+                )
+
+                grid_options = gb.build()
+
+                # ==========================
+                # CUSTOM CSS
+                # ==========================
+
+                custom_css = {
+
+                    # ---------- WRAPPER ----------
+                    ".ag-root-wrapper": {
+                        "background-color": "var(--secondary-background-color)",
+                        # "border": "1px solid var(--primary-color)",
+                        "border-radius": "12px",
+                    },
+
+                    ".ag-center-cols-viewport": {
+                        "background-color": "var(--secondary-background-color)",
+                    },
+
+                    ".ag-body-viewport": {
+                        "background-color": "var(--secondary-background-color)",
+                    },
+
+                    ".ag-center-cols-container": {
+                        "background-color": "var(--secondary-background-color)",
+                    },
+
+                    # ---------- HEADER ----------
+                    ".ag-header": {
+                        "background-color": "var(--background-color)",
+                        "color": "var(--text-color)",
+                        "font-weight": "600",
+                        "font-size": "13px",
+                        # "border-bottom": "2px solid var(--primary-color)"
+                    },
+
+                    ".ag-header-cell": {
+                        "padding-top": "8px",
+                        "padding-bottom": "8px",
+                        "border-right": "1px solid var(--secondary-background-color)"
+                    },
+
+                    ".ag-header-cell-label": {
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%"
+                    },
+
+                    ".ag-header-cell-text": {
+                        "flex-grow": "1",
+                        "text-align": "center",
+                        "text-transform": "capitalize"
+                    },
+
+                    # ---------- BODY ----------
+                    ".ag-row": {
+                        "background-color": "var(--secondary-background-color)",
+                        "color": "var(--text-color)",
+                        "border-bottom": "1px solid var(--background-color)"
+                    },
+
+                    ".ag-row-hover": {
+                        "background-color": "rgba(128,128,128,0.15)",
+                    },
+
+                    ".ag-cell": {
+                        "border-color": "var(--background-color)",
+                        "border-right": "1px solid var(--background-color)",
+                        "border-bottom": "1px solid var(--background-color)"
+                    },
+
+                    # ---------- PAGINATION ----------
+                    ".ag-paging-panel": {
+                        "background-color": "var(--secondary-background-color)",
+                        "color": "var(--text-color)",
+                    },
+
+                    # ---------- ICON STYLE ----------
+                    ".ag-icon": {
+                        "font-size": "11px",
+                        "opacity": "0.8"
+                    }
+
+                }
+
+
+                # ==========================
+                # RENDER GRID
+                # ==========================
+
+                AgGrid(
+                    preview_df,
+                    gridOptions=grid_options,
+                    height=600,
+                    theme="dark",
+                    custom_css=custom_css,
+                    allow_unsafe_jscode=True
+                )
+
+
+            # ==========================
+            # PERIOD & LOG
+            # ==========================
+            year = st.session_state["log_period"]["year"]
+            month = st.session_state["log_period"]["month"]
+
+
+            # ==========================
+            # DRIVE FOLDER PER PERIODE (STEP 3)
+            # ==========================
+            drive_folders = get_period_drive_folders(
+                year=year,
+                month=month,
+                root_folder_id=ROOT_DRIVE_FOLDER_ID
+            )
+
+            PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+
+            # ==========================
+            # FORM INPUT
+            # ==========================
+
+            with st.expander("🧾 Informasi Voucher", expanded=True):
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    account_with = st.selectbox(
+                        "Account With",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ALLIANZ LIFE SYARIAH (Health)",
+                            "ALLIANZ LIFE SYARIAH (FlexiCare)",
+                            "ALLIANZ LIFE SYARIAH (HSCP)",
+                            "ALLIANZ LIFE SYARIAH (Individu DMTM)",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
+                    )
+
+                    cedant_company = st.selectbox(
+                        "Cedant Company",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PANIN DAICHI LIFE SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
+                    )
+
+
+                    pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+                    product = st.text_input("Product")
+
+                with col2:
+                    years = list(range(2010, year + 1))
+                    months = list(range(1, 13))
+
+                    cby = st.selectbox("Ceding Book Year (CBY)", years, index=years.index(year))
+                    cbm = st.selectbox("Ceding Book Month (CBM)", months)#, index=months.index(month))
+                    #oby = st.selectbox("Our Book Year (OBY)", years, index=years.index(year))
+                    #obm = st.selectbox("Our Book Month (OBM)", months)#, index=months.index(month))
+                    oby = st.text_input("Our Book Year (OBY)", value=year, disabled=True)
+                    obm = st.text_input("Our Book Month (OBM)", value=month, disabled=True)
+
+                kob = st.selectbox(
+                    "Kind of Business (KOB)",
+                    [
+                        "TTY",
+                        "FAC"
+                    ]
+                )
+
+                cob = st.selectbox(
+                    "Class of Business (COB)",
+                    [
+                        "CREDIT GROUP",
+                        "HEALTH GROUP",
+                        "HEALTH INDIVIDUAL",
+                        "LIFE GROUP",
+                        "LIFE INDIVIDUAL",
+                        "P.A GROUP",
+                        "P.A INDIVIDUAL",
+                    ]
+                )
+
+                mop = st.selectbox(
+                    "Mode of Payment (MOP)",
+                    ["Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"]
+                )
+
+                curr = st.selectbox(
+                    "Currency",
+                    ["IDR", "USD"]
+                )
+
+                subject_email = st.text_area("Subject Email")
+
+                email_date = st.date_input("Email Date",value=date.today())
+
+                remarks = st.text_area("Remarks")
+
+
+            # ==========================
+            # FINANCIAL SUMMARY
+            # ==========================
+            st.subheader("💰 Ringkasan Finansial")
+
+            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Total Contribution",
+                        "Commission",
+                        "Tabarru",
+                        "Ujrah",
+                        "Nett Premium"
+                    ],
+                    "Nilai": [
+                        df["reins total premium"].sum(),
+                        df["reins total comm"].sum(),
+                        df["reins tabarru"].sum(),
+                        df["reins ujrah"].sum(),
+                        df["reins nett premium"].sum(),
+                    ]
+                })
+
+            elif biz_type == "Claim":
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Amount of Claim IDR",
+                        "Reins Claim IDR",
+                        "Marein Share IDR"
+                    ],
+                    "Nilai": [
+                        df["amount of claim idr"].sum(),
+                        df["reins claim idr"].sum(),
+                        df["marein share idr"].sum()
+                        ]
+                })
+                
+
+            st.dataframe(
+                summary_df.style.format({"Nilai": "{:,.2f}"}),
+                use_container_width=True
+            )
+
+
+            # ==========================
+            # POST VOUCHER (LOCKED)
+            # ==========================
+            if st.button("💾 Simpan Voucher"):
+                start_time = time.time()
+
+                if not product.strip() or not remarks.strip() or not subject_email.strip():
+                    st.error("Product, Subject Email, dan Remarks wajib diisi")
+                    st.stop()
+
+                #lock_path = log_path + ".lock"
+                service = get_drive_service()
+
+                with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
+
+                    try:
+                        service = get_drive_service()                    
+
+                        drive_folders = get_period_drive_folders(
+                            year=int(oby),
+                            month=int(obm),
+                            root_folder_id=ROOT_DRIVE_FOLDER_ID
+                        )
+
+                        PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
+                        # reload log terbaru setelah lock
+                        # if os.path.exists(log_path):
+                        #     log_df = pd.read_excel(log_path)
+                        # else:
+                        #     log_df = pd.DataFrame()
+
+                        voucher, seq_no = generate_vin_from_drive(
+                            service=service,
+                            period_folder_id=PERIOD_DRIVE_ID,
+                            year=int(oby),
+                            month=int(obm),
+                            find_drive_file=find_drive_file,
+                            biz_type = biz_type
+                        )
+
+                        ceding_folder_name = normalize_folder_name(account_with)
+
+                        ceding_drive = get_or_create_ceding_folders(
+                            service=service,
+                            period_folder_id=PERIOD_DRIVE_ID,
+                            ceding_name=ceding_folder_name
+                        )
+
+                        CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+
+                        # Upload voucher (selalu CREATE)
+                        log_drive_id = find_drive_file(
+                            service=service,
+                            filename=get_log_filename(int(oby), int(obm)),
+                            # filename="log_produksi.xlsx",
+                            parent_id=PERIOD_DRIVE_ID,
+                            mime_type="application/vnd.google-apps.spreadsheet"
+                        )
+
+                        rate_exchange = get_exchange_rate(
+                            service=service,
+                            config_folder_id=CONFIG_FOLDER_ID,
+                            currency=curr,
+                            month=month
+                        )
+
+                        due_date = calculate_due_date(
+                            account_with=account_with,
+                            year=year,
+                            month=month,
+                            service=service
+                        )
+
+
+                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            log_entry = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "Voucher No": voucher,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Product": product,
+                                "CBY": cby,
+                                "CBM": cbm,
+                                "OBY": oby,
+                                "OBM": obm,
+                                "KOB": kob,
+                                "COB": cob,
+                                "MOP": mop,
+                                "Curr":curr,
+                                "Total Contribution": df["reins total premium"].sum(),
+                                "Commission": df["reins total comm"].sum(),
+                                "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
+                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
+                                "Tabarru": df["reins tabarru"].sum(),
+                                "Ujrah": df["reins ujrah"].sum(),
+                                "Claim": 0,
+                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "Check Balance": "",
+                                "Rate Exchange": rate_exchange,
+                                "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
+                                "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
+                                "Overiding (IDR)": (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)*rate_exchange,
+                                "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0))*rate_exchange,
+                                "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)))*rate_exchange,
+                                "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
+                                "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
+                                "Claim (IDR)": 0,
+                                "Balance (IDR)": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
+                                "Check Balance (IDR)":"",
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Due Date": due_date,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON":"-"
+                            }
+
+                        elif biz_type == "Claim":
+                            log_entry = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "Voucher No": voucher,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Product": product,
+                                "CBY": cby,
+                                "CBM": cbm,
+                                "OBY": oby,
+                                "OBM": obm,
+                                "KOB": kob,
+                                "COB": cob,
+                                "MOP": mop,
+                                "Curr":curr,
+                                "Total Contribution": 0,
+                                "Commission": 0,
+                                "Overriding": 0,
+                                "Total Commission": 0,
+                                "Gross Premium Income": 0,
+                                "Tabarru": 0,
+                                "Ujrah": 0,
+                                "Claim": df["marein share idr"].sum(),
+                                "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
+                                "Check Balance": "",
+                                "Rate Exchange": rate_exchange,
+                                "Kontribusi (IDR)": 0,
+                                "Commission (IDR)": 0,
+                                "Overiding (IDR)": 0,
+                                "Total Commission (IDR)": 0,
+                                "Gross Premium Income (IDR)": 0,
+                                "Tabarru (IDR)": 0,
+                                "Ujrah (IDR)": 0,
+                                "Claim (IDR)": (df["marein share idr"].sum() if "marein share idr" in df.columns else 0)*rate_exchange,
+                                "Balance (IDR)": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0)*rate_exchange,
+                                "Check Balance (IDR)": "",
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Due Date": due_date,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON": "-"
+                            }
+
+                        # log_drive_id = find_drive_file(
+                        #     service=service,
+                        #     filename=get_log_filename(int(oby), int(obm)),
+                        #     parent_id=PERIOD_DRIVE_ID,
+                        #     mime_type="application/vnd.google-apps.spreadsheet"
+                        # )
+
+                        if not log_drive_id:
+                            log_drive_id = create_log_gsheet(
+                                service=service,
+                                parent_id=PERIOD_DRIVE_ID,
+                                filename=get_log_filename(int(oby), int(obm)),
+                                columns=list(log_entry.keys())
+                            )
+
+                        sheets_service = init_sheets_service(creds)
+
+                        append_gsheet(
+                            service=sheets_service,
+                            spreadsheet_id=log_drive_id,
+                            row_dict=log_entry
+                        )
+
+                        upload_dataframe_to_drive(
+                            service=service,
+                            df=df,
+                            original_columns=original_columns,
+                            voucher_id=voucher,
+                            subject_email=subject_email,
+                            product=product,
+                            filename=f"{voucher}.xlsx",
+                            folder_id=CEDING_DRIVE_ID
+                        )
+
+                        end_time = time.time()
+                        duration = end_time - start_time
+
+                        st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
+                        st.code(voucher)
+
+                    except RuntimeError as e:
+                            st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                            st.stop()
+
+                    finally:
+                        release_drive_lock(service, PERIOD_DRIVE_ID)
+
+            
 
 
 # ==========================
@@ -755,24 +1540,24 @@ with tab_post:
                                 "Curr":curr,
                                 "Total Contribution": df["reins total premium"].sum(),
                                 "Commission": df["reins total comm"].sum(),
-                                "Overiding": df["overiding"].sum() if "overiding" in df.columns else 0,
-                                "Total Commission": (df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0),
-                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)),
+                                "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
+                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
                                 "Tabarru": df["reins tabarru"].sum(),
                                 "Ujrah": df["reins ujrah"].sum(),
                                 "Claim": 0,
-                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
                                 "Check Balance": "",
                                 "Rate Exchange": rate_exchange,
                                 "Kontribusi (IDR)": (df["reins total premium"].sum())*rate_exchange,
                                 "Commission (IDR)": (df["reins total comm"].sum())*rate_exchange,
-                                "Overiding (IDR)": (df["overiding"].sum() if "overiding" in df.columns else 0)*rate_exchange,
-                                "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0))*rate_exchange,
-                                "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["overiding"].sum() if "overiding" in df.columns else 0)))*rate_exchange,
+                                "Overiding (IDR)": (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)*rate_exchange,
+                                "Total Commission (IDR)": ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0))*rate_exchange,
+                                "Gross Premium Income (IDR)": (df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)))*rate_exchange,
                                 "Tabarru (IDR)": (df["reins tabarru"].sum())*rate_exchange,
                                 "Ujrah (IDR)": (df["reins ujrah"].sum())*rate_exchange,
                                 "Claim (IDR)": 0,
-                                "Balance (IDR)": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["overiding"].sum() if "overiding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
+                                "Balance (IDR)": (df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0))*rate_exchange,
                                 "Check Balance (IDR)":"",
                                 "REMARKS": remarks,
                                 "STATUS": "POSTED",
@@ -808,7 +1593,7 @@ with tab_post:
                                 "Curr":curr,
                                 "Total Contribution": 0,
                                 "Commission": 0,
-                                "Overiding": 0,
+                                "Overriding": 0,
                                 "Total Commission": 0,
                                 "Gross Premium Income": 0,
                                 "Tabarru": 0,
@@ -1478,7 +2263,7 @@ with tab_post:
                                 "Curr":curr,
                                 "Total Contribution": df["retro total premium"].sum(),
                                 "Commission": df["retro total comm"].sum(),
-                                "Overiding": df["retro overriding"].sum() if "retro overriding" in df.columns else 0,
+                                "reins overriding": df["retro overriding"].sum() if "retro overriding" in df.columns else 0,
                                 "Total Commission": (df["retro total comm"].sum()) + (df["retro overriding"].sum() if "retro overriding" in df.columns else 0),
                                 "Gross Premium Income": df["retro total premium"].sum() - ((df["retro total comm"].sum()) + (df["retro overriding"].sum() if "retro overriding" in df.columns else 0)),
                                 "Tabarru": df["retro tabarru"].sum(),
@@ -1533,7 +2318,7 @@ with tab_post:
                                 "Curr":curr,
                                 "Total Contribution": 0,
                                 "Commission": 0,
-                                "Overiding": 0,
+                                "Overriding": 0,
                                 "Total Commission": 0,
                                 "Gross Premium Income": 0,
                                 "Tabarru": 0,
