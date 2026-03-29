@@ -157,7 +157,7 @@ with tab_upload:
     uploaded_file = st.file_uploader(
         "Upload Voucher (.xlsx)",
         type=["xlsx"],
-        key="upload_post"
+        key="upload_post_upload"
     )
 
     if uploaded_file:
