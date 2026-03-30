@@ -458,6 +458,9 @@ with tab_upload:
             year = st.session_state["log_period"]["year"]
             month = st.session_state["log_period"]["month"]
 
+            year = int(2026)
+            month = int(4)
+
 
             # ==========================
             # DRIVE FOLDER PER PERIODE (STEP 3)
