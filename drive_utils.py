@@ -241,14 +241,26 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 
 
 
-def upload_dataframe_to_drive(service, df, original_columns, voucher_id, subject_email, product, filename, folder_id):
+def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id):
     buffer = BytesIO()
 
     df["voucher id"] = voucher_id
-    df["references no"] = f"{subject_email} - {product}"
-    df.columns = original_columns
 
-    df.to_excel(buffer, index=False)
+    mapping_lower_to_template = {col.strip().lower(): col for col in template_columns}
+
+    final_df = pd.DataFrame(columns=template_columns)
+
+    for col_lower in df.columns:
+        if col_lower in mapping_lower_to_template:
+            # Ambil nama kolom asli dari template (misal: "TL Detail ID")
+            target_col = mapping_lower_to_template[col_lower]
+            # Masukkan data dari df ke final_df
+            final_df[target_col] = df[col_lower]
+
+    final_df = pd.DataFrame(columns=template_columns)
+
+
+    final_df.to_excel(buffer, index=False)
     buffer.seek(0)
 
     media = MediaIoBaseUpload(
