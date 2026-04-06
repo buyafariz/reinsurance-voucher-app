@@ -2468,10 +2468,6 @@ with tab_cancel:
         # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
         st.markdown("### 📋 Log PML - Status: POSTED")
 
-        st.write("--- TEST VISUALISASI ---")
-        test_data = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
-        st.dataframe(test_data) # Ini HARUS muncul. Jika ini tidak muncul, Streamlit Anda sedang 'hang'.
-
         if not df_posted.empty:
             # Tambahkan No Urut
             df_posted.insert(0, 'No', range(1, len(df_posted) + 1))
@@ -2480,41 +2476,41 @@ with tab_cancel:
             gb = GridOptionsBuilder.from_dataframe(df_posted)
             
             # Renderer Status & Action
-            status_renderer = JsCode("""
-                function(params) {
-                    return `<span style="background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-                            ● ${params.value}</span>`;
-                }
-            """)
+            # status_renderer = JsCode("""
+            #     function(params) {
+            #         return `<span style="background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+            #                 ● ${params.value}</span>`;
+            #     }
+            # """)
             
-            action_renderer = JsCode("""
-                function(params) {
-                    return `<div style="display: flex; justify-content: center;"><button style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer;">🔍 View</button></div>`;
-                }
-            """)
+            # action_renderer = JsCode("""
+            #     function(params) {
+            #         return `<div style="display: flex; justify-content: center;"><button style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer;">🔍 View</button></div>`;
+            #     }
+            # """)
 
-            gb.configure_column("No", width=80, checkboxSelection=True, headerCheckboxSelection=True, pinned='left')
-            gb.configure_column("PML ID", pinned='left', fontStyle='bold', width=150)
-            gb.configure_column("STATUS", cellRenderer=status_renderer, width=120)
-            gb.configure_column("Actions", cellRenderer=action_renderer, pinned='right', width=100)
+            # gb.configure_column("No", width=80, checkboxSelection=True, headerCheckboxSelection=True, pinned='left')
+            # gb.configure_column("PML ID", pinned='left', fontStyle='bold', width=150)
+            # gb.configure_column("STATUS", cellRenderer=status_renderer, width=120)
+            # gb.configure_column("Actions", cellRenderer=action_renderer, pinned='right', width=100)
 
-            # Format angka akuntansi
-            accounting_cols = ["Total Contribution", "Commission", "Balance"] # Sesuaikan listnya
-            for col in accounting_cols:
-                if col in df_posted.columns:
-                    gb.configure_column(col, type=["numericColumn"], cellStyle={'textAlign': 'right'},
-                                        valueFormatter="Math.floor(value).toLocaleString('en-US')")
+            # # Format angka akuntansi
+            # accounting_cols = ["Total Contribution", "Commission", "Balance"] # Sesuaikan listnya
+            # for col in accounting_cols:
+            #     if col in df_posted.columns:
+            #         gb.configure_column(col, type=["numericColumn"], cellStyle={'textAlign': 'right'},
+            #                             valueFormatter="Math.floor(value).toLocaleString('en-US')")
 
-            gb.configure_pagination(paginationPageSize=15)
-            gb.configure_default_column(resizable=True, filter=True, sortable=True)
-            gb.configure_grid_options(rowHeight=45, rowSelection='multiple')
+            # gb.configure_pagination(paginationPageSize=15)
+            # gb.configure_default_column(resizable=True, filter=True, sortable=True)
+            # gb.configure_grid_options(rowHeight=45, rowSelection='multiple')
 
-            # Custom CSS untuk Dark Mode
-            custom_css = {
-                ".ag-header": {"background-color": "#242830", "color": "#ffffff"},
-                ".ag-row-odd": {"background-color": "#1e2129"},
-                ".ag-row-hover": {"background-color": "rgba(0, 123, 255, 0.1) !important"}
-            }
+            # # Custom CSS untuk Dark Mode
+            # custom_css = {
+            #     ".ag-header": {"background-color": "#242830", "color": "#ffffff"},
+            #     ".ag-row-odd": {"background-color": "#1e2129"},
+            #     ".ag-row-hover": {"background-color": "rgba(0, 123, 255, 0.1) !important"}
+            # }
 
             AgGrid(
                 df_posted,
