@@ -260,13 +260,16 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
     # 4. Pastikan Voucher ID terisi di final_df
     # Cari nama asli kolom Voucher ID di template (misal: "Voucher ID" atau "VOUCHER ID")
-    v_id_col = mapping_lower_to_template.get("voucher id")
-    if v_id_col:
-        final_df[v_id_col] = voucher_id
+    voucher_id_col = mapping_lower_to_template.get("voucher id")
+
+    if voucher_id_col:
+        final_df[voucher_id_col] = voucher_id
 
     # --- BARIS final_df = pd.DataFrame(...) YANG KEDUA DIHAPUS DI SINI ---
 
     # 5. Tulis ke Excel
+
+    
     final_df.to_excel(buffer, index=False)
     buffer.seek(0)
 
