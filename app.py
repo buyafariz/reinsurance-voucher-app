@@ -2468,6 +2468,10 @@ with tab_cancel:
         # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
         st.markdown("### 📋 Log PML - Status: POSTED")
 
+        st.write("--- TEST VISUALISASI ---")
+        test_data = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+        st.dataframe(test_data) # Ini HARUS muncul. Jika ini tidak muncul, Streamlit Anda sedang 'hang'.
+
         if not df_posted.empty:
             # Tambahkan No Urut
             df_posted.insert(0, 'No', range(1, len(df_posted) + 1))
