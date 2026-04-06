@@ -2469,58 +2469,56 @@ with tab_cancel:
         st.markdown("### 📋 Log PML - Status: POSTED")
 
         if not df_posted.empty:
-            # Tambahkan No Urut
-            df_posted.insert(0, 'No', range(1, len(df_posted) + 1))
+            # 1. Pastikan kolom benar-benar bersih
+            df_posted.columns = [c.strip() for c in df_posted.columns]
 
-            # Konfigurasi AgGrid
-            gb = GridOptionsBuilder.from_dataframe(df_posted)
-            
-            # Renderer Status & Action
-            # status_renderer = JsCode("""
-            #     function(params) {
-            #         return `<span style="background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-            #                 ● ${params.value}</span>`;
-            #     }
-            # """)
-            
-            # action_renderer = JsCode("""
-            #     function(params) {
-            #         return `<div style="display: flex; justify-content: center;"><button style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer;">🔍 View</button></div>`;
-            #     }
-            # """)
+            # 2. Definisikan Grid Options secara manual (Tanpa Builder)
+            grid_options = {
+                "columnDefs": [
+                    # Kolom No & Checkbox
+                    {"headerName": "No", "field": "No", "width": 80, "checkboxSelection": True, "headerCheckboxSelection": True, "pinned": "left"},
+                    
+                    # Kolom Data (Sesuaikan dengan nama kolom di Excel Anda)
+                    {"headerName": "PML ID", "field": "PML ID", "width": 150, "pinned": "left", "cellStyle": {"fontWeight": "bold"}},
+                    {"headerName": "Status", "field": "STATUS", "width": 120},
+                    {"headerName": "Product", "field": "Product", "width": 200},
+                    
+                    # Kolom Angka (Value Formatter Manual)
+                    {
+                        "headerName": "Total Contribution", 
+                        "field": "Total Contribution", 
+                        "type": "numericColumn", 
+                        "valueFormatter": "Math.floor(value).toLocaleString()",
+                        "cellStyle": {"textAlign": "right"}
+                    },
+                ],
+                "defaultColDef": {
+                    "resizable": True,
+                    "sortable": True,
+                    "filter": True,
+                },
+                "pagination": True,
+                "paginationPageSize": 15,
+                "rowSelection": "multiple",
+                "rowHeight": 45,
+            }
 
-            # gb.configure_column("No", width=80, checkboxSelection=True, headerCheckboxSelection=True, pinned='left')
-            # gb.configure_column("PML ID", pinned='left', fontStyle='bold', width=150)
-            # gb.configure_column("STATUS", cellRenderer=status_renderer, width=120)
-            # gb.configure_column("Actions", cellRenderer=action_renderer, pinned='right', width=100)
-
-            # # Format angka akuntansi
-            # accounting_cols = ["Total Contribution", "Commission", "Balance"] # Sesuaikan listnya
-            # for col in accounting_cols:
-            #     if col in df_posted.columns:
-            #         gb.configure_column(col, type=["numericColumn"], cellStyle={'textAlign': 'right'},
-            #                             valueFormatter="Math.floor(value).toLocaleString('en-US')")
-
-            # gb.configure_pagination(paginationPageSize=15)
-            # gb.configure_default_column(resizable=True, filter=True, sortable=True)
-            # gb.configure_grid_options(rowHeight=45, rowSelection='multiple')
-
-            # # Custom CSS untuk Dark Mode
-            # custom_css = {
-            #     ".ag-header": {"background-color": "#242830", "color": "#ffffff"},
-            #     ".ag-row-odd": {"background-color": "#1e2129"},
-            #     ".ag-row-hover": {"background-color": "rgba(0, 123, 255, 0.1) !important"}
-            # }
-
-            AgGrid(
-                df_posted,
-                gridOptions=gb.build(),
-                custom_css=custom_css,
-                allow_unsafe_jscode=True,
-                theme="balham", # Balham + Custom CSS = Elegant Dark
-                height=550,
-                width='100%'
-            )
+            # 3. Render
+            st.subheader("📋 Log PML - Status: POSTED")
+            try:
+                AgGrid(
+                    df_posted,
+                    gridOptions=grid_options,
+                    allow_unsafe_jscode=True, # Wajib True jika pakai valueFormatter string
+                    theme="balham",
+                    height=500,
+                    width='100%',
+                    fit_columns_on_grid_load=False
+                )
+            except Exception as e:
+                st.error(f"Gagal merender AgGrid: {e}")
+                st.write("Menampilkan tabel standar sebagai cadangan:")
+                st.dataframe(df_posted)
         else:
             st.info("Tidak ada data dengan status 'POSTED' untuk ditampilkan.")
 
