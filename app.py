@@ -840,7 +840,7 @@ with tab_upload:
                     st.write(PML_DRIVE_ID)
 
                     upload_dataframe_to_drive(
-                        service=sheets_service,
+                        service=service,
                         df=df,
                         template_columns=columns_template,
                         pml_id=pml_id,
