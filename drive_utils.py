@@ -221,25 +221,42 @@ def acquire_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 
 
 def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
-    query = (
-        f"name='{lock_name}' "
-        f"and '{parent_id}' in parents "
-        f"and trashed=false"
-    )
+    # 1. VALIDASI AWAL: Cegah ID kosong yang menyebabkan Error 400
+    if not parent_id or parent_id == "" or parent_id is None:
+        print("Log: parent_id kosong, tidak ada kunci yang perlu dilepas.")
+        return
 
-    result = service.files().list(
-        q=query,
-        fields="files(id)",
-        supportsAllDrives=True,
-        includeItemsFromAllDrives=True,
-    ).execute()
+    try:
+        # 2. QUERY: Mencari file lock di dalam folder tertentu
+        query = (
+            f"name='{lock_name}' "
+            f"and '{parent_id}' in parents "
+            f"and trashed=false"
+        )
 
-    for f in result.get("files", []):
-        service.files().delete(
-            fileId=f["id"],
-            supportsAllDrives=True
+        result = service.files().list(
+            q=query,
+            fields="files(id)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
         ).execute()
 
+        files_to_delete = result.get("files", [])
+        
+        # 3. PENGHAPUSAN: Hapus semua file lock yang ditemukan
+        for f in files_to_delete:
+            try:
+                service.files().delete(
+                    fileId=f["id"],
+                    supportsAllDrives=True
+                ).execute()
+            except Exception as e:
+                # Jika file sudah dihapus proses lain, jangan hentikan aplikasi
+                print(f"Gagal hapus file gembok {f['id']}: {e}")
+
+    except Exception as e:
+        # Menangkap error API lainnya agar tidak merusak UI Streamlit
+        print(f"Error pada release_drive_lock: {e}")
 
 
 def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id, type):
