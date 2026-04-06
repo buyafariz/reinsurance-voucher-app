@@ -2408,8 +2408,6 @@ with tab_cancel:
     sheets_service = init_sheets_service(creds)
 
     if action_type == "Split Voucher":
-        st.subheader("🔄 Update Voucher: Split Voucher")
-        
         # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
         PERIOD_DRIVE_ID = None
         df_posted = pd.DataFrame() # Default kosong agar tidak NameError
@@ -2468,7 +2466,7 @@ with tab_cancel:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
         # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
-        st.markdown("### 📋 Log PML - Status: POSTED")
+        st.markdown("📋 Log PML - Status: POSTED")
 
         if not df_posted.empty:
             # Tambahkan No Urut
