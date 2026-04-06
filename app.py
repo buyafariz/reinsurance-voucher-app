@@ -113,12 +113,12 @@ with tab_upload:
     # ===== ROW 1 =====
     row1_col1, row1_col2 = st.columns(2)
 
-    # with row1_col1:
-    #     reins_type = st.selectbox(
-    #         "Reinsurance Type",
-    #         ["INWARD", "OUTWARD"],
-    #         key="reins_type_upload"
-    #     )
+    with row1_col1:
+        reins_type = st.selectbox(
+            "Reinsurance Type",
+            ["INWARD", "OUTWARD"],
+            key="reins_type_upload"
+        )
 
     # row1_col2 sengaja dikosongkan
 
