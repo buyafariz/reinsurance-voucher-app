@@ -403,7 +403,7 @@ def init_sheets_service(creds):
 def get_headers(_service, spreadsheet_id):
     result = _service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Sheet!1:1"
+        range="Sheet1!:1"
     ).execute()
     return result.get("values", [[]])[0]
 
