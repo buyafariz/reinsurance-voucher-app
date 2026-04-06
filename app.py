@@ -732,7 +732,7 @@ with tab_upload:
                         parent_id=PERIOD_DRIVE_ID
                     )
 
-                    PML_DRIVE_ID = drive_folders["period_id"]
+                    PML_DRIVE_ID = pml_drive["id"]
 
                     # Upload voucher (selalu CREATE)
                     log_pml_drive_id = find_drive_file(
