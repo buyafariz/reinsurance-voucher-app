@@ -837,6 +837,8 @@ with tab_upload:
                         row_dict=log_pml
                     )
 
+                    st.write(PML_DRIVE_ID)
+
                     upload_dataframe_to_drive(
                         service=service,
                         df=df,
