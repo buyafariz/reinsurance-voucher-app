@@ -2452,6 +2452,8 @@ with tab_cancel:
                 mime_type="application/vnd.google-apps.spreadsheet"
             )
 
+            st.write(log_pml_drive_id)
+
             sheets_service = init_sheets_service(creds)
 
             if log_pml_drive_id:
