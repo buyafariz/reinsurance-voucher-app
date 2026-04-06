@@ -2441,8 +2441,6 @@ with tab_cancel:
 
             PML_DRIVE_ID = pml_drive
 
-            st.write(PML_DRIVE_ID)
-
             # Upload voucher (selalu CREATE)
             log_pml_drive_id = find_drive_file(
                 service=service,
@@ -2451,8 +2449,6 @@ with tab_cancel:
                 parent_id=PML_DRIVE_ID,
                 mime_type="application/vnd.google-apps.spreadsheet"
             )
-
-            st.write(log_pml_drive_id)
 
             sheets_service = init_sheets_service(creds)
 
