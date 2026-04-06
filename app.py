@@ -2504,7 +2504,6 @@ with tab_cancel:
             }
 
             # 3. Render
-            st.subheader("📋 Log PML - Status: POSTED")
             try:
                 AgGrid(
                     df_posted,
