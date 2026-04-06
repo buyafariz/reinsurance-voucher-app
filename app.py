@@ -536,6 +536,8 @@ with tab_upload:
 
             with col1:
 
+                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+
                 account_with = st.selectbox(
                     "Account With",
                     [
@@ -616,8 +618,6 @@ with tab_upload:
                         "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                     ]
                 )
-
-                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
 
                 curr = st.selectbox(
                     "Currency",
