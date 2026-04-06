@@ -245,25 +245,32 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id):
     buffer = BytesIO()
 
-    df["voucher id"] = voucher_id
-
+    # 1. Buat mapping (case-insensitive)
     mapping_lower_to_template = {col.strip().lower(): col for col in template_columns}
 
+    # 2. Inisialisasi DataFrame hasil dengan kolom sesuai template
     final_df = pd.DataFrame(columns=template_columns)
 
-    for col_lower in df.columns:
+    # 3. Pindahkan data dari df ke final_df berdasarkan kecocokan nama kolom
+    for col_original in df.columns:
+        col_lower = col_original.strip().lower()
         if col_lower in mapping_lower_to_template:
-            # Ambil nama kolom asli dari template (misal: "TL Detail ID")
             target_col = mapping_lower_to_template[col_lower]
-            # Masukkan data dari df ke final_df
-            final_df[target_col] = df[col_lower]
+            final_df[target_col] = df[col_original]
 
-    final_df = pd.DataFrame(columns=template_columns)
+    # 4. Pastikan Voucher ID terisi di final_df
+    # Cari nama asli kolom Voucher ID di template (misal: "Voucher ID" atau "VOUCHER ID")
+    v_id_col = mapping_lower_to_template.get("voucher id")
+    if v_id_col:
+        final_df[v_id_col] = voucher_id
 
+    # --- BARIS final_df = pd.DataFrame(...) YANG KEDUA DIHAPUS DI SINI ---
 
+    # 5. Tulis ke Excel
     final_df.to_excel(buffer, index=False)
     buffer.seek(0)
 
+    # 6. Upload ke Google Drive
     media = MediaIoBaseUpload(
         buffer,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -283,7 +290,6 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
     ).execute()
 
     return file.get("id")
-
 
 def upload_dataframe_to_drive_outward(service, df, original_columns, voucher_id, filename, folder_id, biz_type):
     buffer = BytesIO()
