@@ -2402,180 +2402,129 @@ with tab_cancel:
     years = list(range(2026, datetime.now().year + 1))
     months = list(range(1, 13))
 
-    if action_type == "Split Voucher":
-        # 1. SETUP DATA (Filter hanya yang POSTED)
-        service = get_drive_service()
+    # --- 0. INISIALISASI SERVICE ---
+    # Pastikan fungsi ini didefinisikan di drive_utils.py atau di atas
+    drive_service = get_drive_service()
+    sheets_service = init_sheets_service(creds)
 
+    if action_type == "Split Voucher":
+        st.subheader("🔄 Update Voucher: Split Voucher")
+        
+        # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
+        PERIOD_DRIVE_ID = None
+        df_posted = pd.DataFrame() # Default kosong agar tidak NameError
+        
+        # Ambil Folder ID berdasarkan Tahun/Bulan
         drive_folders = get_period_drive_folders(
             year=int(year),
             month=int(month),
             root_folder_id=ROOT_DRIVE_FOLDER_ID
         )
+        PERIOD_DRIVE_ID = drive_folders.get("period_id")
 
-        PERIOD_DRIVE_ID = drive_folders["period_id"]
+        if not PERIOD_DRIVE_ID:
+            st.error("Folder periode tidak ditemukan di Drive.")
+            st.stop()
 
         try:
-            acquire_drive_lock(service, PERIOD_DRIVE_ID)
+            # 2. LOCKING (Gunakan Drive Service)
+            acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-            # reload log terbaru setelah lock
-            # if os.path.exists(log_path):
-            #     log_df = pd.read_excel(log_path)
-            # else:
-            #     log_df = pd.DataFrame()
-
-
-            pml_id, seq_no = generate_pml_from_drive(
-                service=service,
-                period_folder_id=PERIOD_DRIVE_ID,
-                year=int(year),
-                month=int(month),
-                find_drive_file=find_drive_file,
-                biz_type = biz_type
-            )
-
-            pml_drive = get_or_create_folder(
-                service=service,
+            # 3. MENCARI & MEMBACA DATA
+            # Cari Folder PML
+            pml_drive_id = get_or_create_folder(
+                service=drive_service,
                 folder_name="Folder PML",
                 parent_id=PERIOD_DRIVE_ID
             )
 
-            PML_DRIVE_ID = pml_drive
-
-            # Upload voucher (selalu CREATE)
+            # Cari File Log Spreadsheet
             log_pml_drive_id = find_drive_file(
-                service=service,
+                service=drive_service,
                 filename=get_log_pml_filename(int(year), int(month)),
-                # filename="log_produksi.xlsx",
-                parent_id=PML_DRIVE_ID,
+                parent_id=pml_drive_id,
                 mime_type="application/vnd.google-apps.spreadsheet"
             )
 
-            sheets_service = init_sheets_service(creds)
-
             if log_pml_drive_id:
+                # PENTING: Baca isi pakai SHEETS SERVICE
+                # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
                 df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
-
+                
+                if not df_log.empty and 'STATUS' in df_log.columns:
+                    # Filter hanya yang POSTED
+                    df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
+                else:
+                    st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
             else:
-                st.error("File Log tidak ditemukan di google drive")
+                st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
 
-            df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memproses data: {e}")
+        
+        finally:
+            # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
+            if PERIOD_DRIVE_ID:
+                release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-            # Tambahkan kolom 'No' secara urut untuk tampilan grid
+        # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
+        st.markdown("### 📋 Log PML - Status: POSTED")
+
+        if not df_posted.empty:
+            # Tambahkan No Urut
             df_posted.insert(0, 'No', range(1, len(df_posted) + 1))
 
-            # 2. JAVASCRIPT RENDERERS
-            # Renderer untuk Status POSTED (Badge Hijau)
-            status_renderer = JsCode("""
-            function(params) {
-                return `<span style="background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-                        ● ${params.value}</span>`;
-            }
-            """)
-
-            # Renderer untuk Tombol Action (View Detail)
-            action_renderer = JsCode("""
-            function(params) {
-                return `
-                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                    <button style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 12px;">
-                        🔍 View
-                    </button>
-                </div>
-                `;
-            }
-            """)
-
-            # 3. GRID OPTIONS BUILDER
+            # Konfigurasi AgGrid
             gb = GridOptionsBuilder.from_dataframe(df_posted)
+            
+            # Renderer Status & Action
+            status_renderer = JsCode("""
+                function(params) {
+                    return `<span style="background-color: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                            ● ${params.value}</span>`;
+                }
+            """)
+            
+            action_renderer = JsCode("""
+                function(params) {
+                    return `<div style="display: flex; justify-content: center;"><button style="background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer;">🔍 View</button></div>`;
+                }
+            """)
 
-            # Konfigurasi Kolom Utama & Checkbox
             gb.configure_column("No", width=80, checkboxSelection=True, headerCheckboxSelection=True, pinned='left')
             gb.configure_column("PML ID", pinned='left', fontStyle='bold', width=150)
             gb.configure_column("STATUS", cellRenderer=status_renderer, width=120)
+            gb.configure_column("Actions", cellRenderer=action_renderer, pinned='right', width=100)
 
-            # Konfigurasi Kolom Akuntansi (Rata Kanan & Format Ribuan)
-            accounting_cols = [
-                "Total Contribution", "Commission", "Overriding", "Total Commission", 
-                "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"
-            ]
-
+            # Format angka akuntansi
+            accounting_cols = ["Total Contribution", "Commission", "Balance"] # Sesuaikan listnya
             for col in accounting_cols:
                 if col in df_posted.columns:
-                    gb.configure_column(
-                        col, 
-                        type=["numericColumn"], 
-                        cellStyle={'textAlign': 'right'},
-                        valueFormatter="Math.floor(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
-                    )
+                    gb.configure_column(col, type=["numericColumn"], cellStyle={'textAlign': 'right'},
+                                        valueFormatter="Math.floor(value).toLocaleString('en-US')")
 
-            # Tambahkan Kolom Actions di paling kanan
-            gb.configure_column("Actions", cellRenderer=action_renderer, pinned='right', width=100, suppressMenu=True)
-
-            # Pagination & Default Settings
-            gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=15)
+            gb.configure_pagination(paginationPageSize=15)
             gb.configure_default_column(resizable=True, filter=True, sortable=True)
-            gb.configure_grid_options(
-                rowHeight=45,
-                headerHeight=45,
-                rowSelection='multiple',
-                suppressRowClickSelection=True
-            )
+            gb.configure_grid_options(rowHeight=45, rowSelection='multiple')
 
-            grid_options = gb.build()
-
-            # 4. CUSTOM CSS (Warna Dark & Elegant)
+            # Custom CSS untuk Dark Mode
             custom_css = {
-                ".ag-root-wrapper": {
-                    "background-color": "#1a1c23",
-                    "border": "1px solid #2d3139",
-                    "border-radius": "12px",
-                },
-                ".ag-header": {
-                    "background-color": "#242830",
-                    "color": "#ffffff",
-                    "font-weight": "700",
-                    "border-bottom": "2px solid #007bff"
-                },
-                ".ag-row": {
-                    "background-color": "#1a1c23",
-                    "color": "#e0e0e0",
-                    "border-bottom": "1px solid #2d3139"
-                },
-                ".ag-row-odd": {
-                    "background-color": "#1e2129" 
-                },
-                ".ag-row-hover": {
-                    "background-color": "rgba(0, 123, 255, 0.1) !important",
-                },
-                ".ag-row-selected": {
-                    "background-color": "rgba(40, 167, 69, 0.15) !important",
-                    "border-left": "4px solid #28a745"
-                },
-                ".ag-paging-panel": {
-                    "background-color": "#242830",
-                    "color": "#ffffff",
-                },
-                ".ag-icon": { "color": "#007bff" }
+                ".ag-header": {"background-color": "#242830", "color": "#ffffff"},
+                ".ag-row-odd": {"background-color": "#1e2129"},
+                ".ag-row-hover": {"background-color": "rgba(0, 123, 255, 0.1) !important"}
             }
-
-            # 5. RENDER AGGRID
-            st.subheader("📋 Log PML - Status: POSTED")
 
             AgGrid(
                 df_posted,
-                gridOptions=grid_options,
+                gridOptions=gb.build(),
                 custom_css=custom_css,
                 allow_unsafe_jscode=True,
-                theme="balham", # Base theme
+                theme="balham", # Balham + Custom CSS = Elegant Dark
                 height=550,
-                width='100%',
-                fit_columns_on_grid_load=False # Penting karena banyak kolom (scroll horizontal)
+                width='100%'
             )
-        except Exception as e:
-            st.error(f"Terjadi kesalahan: {e}")
-        
-        finally:
-            release_drive_lock(service, PERIOD_DRIVE_ID)
+        else:
+            st.info("Tidak ada data dengan status 'POSTED' untuk ditampilkan.")
 
     elif action_type == "Delete Voucher":
         prod_year = st.selectbox(
