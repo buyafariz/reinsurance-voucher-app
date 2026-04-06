@@ -274,7 +274,6 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
     # 5. Tulis ke Excel
 
-
     final_df.to_excel(buffer, index=False)
     buffer.seek(0)
 
