@@ -2466,7 +2466,7 @@ with tab_cancel:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
         # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
-        st.markdown("## 📋 Log PML - Status: POSTED")
+        st.markdown("### 📋 Log PML - Status: POSTED")
 
         if not df_posted.empty:
             # Tambahkan No Urut
