@@ -1198,14 +1198,20 @@ with tab_post:
                 # RENDER GRID
                 # ==========================
 
-                AgGrid(
-                    preview_df,
-                    gridOptions=grid_options,
-                    height=600,
-                    theme="dark",
-                    custom_css=custom_css,
-                    allow_unsafe_jscode=True
-                )
+                try:
+                    AgGrid(
+                        preview_df,
+                        gridOptions=grid_options,
+                        height=600,
+                        theme="alpine", # Coba ganti tema ke alpine atau balham dulu
+                        allow_unsafe_jscode=True,
+                        reload_data=False, # Tambahkan ini agar tidak loop terus menerus
+                        update_mode="NO_UPDATE" 
+                    )
+                except Exception as e:
+                    st.error(f"Terjadi kesalahan pada AgGrid: {e}")
+                    # Fallback ke dataframe standar jika AgGrid error
+                    st.dataframe(preview_df)
 
 
             # ==========================
