@@ -2419,6 +2419,7 @@ with tab_cancel:
         # else:
         #     log_df = pd.DataFrame()
 
+
         pml_id, seq_no = generate_pml_from_drive(
             service=service,
             period_folder_id=PERIOD_DRIVE_ID,
@@ -2445,8 +2446,10 @@ with tab_cancel:
             mime_type="application/vnd.google-apps.spreadsheet"
         )
 
+        sheets_service = init_sheets_service(creds)
+
         if log_pml_drive_id:
-            df_log = load_log_from_gsheet(service, log_pml_drive_id)
+            df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
 
         else:
             st.error("File Log tidak ditemukan di google drive")
