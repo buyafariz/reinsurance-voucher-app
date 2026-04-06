@@ -96,7 +96,7 @@ st.title("📄 Retakaful Voucher Tools")
 st.write("")
 
 tab_upload, tab_calc, tab_post, tab_cancel = st.tabs([
-    "📤 Upload & Validation",
+    "📤 Upload File",
     "🧮 Calculate",
     "📥 Create Voucher",
     "🔄 Update Voucher",
@@ -108,7 +108,7 @@ tab_upload, tab_calc, tab_post, tab_cancel = st.tabs([
 # ==========================
 
 with tab_upload:
-    st.subheader("📤 Upload & Validation")
+    st.subheader("📤 Upload File")
     
     # ===== ROW 1 =====
     row1_col1, row1_col2 = st.columns(2)
