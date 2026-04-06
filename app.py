@@ -2396,6 +2396,9 @@ with tab_cancel:
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
 
+    prod_year = int(year)
+    prod_month = int(month)
+
     years = list(range(2026, datetime.now().year + 1))
     months = list(range(1, 13))
 
