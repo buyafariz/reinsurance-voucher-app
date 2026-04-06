@@ -536,49 +536,46 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
 template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
 def create_log_gsheet(service, parent_id, filename, columns=None):
-    """
-    Fungsi untuk membuat file Google Sheet baru dengan menyalin dari template,
-    lalu mengisi header (kolom) di baris pertama.
-    """
-    
-    # 1️⃣ COPY TEMPLATE FILE
-    # Ini akan membuat salinan dari template yang sudah ada ke folder tujuan
-    file_metadata = {
-        "name": filename,
-        "parents": [parent_id]
-    }
+    try:
+        # 1️⃣ BUAT SPREADSHEET BARU
+        file_metadata = {
+            "name": filename,
+            "mimeType": "application/vnd.google-apps.spreadsheet",
+            "parents": [parent_id]
+        }
 
-    # ID Template yang Anda gunakan sebelumnya
-    TEMPLATE_ID = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
-
-    file = service.files().copy(
-        fileId=TEMPLATE_ID,
-        body=file_metadata,
-        supportsAllDrives=True,
-        fields="id"
-    ).execute()
-
-    spreadsheet_id = file["id"]
-
-    # 2️⃣ ISI HEADER (Jika parameter columns diberikan)
-    if columns:
-        # Kita buat service Sheets API menggunakan kredensial dari Drive service
-        sheets_service = build(
-            "sheets", 
-            "v4", 
-            credentials=service._http.credentials,
-            cache_discovery=False # Opsional: menghindari error cache di beberapa environment
-        )
-
-        # Menulis kolom ke sheet bernama "Log Produksi" di sel A1
-        sheets_service.spreadsheets().values().update(
-            spreadsheetId=spreadsheet_id,
-            range="Log Produksi!A1",
-            valueInputOption="RAW",
-            body={"values": [columns]}
+        # Tambahkan supportsAllDrives=True jika folder tujuan ada di Shared Drive
+        file = service.files().create(
+            body=file_metadata,
+            supportsAllDrives=True, 
+            fields="id"
         ).execute()
 
-    return spreadsheet_id
+        spreadsheet_id = file["id"]
+
+        # 2️⃣ ISI HEADER
+        if columns:
+            sheets_service = build(
+                "sheets", 
+                "v4", 
+                credentials=service._http.credentials,
+                cache_discovery=False
+            )
+
+            # File baru secara default memiliki sheet bernama "Sheet1"
+            sheets_service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id,
+                range="Sheet1!A1",
+                valueInputOption="RAW",
+                body={"values": [columns]}
+            ).execute()
+
+        return spreadsheet_id
+
+    except HttpError as error:
+        # Ini akan memunculkan pesan error detail di log Streamlit Anda
+        print(f"Detail Error Google API: {error.resp.status} - {error.content}")
+        raise error
 
 
 def upload_log_dataframe(service, df, filename, folder_id, file_id=None):
