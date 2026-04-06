@@ -639,7 +639,7 @@ with tab_upload:
         # ==========================
         # FINANCIAL SUMMARY
         # ==========================
-        st.subheader("💰 Summary")
+        st.subheader("💰 Summary Financial")
 
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             summary_df = pd.DataFrame({
