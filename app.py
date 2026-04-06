@@ -2403,16 +2403,16 @@ with tab_cancel:
         # 1. SETUP DATA (Filter hanya yang POSTED)
         service = get_drive_service()
 
+        drive_folders = get_period_drive_folders(
+            year=int(year),
+            month=int(month),
+            root_folder_id=ROOT_DRIVE_FOLDER_ID
+        )
+
+        PERIOD_DRIVE_ID = drive_folders["period_id"]
+
         try:
-            acquire_drive_lock(service, PERIOD_DRIVE_ID)           
-
-            drive_folders = get_period_drive_folders(
-                year=int(year),
-                month=int(month),
-                root_folder_id=ROOT_DRIVE_FOLDER_ID
-            )
-
-            PERIOD_DRIVE_ID = drive_folders["period_id"]
+            acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
             # reload log terbaru setelah lock
             # if os.path.exists(log_path):
