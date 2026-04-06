@@ -2590,6 +2590,13 @@ with tab_cancel:
         )
 
     elif action_type == 'Cancel Voucher':
+
+        year = st.session_state["log_period"]["year"]
+        month = st.session_state["log_period"]["month"]
+
+        years = list(range(2026, datetime.now().year + 1))
+        months = list(range(1, 13))
+
         prod_year = st.selectbox(
             "Tahun Produksi",
             years,
