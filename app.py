@@ -117,7 +117,9 @@ with tab_upload:
         reins_type = st.selectbox(
             "Reinsurance Type",
             ["INWARD", "OUTWARD"],
-            key="reins_type_upload"
+            key="reins_type_upload",
+            value="INWARD",
+            disabled=True
         )
 
     # row1_col2 sengaja dikosongkan
