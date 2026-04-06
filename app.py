@@ -624,11 +624,14 @@ with tab_upload:
                 ["IDR", "USD"]
             )
 
+        with col2:
+            
             subject_email = st.text_area("Subject Email")
 
             email_date = st.date_input("Email Date",value=date.today())
 
             remarks = st.text_area("Remarks")
+
 
 
         # ==========================
