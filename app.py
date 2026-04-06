@@ -617,21 +617,20 @@ with tab_upload:
                     ]
                 )
 
-            pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
 
-            curr = st.selectbox(
-                "Currency",
-                ["IDR", "USD"]
-            )
+                curr = st.selectbox(
+                    "Currency",
+                    ["IDR", "USD"]
+                )
 
-        with col2:
-            
-            subject_email = st.text_area("Subject Email")
+            with col2:
+                
+                subject_email = st.text_area("Subject Email")
 
-            email_date = st.date_input("Email Date",value=date.today())
+                email_date = st.date_input("Email Date",value=date.today())
 
-            remarks = st.text_area("Remarks")
-
+                remarks = st.text_area("Remarks")
 
 
         # ==========================
