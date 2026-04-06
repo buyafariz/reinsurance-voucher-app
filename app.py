@@ -211,7 +211,7 @@ with tab_upload:
         "CBM",
         "COB",
         "Voucher ID",
-        "PML ID"
+        "PML ID",
         "References No",
         "Elapse No",
         "Ref Voucher ID"
@@ -846,7 +846,8 @@ with tab_upload:
                         template_columns=columns_template,
                         voucher_id=pml_id,
                         filename=f"{pml_id}.xlsx",
-                        folder_id=PML_DRIVE_ID
+                        folder_id=PML_DRIVE_ID,
+                        type = "PML"
                     )
 
                     end_time = time.time()

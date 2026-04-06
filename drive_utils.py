@@ -242,7 +242,7 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
 
 
 
-def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id):
+def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id, type):
     buffer = BytesIO()
 
     # 1. Buat mapping (case-insensitive)
@@ -260,16 +260,21 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
     # 4. Pastikan Voucher ID terisi di final_df
     # Cari nama asli kolom Voucher ID di template (misal: "Voucher ID" atau "VOUCHER ID")
-    voucher_id_col = mapping_lower_to_template.get("voucher id")
+    if type == "PML":
+        pml_id_col = mapping_lower_to_template.get("pml id")
+        if pml_id_col:
+            final_df[pml_id_col] = voucher_id
 
-    if voucher_id_col:
-        final_df[voucher_id_col] = voucher_id
+    else:
+        voucher_id_col = mapping_lower_to_template.get("voucher id")
+        if voucher_id_col:
+            final_df[voucher_id_col] = voucher_id
 
     # --- BARIS final_df = pd.DataFrame(...) YANG KEDUA DIHAPUS DI SINI ---
 
     # 5. Tulis ke Excel
 
-    
+
     final_df.to_excel(buffer, index=False)
     buffer.seek(0)
 
