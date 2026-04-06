@@ -536,15 +536,23 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
 template_id = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
 def create_log_gsheet(service, parent_id, filename, columns=None):
-
+    """
+    Fungsi untuk membuat file Google Sheet baru dengan menyalin dari template,
+    lalu mengisi header (kolom) di baris pertama.
+    """
+    
     # 1️⃣ COPY TEMPLATE FILE
+    # Ini akan membuat salinan dari template yang sudah ada ke folder tujuan
     file_metadata = {
         "name": filename,
         "parents": [parent_id]
     }
 
+    # ID Template yang Anda gunakan sebelumnya
+    TEMPLATE_ID = "1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw"
+
     file = service.files().copy(
-        fileId="1FbnbPq8fitRRRCSXeo4WakUr4QQLgAyXsVHbxSeXBhw",
+        fileId=TEMPLATE_ID,
         body=file_metadata,
         supportsAllDrives=True,
         fields="id"
@@ -552,14 +560,17 @@ def create_log_gsheet(service, parent_id, filename, columns=None):
 
     spreadsheet_id = file["id"]
 
-    sheets_service = build(
-        "sheets",
-        "v4",
-        credentials=service._http.credentials
-    )
-
-    # 2️⃣ OPTIONAL: update header jika ingin override
+    # 2️⃣ ISI HEADER (Jika parameter columns diberikan)
     if columns:
+        # Kita buat service Sheets API menggunakan kredensial dari Drive service
+        sheets_service = build(
+            "sheets", 
+            "v4", 
+            credentials=service._http.credentials,
+            cache_discovery=False # Opsional: menghindari error cache di beberapa environment
+        )
+
+        # Menulis kolom ke sheet bernama "Log Produksi" di sel A1
         sheets_service.spreadsheets().values().update(
             spreadsheetId=spreadsheet_id,
             range="Log Produksi!A1",
