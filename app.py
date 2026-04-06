@@ -118,7 +118,7 @@ with tab_upload:
             "Reinsurance Type",
             ["INWARD", "OUTWARD"],
             key="reins_type_upload",
-            value="INWARD",
+            index=0, #INWARD
             disabled=True
         )
 
