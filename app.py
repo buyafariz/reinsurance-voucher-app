@@ -680,7 +680,7 @@ with tab_upload:
         # ==========================
         # POST VOUCHER (LOCKED)
         # ==========================
-        if st.button("💾 Simpan Voucher"):
+        if st.button("💾 Simpan File"):
             start_time = time.time()
 
             if not remarks.strip() or not subject_email.strip():
@@ -873,7 +873,7 @@ with tab_upload:
                     end_time = time.time()
                     duration = end_time - start_time
 
-                    st.success(f"✅ PML berhasil diposting: {pml_id} ({int(duration)} seconds)")
+                    st.success(f"✅ File berhasil diposting: {pml_id} ({int(duration)} seconds)")
                     st.code(pml_id)
 
                 except RuntimeError as e:
