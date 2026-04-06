@@ -1203,7 +1203,7 @@ with tab_post:
                         preview_df,
                         gridOptions=grid_options,
                         height=600,
-                        theme="alpine", # Coba ganti tema ke alpine atau balham dulu
+                        theme="dark", # Coba ganti tema ke alpine atau balham dulu
                         allow_unsafe_jscode=True,
                         reload_data=False, # Tambahkan ini agar tidak loop terus menerus
                         update_mode="NO_UPDATE" 
