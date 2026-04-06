@@ -2389,7 +2389,7 @@ with tab_cancel:
     # ==============================
     action_type = st.radio(
         "Pilih Opsi",
-        ["Delete Voucher", "Cancel Voucher"],
+        ["Split Voucher", "Delete Voucher", "Cancel Voucher"],
         key="action_type"
     )
 
@@ -2399,7 +2399,22 @@ with tab_cancel:
     years = list(range(2026, datetime.now().year + 1))
     months = list(range(1, 13))
 
-    if action_type == "Delete Voucher":
+    if action_type == "Split Voucher":
+        prod_year = st.selectbox(
+            "Tahun Produksi",
+            [year],
+            key="prod_year",
+            disabled=True
+        )
+
+        prod_month = st.selectbox(
+            "Bulan Produksi",
+            [month],
+            key="prod_month",
+            disabled=True
+        )
+
+    elif action_type == "Delete Voucher":
         prod_year = st.selectbox(
             "Tahun Produksi",
             [year],
