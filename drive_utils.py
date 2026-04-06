@@ -9,6 +9,7 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 import calendar
 from datetime import datetime
+from googleapiclient.errors import HttpError
 
 
 SCOPES = [
@@ -402,7 +403,7 @@ def init_sheets_service(creds):
 def get_headers(_service, spreadsheet_id):
     result = _service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="Log Produksi!1:1"
+        range="Sheet!1:1"
     ).execute()
     return result.get("values", [[]])[0]
 
@@ -459,7 +460,7 @@ def append_gsheet(service, spreadsheet_id, row_dict):
 
     request = service.spreadsheets().values().append(
         spreadsheetId=spreadsheet_id,
-        range="Log Produksi!A1",
+        range="Sheet1!A1",
         valueInputOption="USER_ENTERED",
         insertDataOption="INSERT_ROWS",
         body={"values": [cleaned_row]}
