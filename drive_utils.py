@@ -287,11 +287,26 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
         if voucher_id_col:
             final_df[voucher_id_col] = voucher_id
 
-    # --- BARIS final_df = pd.DataFrame(...) YANG KEDUA DIHAPUS DI SINI ---
+    # 5. Tulis ke Excel dengan Format BOLD pada Header
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        final_df.to_excel(writer, index=False, sheet_name='Sheet1')
+        
+        # Ambil objek workbook dan worksheet
+        workbook  = writer.book
+        worksheet = writer.sheets['Sheet1']
 
-    # 5. Tulis ke Excel
+        # Definisikan format Bold
+        header_format = workbook.add_format({
+            'bold': True,
+            'text_wrap': False,
+            'valign': 'vcenter',
+            'border': 1
+        })
 
-    final_df.to_excel(buffer, index=False)
+        # Tulis ulang header dengan format bold
+        for col_num, value in enumerate(final_df.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+            
     buffer.seek(0)
 
     # 6. Upload ke Google Drive
