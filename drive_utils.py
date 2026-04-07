@@ -289,9 +289,9 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
     # 5. Tulis ke Excel dengan Format BOLD pada Header
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        final_df.to_excel(writer, index=False, sheet_name='Sheet1')
+        # PENTING: Matikan header default pandas agar tidak menimpa format kita
+        final_df.to_excel(writer, index=False, sheet_name='Sheet1', header=False, startrow=1)
         
-        # Ambil objek workbook dan worksheet
         workbook  = writer.book
         worksheet = writer.sheets['Sheet1']
 
@@ -300,13 +300,18 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
             'bold': True,
             'text_wrap': False,
             'valign': 'vcenter',
-            'border': 1
+            'align': 'center', # Opsional: buat teks di tengah
+            'border': 1,
+            'bg_color': '#D3D3D3' # Opsional: beri warna abu-abu muda agar lebih terlihat
         })
 
-        # Tulis ulang header dengan format bold
+        # Tulis header secara manual di baris pertama (indeks 0)
         for col_num, value in enumerate(final_df.columns.values):
             worksheet.write(0, col_num, value, header_format)
             
+        # Opsional: Atur lebar kolom otomatis agar tidak terpotong
+        worksheet.set_column(0, len(final_df.columns) - 1, 15)
+
     buffer.seek(0)
 
     # 6. Upload ke Google Drive
