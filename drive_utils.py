@@ -287,30 +287,38 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
         if voucher_id_col:
             final_df[voucher_id_col] = voucher_id
 
-    # 5. Tulis ke Excel dengan Format BOLD pada Header
+    # 5. Tulis ke Excel dengan Format BOLD pada Header & Auto-Fit
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        # PENTING: Matikan header default pandas agar tidak menimpa format kita
+        # Tulis data mulai dari baris kedua
         final_df.to_excel(writer, index=False, sheet_name='Sheet1', header=False, startrow=1)
         
         workbook  = writer.book
         worksheet = writer.sheets['Sheet1']
 
-        # Definisikan format Bold
+        # Format header
         header_format = workbook.add_format({
             'bold': True,
             'text_wrap': False,
             'valign': 'vcenter',
-            'align': 'center', # Opsional: buat teks di tengah
-            'border': 1,
-            'bg_color': '#D3D3D3' # Opsional: beri warna abu-abu muda agar lebih terlihat
+            'border': 1
         })
 
-        # Tulis header secara manual di baris pertama (indeks 0)
+        # Tulis header manual & Hitung Auto-fit
         for col_num, value in enumerate(final_df.columns.values):
+            # Tulis header
             worksheet.write(0, col_num, value, header_format)
             
-        # Opsional: Atur lebar kolom otomatis agar tidak terpotong
-        worksheet.set_column(0, len(final_df.columns) - 1, 15)
+            # --- LOGIKA AUTOFIT ---
+            # Cari panjang karakter maksimal antara Header vs Isi Data
+            # Ambil data di kolom tersebut, ubah ke string, cari yang terpanjang
+            column_data = final_df.iloc[:, col_num].astype(str)
+            max_len = max(
+                column_data.map(len).max(), # Panjang isi data
+                len(str(value))             # Panjang nama header
+            ) + 2  # Tambah padding sedikit (2 karakter) agar tidak terlalu mepet
+            
+            # Terapkan lebar ke kolom tersebut
+            worksheet.set_column(col_num, col_num, max_len)
 
     buffer.seek(0)
 
