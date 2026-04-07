@@ -2265,49 +2265,65 @@ with tab_cancel:
             if PERIOD_DRIVE_ID:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-        # --- 5. RENDER UI (DI LUAR BLOK TRY-FINALLY) ---
-        st.markdown("### 📋 Log PML - Status: POSTED")
+# --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
         if not df_posted.empty:
-            # 1. Pastikan kolom benar-benar bersih
-            df_posted.columns = [c.strip() for c in df_posted.columns]
+            # 1. Tambahkan kolom Checkbox (default False)
+            df_to_edit = df_posted.copy()
+            df_to_edit.insert(0, "Pilih", False)
 
-            # 2. Persiapkan Data untuk Tampilan (Formatting)
-            # Kita buat salinan untuk tampilan agar data asli tetap numerik
-            display_posted = df_posted.copy()
+            # 2. Konfigurasi Tampilan Kolom (Formatting)
+            # Pastikan kolom angka tetap rapi
+            format_dict = {"Total Contribution": "{:,.0f}"}
 
-            # Pastikan kolom No ada untuk referensi
-            if 'No' not in display_posted.columns:
-                display_posted.insert(0, 'No', range(1, len(display_posted) + 1))
+            # 3. Gunakan st.data_editor agar bisa dicentang
+            edited_df = st.data_editor(
+                df_to_edit,
+                column_config={
+                    "Pilih": st.column_config.CheckboxColumn(
+                        "Pilih",
+                        help="Pilih baris ini untuk di-split",
+                        default=False,
+                    ),
+                    # Kunci kolom lain agar tidak bisa diedit oleh user
+                    "PML ID": st.column_config.Column(disabled=True),
+                    "STATUS": st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column(disabled=True),
+                    "Total Contribution": st.column_config.NumberColumn(
+                        "Total Contribution", format="#,##0", disabled=True
+                    ),
+                },
+                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
+                hide_index=True,
+                use_container_width=True,
+            )
 
-            # Daftar kolom yang ingin diformat sebagai angka ribuan
-            numeric_cols = ["Total Contribution"] 
+            # 4. Filter Baris yang Dipilih
+            selected_rows = edited_df[edited_df["Pilih"] == True]
+
+            # 5. Logika Validasi Pilihan
+            if len(selected_rows) > 1:
+                st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
             
-            format_dict = {}
-            for col in numeric_cols:
-                if col in display_posted.columns:
-                    # Konversi ke numerik (jaga-jaga jika ada data string/NaN)
-                    display_posted[col] = pd.to_numeric(display_posted[col], errors='coerce').fillna(0)
-                    format_dict[col] = "{:,.0f}" # Tanpa desimal sesuai valueFormatter AgGrid Anda sebelumnya
-
-            # 3. Render Menggunakan st.dataframe (Gaya Summary Financial)
-            try:
-                # Menggunakan st.data_editor jika Anda butuh fitur centang (checkbox) 
-                # atau tetap st.dataframe jika hanya untuk preview.
-                st.dataframe(
-                    display_posted.style.format(format_dict),
-                    use_container_width=True,
-                    height=500
-                )
+            elif len(selected_rows) == 1:
+                selected_pml_id = selected_rows.iloc[0]["PML ID"]
+                st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
                 
-                st.info("💡 Gunakan fitur search (Ctrl+F) pada tabel untuk memfilter data dengan cepat.")
+                # --- TOMBOL PROSES SPLIT ---
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                    # Di sini Anda bisa memanggil fungsi untuk:
+                    # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                    # 2. Melakukan logika split berdasarkan kolom tertentu
+                    # 3. Menghasilkan beberapa PML baru
+                    st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")
+            
+            else:
+                st.write("Silakan pilih baris terlebih dahulu.")
 
-            except Exception as e:
-                st.error(f"Gagal merender tabel: {e}")
-                st.dataframe(df_posted)
         else:
-            # Pesan ini akan muncul jika file ada tapi tidak ada baris berstatus 'POSTED'
-            st.info("Tidak ada data dengan status 'POSTED' untuk periode ini.")
+            st.info("Tidak ada data dengan status 'POSTED'.")
 
     elif action_type == "Delete Voucher":
         prod_year = st.selectbox(
