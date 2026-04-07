@@ -305,20 +305,25 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
         # Tulis header manual & Hitung Auto-fit
         for col_num, value in enumerate(final_df.columns.values):
-            # Tulis header
+            # 1. Tulis header
             worksheet.write(0, col_num, value, header_format)
             
-            # --- LOGIKA AUTOFIT ---
-            # Cari panjang karakter maksimal antara Header vs Isi Data
-            # Ambil data di kolom tersebut, ubah ke string, cari yang terpanjang
-            column_data = final_df.iloc[:, col_num].astype(str)
-            max_len = max(
-                column_data.map(len).max(), # Panjang isi data
-                len(str(value))             # Panjang nama header
-            ) + 2  # Tambah padding sedikit (2 karakter) agar tidak terlalu mepet
+            # 2. Ambil data kolom dan bersihkan (Convert ke string & tangani NaN)
+            # Kita gunakan list comprehension agar lebih stabil dibanding .map(len)
+            column_values = final_df.iloc[:, col_num].astype(str).replace('nan', '').tolist()
             
-            # Terapkan lebar ke kolom tersebut
-            worksheet.set_column(col_num, col_num, max_len)
+            # Cari yang paling panjang antara isi data vs nama header
+            max_data_len = max([len(str(x)) for x in column_values] + [0])
+            header_len = len(str(value))
+            
+            # Ambil nilai tertinggi dan tambah padding
+            final_len = max(max_data_len, header_len) + 3
+            
+            # Batasi lebar maksimal (misal 50) agar tidak terlalu lebar jika ada teks sangat panjang
+            final_len = min(final_len, 50)
+            
+            # Terapkan lebar
+            worksheet.set_column(col_num, col_num, final_len)
 
     buffer.seek(0)
 
