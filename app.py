@@ -2272,54 +2272,42 @@ with tab_cancel:
             # 1. Pastikan kolom benar-benar bersih
             df_posted.columns = [c.strip() for c in df_posted.columns]
 
-            # 2. Definisikan Grid Options secara manual (Tanpa Builder)
-            grid_options = {
-                "columnDefs": [
-                    # Kolom No & Checkbox
-                    {"headerName": "No", "field": "No", "width": 80, "checkboxSelection": True, "headerCheckboxSelection": True, "pinned": "left"},
-                    
-                    # Kolom Data (Sesuaikan dengan nama kolom di Excel Anda)
-                    {"headerName": "PML ID", "field": "PML ID", "width": 150, "pinned": "left", "cellStyle": {"fontWeight": "bold"}},
-                    {"headerName": "Status", "field": "STATUS", "width": 120},
-                    {"headerName": "Product", "field": "Product", "width": 200},
-                    
-                    # Kolom Angka (Value Formatter Manual)
-                    {
-                        "headerName": "Total Contribution", 
-                        "field": "Total Contribution", 
-                        "type": "numericColumn", 
-                        "valueFormatter": "Math.floor(value).toLocaleString()",
-                        "cellStyle": {"textAlign": "right"}
-                    },
-                ],
-                "defaultColDef": {
-                    "resizable": True,
-                    "sortable": True,
-                    "filter": True,
-                },
-                "pagination": True,
-                "paginationPageSize": 15,
-                "rowSelection": "multiple",
-                "rowHeight": 45,
-            }
+            # 2. Persiapkan Data untuk Tampilan (Formatting)
+            # Kita buat salinan untuk tampilan agar data asli tetap numerik
+            display_posted = df_posted.copy()
 
-            # 3. Render
+            # Pastikan kolom No ada untuk referensi
+            if 'No' not in display_posted.columns:
+                display_posted.insert(0, 'No', range(1, len(display_posted) + 1))
+
+            # Daftar kolom yang ingin diformat sebagai angka ribuan
+            numeric_cols = ["Total Contribution"] 
+            
+            format_dict = {}
+            for col in numeric_cols:
+                if col in display_posted.columns:
+                    # Konversi ke numerik (jaga-jaga jika ada data string/NaN)
+                    display_posted[col] = pd.to_numeric(display_posted[col], errors='coerce').fillna(0)
+                    format_dict[col] = "{:,.0f}" # Tanpa desimal sesuai valueFormatter AgGrid Anda sebelumnya
+
+            # 3. Render Menggunakan st.dataframe (Gaya Summary Financial)
             try:
-                AgGrid(
-                    df_posted,
-                    gridOptions=grid_options,
-                    allow_unsafe_jscode=True, # Wajib True jika pakai valueFormatter string
-                    theme="balham",
-                    height=500,
-                    width='100%',
-                    fit_columns_on_grid_load=False
+                # Menggunakan st.data_editor jika Anda butuh fitur centang (checkbox) 
+                # atau tetap st.dataframe jika hanya untuk preview.
+                st.dataframe(
+                    display_posted.style.format(format_dict),
+                    use_container_width=True,
+                    height=500
                 )
+                
+                st.info("💡 Gunakan fitur search (Ctrl+F) pada tabel untuk memfilter data dengan cepat.")
+
             except Exception as e:
-                st.error(f"Gagal merender AgGrid: {e}")
-                st.write("Menampilkan tabel standar sebagai cadangan:")
+                st.error(f"Gagal merender tabel: {e}")
                 st.dataframe(df_posted)
         else:
-            st.info("Tidak ada data dengan status 'POSTED' untuk ditampilkan.")
+            # Pesan ini akan muncul jika file ada tapi tidak ada baris berstatus 'POSTED'
+            st.info("Tidak ada data dengan status 'POSTED' untuk periode ini.")
 
     elif action_type == "Delete Voucher":
         prod_year = st.selectbox(
