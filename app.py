@@ -1229,7 +1229,8 @@ with tab_post:
                             subject_email=subject_email,
                             product=product,
                             filename=f"{voucher}.xlsx",
-                            folder_id=CEDING_DRIVE_ID
+                            folder_id=CEDING_DRIVE_ID,
+                            type=None
                         )
 
                         end_time = time.time()
