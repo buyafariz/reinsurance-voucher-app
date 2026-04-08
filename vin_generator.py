@@ -130,6 +130,15 @@ def generate_vin_from_drive(
             else:
                 next_seq = int(seq_series.max()) + 1
 
+    # ==========================
+    # Format Voucher
+    # ==========================
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
+
 def generate_pml_from_drive(
     service,
     period_folder_id,

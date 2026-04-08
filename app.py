@@ -1054,7 +1054,7 @@ with tab_post:
                             year=int(oby),
                             month=int(obm),
                             find_drive_file=find_drive_file,
-                            biz_type = biz_type
+                            biz_type=biz_type
                         )
 
                         ceding_folder_name = normalize_folder_name(account_with)
