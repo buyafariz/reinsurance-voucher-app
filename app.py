@@ -647,7 +647,7 @@ with tab_upload:
                         voucher_id=pml_id,
                         filename=f"{pml_id}.xlsx",
                         folder_id=PML_DRIVE_ID,
-                        type = "PML"
+                        file_type = "PML"
                     )
 
                     end_time = time.time()
@@ -1230,7 +1230,7 @@ with tab_post:
                             product=product,
                             filename=f"{voucher}.xlsx",
                             folder_id=CEDING_DRIVE_ID,
-                            type="Voucher"
+                            file_type="Voucher"
                         )
 
                         end_time = time.time()

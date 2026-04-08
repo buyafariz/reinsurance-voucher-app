@@ -259,7 +259,7 @@ def release_drive_lock(service, parent_id, lock_name="log_produksi.lock"):
         print(f"Error pada release_drive_lock: {e}")
 
 
-def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id, type):
+def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filename, folder_id, file_type):
     buffer = BytesIO()
 
     # 1. Buat mapping (case-insensitive)
