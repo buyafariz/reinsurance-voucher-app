@@ -2250,10 +2250,16 @@ with tab_cancel:
     # PROSES
     # ==============================
 
+    button_label = None
+
     if action_type == "Delete Voucher":
         button_label = "❌ Delete Voucher"
     elif action_type == "Cancel Voucher":
         button_label = "🔁 Cancel Voucher"
+
+    if button_label is None:
+        st.error(f"Action type tidak valid: {action_type}")
+        st.stop()
 
     if st.button(button_label, key="process_update"):
 
