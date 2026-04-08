@@ -1224,10 +1224,8 @@ with tab_post:
                         upload_dataframe_to_drive(
                             service=service,
                             df=df,
-                            original_columns=original_columns,
+                            template_columns=columns_template,
                             voucher_id=voucher,
-                            subject_email=subject_email,
-                            product=product,
                             filename=f"{voucher}.xlsx",
                             folder_id=CEDING_DRIVE_ID,
                             file_type="Voucher"
