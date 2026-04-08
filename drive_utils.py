@@ -282,7 +282,7 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
         if pml_id_col:
             final_df[pml_id_col] = voucher_id
 
-    elif type is None:
+    elif type is "Voucher":
         voucher_id_col = mapping_lower_to_template.get("voucher id")
         if voucher_id_col:
             final_df[voucher_id_col] = voucher_id

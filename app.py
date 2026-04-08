@@ -1230,7 +1230,7 @@ with tab_post:
                             product=product,
                             filename=f"{voucher}.xlsx",
                             folder_id=CEDING_DRIVE_ID,
-                            type=None
+                            type="Voucher"
                         )
 
                         end_time = time.time()
