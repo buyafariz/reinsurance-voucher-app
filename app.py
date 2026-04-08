@@ -768,250 +768,43 @@ with tab_post:
             # PREVIEW + FILTER
             # ==========================
             with st.expander("📊 Preview Data Voucher", expanded=True):
+                if not df.empty:
+                    # 1. Batasi jumlah baris agar aplikasi tetap cepat
+                    MAX_PREVIEW = 1000
+                    total_rows = len(df)
+                    preview_df = df.head(MAX_PREVIEW).copy()
 
-                filtered_df = df.copy()
+                    st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
 
-                MAX_PREVIEW_ROWS = 2000
+                    # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
+                    # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
+                    
+                    ACCOUNTING_COLS = [
+                        "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
+                        "reins premium", "reins em premium", "reins er premium", "reins total premium",
+                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
+                    ]
 
-                display_df = filtered_df.copy()
-                total_rows = len(display_df)
+                    # Buat dictionary formatter untuk kolom yang ada saja
+                    format_dict = {}
+                    for col in ACCOUNTING_COLS:
+                        if col in preview_df.columns:
+                            # Pastikan data adalah numerik sebelum diformat
+                            preview_df[col] = pd.to_numeric(preview_df[col], errors='coerce').fillna(0)
+                            format_dict[col] = "{:,.2f}"
 
-                # # ==========================
-                # # LIMIT PREVIEW ROWS
-                # # ==========================
-
-                if total_rows > MAX_PREVIEW_ROWS:
-                    st.warning(
-                        f"⚠️ Data sangat besar ({total_rows:,} baris). "
-                        f"Hanya menampilkan {MAX_PREVIEW_ROWS:,} baris pertama untuk preview."
-                    )
-                    preview_df = display_df.head(MAX_PREVIEW_ROWS)
-                else:
-                    preview_df = display_df
-
-                st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
-
-                # ==========================
-                # SANITIZE DATA (ANTI-CRASH)
-                # ==========================
-
-                preview_df = preview_df.copy()
-
-                for col in preview_df.columns:
-                    # Convert datetime (including timezone) to string
-                    if pd.api.types.is_datetime64_any_dtype(preview_df[col]):
-                        preview_df[col] = preview_df[col].astype(str)
-
-                    # Convert Period
-                    elif "period" in str(preview_df[col].dtype):
-                        preview_df[col] = preview_df[col].astype(str)
-
-                    # Convert object that might contain mixed types
-                    elif preview_df[col].dtype == "object":
-                        preview_df[col] = preview_df[col].astype(str)
-
-                preview_df = preview_df.fillna("")
-
-                # ==========================
-                # GRID BUILDER
-                # ==========================
-
-                gb = GridOptionsBuilder.from_dataframe(preview_df)
-
-                gb.configure_default_column(
-                    filter=True,
-                    sortable=True,
-                    resizable=True,
-                    minWidth=120,
-                    flex=0
-                )
-
-                # ==========================
-                # ACCOUNTING FORMATTER (INTERNATIONAL)
-                # ==========================
-
-                accounting_formatter = JsCode("""
-                function(params) {
-                    if (params.value == null || params.value === '') return '';
-
-                    let value = Number(params.value);
-
-                    let formatted = Math.abs(value).toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-
-                    if (value < 0) {
-                        return '(' + formatted + ')';
-                    }
-
-                    return formatted;
-                }
-                """)
-
-                ACCOUNTING_COLS = [
-                    "sum insured",
-                    "sum at risk",
-                    "reins sum insured",
-                    "reins sum at risk",
-                    "retro sum insured",
-                    "retro sum at risk",
-                    "retro premium",
-                    "retro em premium",
-                    "retro er premium",
-                    "retro oth premium",
-                    "retro total premium",
-                    "retro comm",
-                    "retro em comm",
-                    "retro er comm",
-                    "retro oth comm",
-                    "retro profit share",
-                    "retro overriding",
-                    "retro total comm",
-                    "retro tabarru",
-                    "retro ujrah",
-                    "retro nett premium"
-                ]
-
-                for col in ACCOUNTING_COLS:
-                    if col in preview_df.columns:
-                        gb.configure_column(
-                            col,
-                            type=["numericColumn"],
-                            valueFormatter=accounting_formatter,
-                            cellStyle={"textAlign": "right"}
+                    # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
+                    try:
+                        st.dataframe(
+                            preview_df.style.format(format_dict),
+                            use_container_width=True,
+                            height=450 # Memberikan scrollbar internal jika data banyak
                         )
-
-                # ==========================
-                # GRID OPTIONS
-                # ==========================
-
-                gb.configure_pagination(
-                    paginationAutoPageSize=False,
-                    paginationPageSize=50
-                )
-
-                gb.configure_grid_options(
-                    headerHeight=42,
-                    rowHeight=36,
-                    domLayout="normal",
-                    suppressHorizontalScroll=False,
-                    onFirstDataRendered="""
-                    function(params) {
-                        const allColumnIds = [];
-                        params.columnApi.getAllColumns().forEach(function(col) {
-                            allColumnIds.push(col.getId());
-                        });
-                        params.columnApi.autoSizeColumns(allColumnIds, false);
-                    }
-                    """
-                )
-
-                grid_options = gb.build()
-
-                # ==========================
-                # CUSTOM CSS
-                # ==========================
-
-                custom_css = {
-
-                    # ---------- WRAPPER ----------
-                    ".ag-root-wrapper": {
-                        "background-color": "var(--secondary-background-color)",
-                        # "border": "1px solid var(--primary-color)",
-                        "border-radius": "12px",
-                    },
-
-                    ".ag-center-cols-viewport": {
-                        "background-color": "var(--secondary-background-color)",
-                    },
-
-                    ".ag-body-viewport": {
-                        "background-color": "var(--secondary-background-color)",
-                    },
-
-                    ".ag-center-cols-container": {
-                        "background-color": "var(--secondary-background-color)",
-                    },
-
-                    # ---------- HEADER ----------
-                    ".ag-header": {
-                        "background-color": "var(--background-color)",
-                        "color": "var(--text-color)",
-                        "font-weight": "600",
-                        "font-size": "13px",
-                        # "border-bottom": "2px solid var(--primary-color)"
-                    },
-
-                    ".ag-header-cell": {
-                        "padding-top": "8px",
-                        "padding-bottom": "8px",
-                        "border-right": "1px solid var(--secondary-background-color)"
-                    },
-
-                    ".ag-header-cell-label": {
-                        "display": "flex",
-                        "align-items": "center",
-                        "justify-content": "center",
-                        "width": "100%"
-                    },
-
-                    ".ag-header-cell-text": {
-                        "flex-grow": "1",
-                        "text-align": "center",
-                        "text-transform": "capitalize"
-                    },
-
-                    # ---------- BODY ----------
-                    ".ag-row": {
-                        "background-color": "var(--secondary-background-color)",
-                        "color": "var(--text-color)",
-                        "border-bottom": "1px solid var(--background-color)"
-                    },
-
-                    ".ag-row-hover": {
-                        "background-color": "rgba(128,128,128,0.15)",
-                    },
-
-                    ".ag-cell": {
-                        "border-color": "var(--background-color)",
-                        "border-right": "1px solid var(--background-color)",
-                        "border-bottom": "1px solid var(--background-color)"
-                    },
-
-                    # ---------- PAGINATION ----------
-                    ".ag-paging-panel": {
-                        "background-color": "var(--secondary-background-color)",
-                        "color": "var(--text-color)",
-                    },
-
-                    # ---------- ICON STYLE ----------
-                    ".ag-icon": {
-                        "font-size": "11px",
-                        "opacity": "0.8"
-                    }
-
-                }
-
-
-                # ==========================
-                # RENDER GRID
-                # ==========================
-
-                try:
-                    AgGrid(
-                        preview_df,
-                        gridOptions=grid_options,
-                        height=600,
-                        theme="dark", # Coba ganti tema ke alpine atau balham dulu
-                        allow_unsafe_jscode=True,
-                        reload_data=False, # Tambahkan ini agar tidak loop terus menerus
-                        update_mode="NO_UPDATE" 
-                    )
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan pada AgGrid: {e}")
-                    # Fallback ke dataframe standar jika AgGrid error
-                    st.dataframe(preview_df)
+                    except Exception as e:
+                        st.error(f"Gagal menampilkan preview: {e}")
+                        st.dataframe(preview_df) # Fallback ke tabel mentah jika styling gagal
+                else:
+                    st.info("Belum ada data untuk ditampilkan. Silakan upload file terlebih dahulu.")
 
 
             # ==========================
@@ -1019,7 +812,6 @@ with tab_post:
             # ==========================
             year = st.session_state["log_period"]["year"]
             month = st.session_state["log_period"]["month"]
-
 
             # ==========================
             # DRIVE FOLDER PER PERIODE (STEP 3)
@@ -1036,6 +828,7 @@ with tab_post:
             # ==========================
             # FORM INPUT
             # ==========================
+
 
             with st.expander("🧾 Informasi Voucher", expanded=True):
 
@@ -2265,7 +2058,7 @@ with tab_cancel:
             if PERIOD_DRIVE_ID:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-# --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
         st.markdown("### 📋 Pilih Data PML untuk Di-Split")
         st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
