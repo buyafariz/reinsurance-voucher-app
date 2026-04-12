@@ -2170,6 +2170,8 @@ with tab_update:
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
                     # Di sini Anda bisa memanggil fungsi untuk:
                     # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                    st.write("Selected:", selected_pml_id)
+
                     pml_drive = get_or_create_folder(
                         service=service,
                         folder_name="Folder PML",
