@@ -2215,7 +2215,8 @@ with tab_update:
 
                 selected_columns = st.multiselect(
                     "Pilih kolom untuk split (bisa lebih dari 1)",
-                    df.columns.tolist()
+                    df.columns.tolist(),
+                    disabled=st.session_state.is_processing_split
                 )
 
                 if not selected_columns:
@@ -2223,7 +2224,7 @@ with tab_update:
                     st.stop()
 
                 # --- TOMBOL PROSES SPLIT ---
-                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary", disabled=st.session_state.is_processing_split):
 
                     # 🔥 PREVENT DOUBLE RUN
                     if st.session_state.is_processing_split:
