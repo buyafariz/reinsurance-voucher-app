@@ -481,7 +481,7 @@ def split_upload_with_log(
             "Ujrah": ujrah,
             "Claim": 0,
             "Balance": total_contribution - total_commission,
-            "REMARKS": f"Split from {base_info['source_pml']} ({split_column}={key})",
+            "REMARKS": f"Split from {base_info['source_pml']}",
             "STATUS": "POSTED",
             "CREATED AT": now_wib_naive(),
             "CREATED BY": base_info["pic"],
