@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, update_pml_status_to_splitted
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -2165,31 +2165,28 @@ with tab_update:
             elif len(selected_rows) == 1:
                 selected_pml_id = selected_rows.iloc[0]["PML ID"]
                 st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
-                
+
+                # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                st.write("Selected:", selected_pml_id)
+
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                PML_DRIVE_ID = pml_drive
+
+
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
+
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
                     # Di sini Anda bisa memanggil fungsi untuk:
-                    # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
-                    st.write("Selected:", selected_pml_id)
-
-                    pml_drive = get_or_create_folder(
-                        service=service,
-                        folder_name="Folder PML",
-                        parent_id=PERIOD_DRIVE_ID
-                    )
-
-                    PML_DRIVE_ID = pml_drive
-
-                    st.write(PML_DRIVE_ID)
-
-                    pml_file_id = find_drive_file(
-                        service=service,
-                        filename=selected_pml_id,
-                        parent_id=PML_DRIVE_ID
-                    )
-
-                    st.write(pml_file_id)
-
                     # 2. Melakukan logika split berdasarkan kolom tertentu
                     # 3. Menghasilkan beberapa PML baru
                     st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")

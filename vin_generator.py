@@ -4,9 +4,8 @@ import pandas as pd
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
-from drive_utils import load_log_from_gsheet
+from drive_utils import load_log_from_gsheet, find_drive_file, append_gsheet, upload_dataframe_to_drive
 from zoneinfo import ZoneInfo
-
 
 MONTH_ID = [
     "", "Januari", "Februari", "Maret", "April",
@@ -193,7 +192,6 @@ def generate_pml_from_drive(
     return voucher, next_seq
 
 
-
 def generate_vou_from_drive(
     service,
     outward_folder_id,
@@ -370,3 +368,103 @@ def create_cancel_row(original_row, new_voucher, seq_no, year, month, user, reas
     cancel["REMARKS"] = f"Cancel voucher {original_row['Voucher No']}"
 
     return cancel
+
+def now_wib_naive():
+    return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
+
+def split_upload_with_log(
+    service,
+    sheets_service,
+    df,
+    split_column,
+    period_drive_id,
+    pml_folder_id,
+    log_pml_drive_id,
+    year,
+    month,
+    biz_type,
+    base_info,
+    columns_template
+):
+    results = []
+
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=[split_column])
+
+    grouped = df.groupby(split_column)
+
+    for key, group in grouped:
+
+        if group.empty:
+            continue
+
+        # 🔥 Generate PML baru
+        pml_id, seq_no = generate_pml_from_drive(
+            service=service,
+            period_folder_id=period_drive_id,
+            year=year,
+            month=month,
+            find_drive_file=find_drive_file,
+            biz_type=biz_type
+        )
+
+        total_contribution = group["reins total premium"].sum()
+        commission = group["reins total comm"].sum()
+        overriding = group["reins overriding"].sum() if "reins overriding" in group.columns else 0
+        total_commission = commission + overriding
+
+        log_pml = {
+            "Seq No": seq_no,
+            "Department": base_info["department"],
+            "Biz Type": biz_type,
+            "PML ID": pml_id,
+            "Account With": base_info["account_with"],
+            "Cedant Company": base_info["cedant_company"],
+            "PIC": base_info["pic"],
+            "Curr": base_info["curr"],
+            "Total Contribution": total_contribution,
+            "Commission": commission,
+            "Overriding": overriding,
+            "Total Commission": total_commission,
+            "Gross Premium Income": total_contribution - total_commission,
+            "Tabarru": group["reins tabarru"].sum() if "reins tabarru" in group.columns else 0,
+            "Ujrah": group["reins ujrah"].sum() if "reins ujrah" in group.columns else 0,
+            "Claim": 0,
+            "Balance": total_contribution - total_commission,
+            "REMARKS": f"SPLIT FROM {base_info['source_pml']} ({split_column}={key})",
+            "STATUS": "POSTED",
+            "CREATED AT": now_wib_naive(),
+            "CREATED BY": base_info["pic"],
+            "Subject Email": base_info["subject_email"],
+            "Email Date": base_info["email_date"],
+            "CANCELED AT": "-",
+            "CANCELED BY": "-",
+            "CANCEL OF VOUCHER": "-",
+            "CANCEL REASON": "-"
+        }
+
+        # Append ke log
+        append_gsheet(
+            service=sheets_service,
+            spreadsheet_id=log_pml_drive_id,
+            row_dict=log_pml
+        )
+
+        # Upload file split
+        upload_dataframe_to_drive(
+            service=service,
+            df=group,
+            template_columns=columns_template,
+            voucher_id=pml_id,
+            filename=f"{pml_id}.xlsx",
+            folder_id=pml_folder_id,
+            file_type="PML"
+        )
+
+        results.append({
+            "pml_id": pml_id,
+            "rows": len(group),
+            "split_value": key
+        })
+
+    return results
