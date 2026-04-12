@@ -886,27 +886,24 @@ with tab_calc:
         has_rate = rate_file_id is not None
 
         # st.markdown("### ⚙️ Pilih Metode Calculate")
-
-        col1, col2 = st.columns(2)
-
         # ==========================
-        # BUTTON CEDING
+        # LAYOUT 4 KOLOM
         # ==========================
-        with col1:
+        col1, col2, col3, col4 = st.columns([2, 2, 1, 1])
+
+        with col3:
             ceding_clicked = st.button(
-                "📥 Ceding Calculate",
+                "📥 Ceding",
                 use_container_width=True,
                 type="primary"
             )
 
-        # ==========================
-        # BUTTON OUR (DISABLED JIKA TIDAK ADA RATE)
-        # ==========================
-        with col2:
+        with col4:
             our_clicked = st.button(
-                "🧮 Our Calculate",
+                "🧮 Our",
                 use_container_width=True,
-                disabled=not has_rate  # 🔥 kunci utama
+                disabled=not has_rate,
+                help="Menggunakan rate internal"
             )
 
         # ==========================
