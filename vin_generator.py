@@ -181,8 +181,8 @@ def generate_pml_from_drive(
             else:
                 next_seq = int(seq_series.max()) + 1
 
-    st.write("COLUMNS:", log_df.columns.tolist())
-    st.write("DATA:", log_df.head())
+        st.write("COLUMNS:", log_df.columns.tolist())
+        st.write("DATA:", log_df.head())
 
     # ==========================
     # Format Voucher
