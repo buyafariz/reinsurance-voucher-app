@@ -181,6 +181,8 @@ def find_drive_file(service, filename, parent_id, mime_type=None):
         includeItemsFromAllDrives=True,
     ).execute()
 
+    st.write("ISI FOLDER:", results.get("files", []))
+
     files = results.get("files", [])
     return files[0]["id"] if files else None
 
