@@ -401,7 +401,7 @@ def get_last_seq_no(sheets_service, spreadsheet_id):
 def generate_pml_id(seq_no, year, month, biz_type):
     new_seq = seq_no + 1
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-        voucher = f"PML{year}{month:02d}LST{new_seq:04d}"
+        voucher = f"PML{year}{month:02d}LIS{new_seq:04d}"
 
     elif biz_type == "Claim":
         voucher = f"PLA{year}{month:02d}LSC{new_seq:04d}"
