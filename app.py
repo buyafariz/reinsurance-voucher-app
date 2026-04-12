@@ -714,7 +714,199 @@ with tab_upload:
 
                 finally:
                     release_drive_lock(service, PERIOD_DRIVE_ID)
-                    
+
+
+# ==========================
+# TAB CALCULATE
+# ==========================
+with tab_calc:
+
+    st.subheader("📊 Calculate PML")
+
+    # ==========================
+    # INIT SERVICE
+    # ==========================
+    service = get_drive_service()
+    sheets_service = init_sheets_service(creds)
+
+    # ==========================
+    # GET PERIOD FOLDER
+    # ==========================
+    drive_folders = get_period_drive_folders(
+        year=int(year),
+        month=int(month),
+        root_folder_id=ROOT_DRIVE_FOLDER_ID
+    )
+
+    PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+    # ==========================
+    # GET PML FOLDER
+    # ==========================
+    pml_drive = get_or_create_folder(
+        service=service,
+        folder_name="Folder PML",
+        parent_id=PERIOD_DRIVE_ID
+    )
+
+    PML_DRIVE_ID = pml_drive
+
+    # ==========================
+    # GET LOG PML FILE
+    # ==========================
+    log_pml_drive_id = find_drive_file(
+        service=service,
+        filename=get_log_pml_filename(int(year), int(month)),
+        parent_id=PML_DRIVE_ID,
+        mime_type="application/vnd.google-apps.spreadsheet"
+    )
+
+    if not log_pml_drive_id:
+        st.warning("⚠️ Log PML belum tersedia")
+        st.stop()
+
+    # ==========================
+    # LOAD LOG DATA
+    # ==========================
+    log_df = load_log_from_gsheet(
+        service=sheets_service,
+        spreadsheet_id=log_pml_drive_id
+    )
+
+    if log_df.empty:
+        st.warning("⚠️ Log PML kosong")
+        st.stop()
+
+    # ==========================
+    # NORMALIZE COLUMN
+    # ==========================
+    log_df.columns = log_df.columns.str.strip()
+
+    # ==========================
+    # VALIDASI KOLOM
+    # ==========================
+    required_cols = ["PML ID", "STATUS"]
+
+    missing_cols = [col for col in required_cols if col not in log_df.columns]
+
+    if missing_cols:
+        st.error(f"❌ Kolom tidak ditemukan: {missing_cols}")
+        st.stop()
+
+    # ==========================
+    # FILTER STATUS POSTED
+    # ==========================
+    df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
+
+    if df_posted.empty:
+        st.info("Tidak ada data dengan status POSTED")
+        st.stop()
+
+    # ==========================
+    # SEARCH FILTER
+    # ==========================
+    search = st.text_input("🔍 Cari PML ID")
+
+    if search:
+        df_posted = df_posted[
+            df_posted["PML ID"].astype(str).str.contains(search, case=False, na=False)
+        ]
+
+    # ==========================
+    # INFO
+    # ==========================
+    st.write(f"Total PML POSTED: {len(df_posted)}")
+
+    # ==========================
+    # DISPLAY TABLE
+    # ==========================
+    st.dataframe(df_posted, use_container_width=True)
+
+    # ==========================
+    # SELECT PML (FORM = ANTI RERUN LIAR)
+    # ==========================
+    with st.form("calculate_form"):
+
+        selected_pml_id = st.selectbox(
+            "Pilih PML untuk dihitung",
+            df_posted["PML ID"].unique()
+        )
+
+        submitted = st.form_submit_button("🚀 Calculate")
+
+    # ==========================
+    # PROCESS CALCULATE
+    # ==========================
+    if submitted:
+
+        with st.spinner(f"⏳ Mengambil file {selected_pml_id}..."):
+
+            # ==========================
+            # FIND FILE PML
+            # ==========================
+            pml_file_id = find_drive_file(
+                service=service,
+                filename=f"{selected_pml_id}.xlsx",
+                parent_id=PML_DRIVE_ID
+            )
+
+            if not pml_file_id:
+                st.error("❌ File PML tidak ditemukan di Drive")
+                st.stop()
+
+            # ==========================
+            # DOWNLOAD FILE
+            # ==========================
+            file_stream = download_file_from_drive(service, pml_file_id)
+
+            df_pml = pd.read_excel(file_stream)
+
+            if df_pml.empty:
+                st.warning("⚠️ File PML kosong")
+                st.stop()
+
+            # ==========================
+            # NORMALIZE
+            # ==========================
+            df_pml.columns = df_pml.columns.str.strip().str.lower()
+
+            # ==========================
+            # PREVIEW
+            # ==========================
+            st.subheader("Preview Data PML")
+            st.dataframe(df_pml.head(), use_container_width=True)
+
+            # ==========================
+            # SAMPLE CALCULATION
+            # ==========================
+            if "reins total premium" in df_pml.columns:
+                total_premium = df_pml["reins total premium"].sum()
+            else:
+                total_premium = 0
+
+            if "reins total comm" in df_pml.columns:
+                total_commission = df_pml["reins total comm"].sum()
+            else:
+                total_commission = 0
+
+            if "reins overriding" in df_pml.columns:
+                overriding = df_pml["reins overriding"].sum()
+            else:
+                overriding = 0
+
+            gross_income = total_premium - (total_commission + overriding)
+
+            # ==========================
+            # RESULT
+            # ==========================
+            st.subheader("📊 Hasil Perhitungan")
+
+            st.metric("Total Premium", f"{total_premium:,.0f}")
+            st.metric("Total Commission", f"{total_commission:,.0f}")
+            st.metric("Overriding", f"{overriding:,.0f}")
+            st.metric("Gross Income", f"{gross_income:,.0f}")
+
+
 # ==========================
 # SIMPAN VOUCHER
 # ==========================
