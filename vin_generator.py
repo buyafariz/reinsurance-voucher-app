@@ -398,7 +398,7 @@ def get_last_seq_no(sheets_service, spreadsheet_id):
 
 
 def generate_pml_id(seq_no, year, month):
-    new_seq = seq_no
+    new_seq = seq_no + 1
     pml_id = f"PML{year}{str(month).zfill(2)}LIS{str(new_seq).zfill(4)}"
     return pml_id, new_seq
 
