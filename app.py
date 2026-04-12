@@ -903,7 +903,7 @@ with tab_calc:
                 "🧮 Our Calculation",
                 use_container_width=True,
                 disabled=not has_rate,
-                help="Menggunakan rate internal"
+                help="Rate belum tersedia"
             )
 
         # ==========================
