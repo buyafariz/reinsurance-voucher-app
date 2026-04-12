@@ -871,8 +871,10 @@ with tab_calc:
         else:
             st.info("Silakan pilih satu baris untuk melanjutkan.")
 
-        
-
+    
+        # ==========================
+        # CEK RATE FILE
+        # ==========================
         selected_account = selected_rows.iloc[0]["Account With"]
 
         rate_file_id = find_drive_file(
@@ -883,20 +885,35 @@ with tab_calc:
 
         has_rate = rate_file_id is not None
 
-        st.markdown("### ⚙️ Metode Calculate")
+        st.markdown("### ⚙️ Pilih Metode Calculate")
 
-        calculate_method = st.radio(
-            "Pilih metode:",
-            ["Ceding Calculate", "Our Calculate"],
-            horizontal=True
-        )
+        col1, col2 = st.columns(2)
 
+        # ==========================
+        # BUTTON CEDING
+        # ==========================
+        with col1:
+            ceding_clicked = st.button(
+                "📥 Ceding Calculate",
+                use_container_width=True,
+                type="primary"
+            )
+
+        # ==========================
+        # BUTTON OUR (DISABLED JIKA TIDAK ADA RATE)
+        # ==========================
+        with col2:
+            our_clicked = st.button(
+                "🧮 Our Calculate",
+                use_container_width=True,
+                disabled=not has_rate  # 🔥 kunci utama
+            )
+
+        # ==========================
+        # INFO JIKA RATE BELUM ADA
+        # ==========================
         if not has_rate:
-            st.info("ℹ️ Rate belum tersedia untuk account ini → hanya Ceding Calculate yang bisa digunakan")
-
-        if calculate_method == "Our Calculate" and not has_rate:
-            st.warning("⚠️ Tidak bisa menggunakan Our Calculate karena rate belum tersedia")
-            st.stop()
+            st.info("ℹ️ Rate belum tersedia → Our Calculate dinonaktifkan")
 
 
 # ==========================
