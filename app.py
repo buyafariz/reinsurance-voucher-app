@@ -170,7 +170,8 @@ with tab_upload:
         "Pol Holder No",
         "Policy Holder",
         "Birth Date",
-        "Age At Issue Date",
+        "Age At",
+        "Issue Date",
         "Term Year",
         "Term Month",
         "Expired Date",
@@ -2217,7 +2218,7 @@ with tab_update:
 
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
-                    
+
                     acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
                     try:
