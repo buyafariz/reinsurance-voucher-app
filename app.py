@@ -893,14 +893,14 @@ with tab_calc:
 
         with col3:
             ceding_clicked = st.button(
-                "📥 Ceding",
+                "📥 Ceding Calculation",
                 use_container_width=True,
                 type="primary"
             )
 
         with col4:
             our_clicked = st.button(
-                "🧮 Our",
+                "🧮 Our Calculation",
                 use_container_width=True,
                 disabled=not has_rate,
                 help="Menggunakan rate internal"
