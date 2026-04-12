@@ -797,7 +797,7 @@ with tab_calc:
         st.stop()
 
     # ==========================
-    # FILTER STATUS POSTED
+    # FILTER POSTED
     # ==========================
     df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
 
@@ -806,7 +806,7 @@ with tab_calc:
         st.stop()
 
     # ==========================
-    # SEARCH FILTER
+    # SEARCH
     # ==========================
     search = st.text_input("🔍 Cari PML ID")
 
@@ -815,99 +815,109 @@ with tab_calc:
             df_posted["PML ID"].astype(str).str.contains(search, case=False, na=False)
         ]
 
-    # ==========================
-    # INFO
-    # ==========================
     st.write(f"Total PML POSTED: {len(df_posted)}")
 
     # ==========================
-    # DISPLAY TABLE
+    # ADD CHECKBOX COLUMN
     # ==========================
-    st.dataframe(df_posted, use_container_width=True)
+    df_posted["Select"] = False
+
+    edited_df = st.data_editor(
+        df_posted,
+        use_container_width=True,
+        num_rows="dynamic"
+    )
 
     # ==========================
-    # SELECT PML (FORM = ANTI RERUN LIAR)
+    # GET SELECTED DATA
     # ==========================
-    with st.form("calculate_form"):
+    selected_df = edited_df[edited_df["Select"] == True]
 
-        selected_pml_id = st.selectbox(
-            "Pilih PML untuk dihitung",
-            df_posted["PML ID"].unique()
-        )
-
-        submitted = st.form_submit_button("🚀 Calculate")
+    if not selected_df.empty:
+        st.write("📌 Selected PML:")
+        st.dataframe(selected_df)
 
     # ==========================
-    # PROCESS CALCULATE
+    # FORM PROCESS (ANTI RERUN)
+    # ==========================
+    with st.form("calculate_form_multi"):
+
+        submitted = st.form_submit_button("🚀 Calculate Selected")
+
+    # ==========================
+    # PROCESS
     # ==========================
     if submitted:
 
-        with st.spinner(f"⏳ Mengambil file {selected_pml_id}..."):
+        if selected_df.empty:
+            st.warning("⚠️ Pilih minimal 1 PML")
+            st.stop()
 
-            # ==========================
-            # FIND FILE PML
-            # ==========================
-            pml_file_id = find_drive_file(
-                service=service,
-                filename=f"{selected_pml_id}.xlsx",
-                parent_id=PML_DRIVE_ID
-            )
+        progress_bar = st.progress(0)
+        status_text = st.empty()
 
-            if not pml_file_id:
-                st.error("❌ File PML tidak ditemukan di Drive")
-                st.stop()
+        total = len(selected_df)
 
-            # ==========================
-            # DOWNLOAD FILE
-            # ==========================
-            file_stream = download_file_from_drive(service, pml_file_id)
+        with st.spinner("⏳ Processing selected PML..."):
 
-            df_pml = pd.read_excel(file_stream)
+            for i, (_, row) in enumerate(selected_df.iterrows()):
 
-            if df_pml.empty:
-                st.warning("⚠️ File PML kosong")
-                st.stop()
+                pml_id = row["PML ID"]
 
-            # ==========================
-            # NORMALIZE
-            # ==========================
-            df_pml.columns = df_pml.columns.str.strip().str.lower()
+                status_text.text(f"Processing {i+1}/{total} → {pml_id}")
+                progress_bar.progress((i + 1) / total)
 
-            # ==========================
-            # PREVIEW
-            # ==========================
-            st.subheader("Preview Data PML")
-            st.dataframe(df_pml.head(), use_container_width=True)
+                # ==========================
+                # FIND FILE
+                # ==========================
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=f"{pml_id}.xlsx",
+                    parent_id=PML_DRIVE_ID
+                )
 
-            # ==========================
-            # SAMPLE CALCULATION
-            # ==========================
-            if "reins total premium" in df_pml.columns:
-                total_premium = df_pml["reins total premium"].sum()
-            else:
-                total_premium = 0
+                if not pml_file_id:
+                    st.warning(f"❌ File tidak ditemukan: {pml_id}")
+                    continue
 
-            if "reins total comm" in df_pml.columns:
-                total_commission = df_pml["reins total comm"].sum()
-            else:
-                total_commission = 0
+                # ==========================
+                # DOWNLOAD FILE
+                # ==========================
+                file_stream = download_file_from_drive(service, pml_file_id)
 
-            if "reins overriding" in df_pml.columns:
-                overriding = df_pml["reins overriding"].sum()
-            else:
-                overriding = 0
+                df_pml = pd.read_excel(file_stream)
 
-            gross_income = total_premium - (total_commission + overriding)
+                if df_pml.empty:
+                    st.warning(f"⚠️ File kosong: {pml_id}")
+                    continue
 
-            # ==========================
-            # RESULT
-            # ==========================
-            st.subheader("📊 Hasil Perhitungan")
+                # ==========================
+                # NORMALIZE
+                # ==========================
+                df_pml.columns = df_pml.columns.str.strip().str.lower()
 
-            st.metric("Total Premium", f"{total_premium:,.0f}")
-            st.metric("Total Commission", f"{total_commission:,.0f}")
-            st.metric("Overriding", f"{overriding:,.0f}")
-            st.metric("Gross Income", f"{gross_income:,.0f}")
+                # ==========================
+                # CALCULATION
+                # ==========================
+                total_premium = df_pml.get("reins total premium", pd.Series()).sum()
+                total_commission = df_pml.get("reins total comm", pd.Series()).sum()
+                overriding = df_pml.get("reins overriding", pd.Series()).sum()
+
+                gross_income = total_premium - (total_commission + overriding)
+
+                # ==========================
+                # RESULT
+                # ==========================
+                st.success(f"✅ {pml_id}")
+                st.write({
+                    "Total Premium": total_premium,
+                    "Commission": total_commission,
+                    "Overriding": overriding,
+                    "Gross Income": gross_income
+                })
+
+        progress_bar.progress(1.0)
+        status_text.text("✅ Selesai!")
 
 
 # ==========================
