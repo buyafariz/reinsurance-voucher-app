@@ -459,11 +459,11 @@ def split_upload_with_log(
         commission = group["Reins Total Comm"].sum()
         overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
         total_commission = commission + overriding
-        tabarru = group["Tabarru"].sum()
-        ujrah = group["Ujrah"].sum()
+        tabarru = group["Reins Tabarru"].sum()
+        ujrah = group["Reins Ujrah"].sum()
 
         log_pml = {
-            "Seq No": seq_no,
+            "Seq No": current_seq,
             "Department": base_info["department"],
             "Biz Type": biz_type,
             "PML ID": pml_id,
