@@ -2207,24 +2207,31 @@ with tab_update:
                     st.error("File PML tidak ditemukan")
                     st.stop()
 
-                # Download & baca
+
+                # ==========================
+                # LOAD FILE
+                # ==========================
                 file_stream = download_file_from_drive(service, pml_file_id)
                 df = pd.read_excel(file_stream)
 
                 st.write("Preview Data:", df.head())
 
+                # ==========================
+                # SELECT MULTI COLUMN
+                # ==========================
                 selected_columns = st.multiselect(
                     "Pilih kolom untuk split (bisa lebih dari 1)",
-                    df.columns.tolist(),
-                    disabled=st.session_state.is_processing_split
+                    df.columns.tolist()
                 )
 
                 if not selected_columns:
                     st.warning("Pilih minimal 1 kolom untuk split")
                     st.stop()
 
-                # --- TOMBOL PROSES SPLIT ---
-                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary", disabled=st.session_state.is_processing_split):
+                # ==========================
+                # PROSES SPLIT
+                # ==========================
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
 
                     # 🔥 PREVENT DOUBLE RUN
                     if st.session_state.is_processing_split:
@@ -2278,7 +2285,7 @@ with tab_update:
                                 status_text=status_text
                             )
 
-                            # 🔥 UPDATE STATUS PML LAMA
+                            # 🔥 UPDATE STATUS
                             update_pml_status_to_splitted(
                                 service=sheets_service,
                                 spreadsheet_id=log_pml_drive_id,
