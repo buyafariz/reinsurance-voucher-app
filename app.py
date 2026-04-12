@@ -2182,96 +2182,94 @@ with tab_update:
                     parent_id=PML_DRIVE_ID
                 )
 
+                service = get_drive_service()
+
+                # Folder
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                PML_DRIVE_ID = pml_drive
+
+                # Cari file
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
+
+                if not pml_file_id:
+                    st.error("File PML tidak ditemukan")
+                    st.stop()
+
+                # Download & baca
+                file_stream = download_file_from_drive(service, pml_file_id)
+                df = pd.read_excel(file_stream)
+
+                st.write("Preview Data:", df.head())
+
+                selected_column = st.selectbox(
+                    "Pilih kolom untuk split",
+                    df.columns.tolist()
+                )
+
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                    
+                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                    service = get_drive_service()
+                    try:
+                        sheets_service = init_sheets_service(creds)
 
-                    # Folder
-                    pml_drive = get_or_create_folder(
-                        service=service,
-                        folder_name="Folder PML",
-                        parent_id=PERIOD_DRIVE_ID
-                    )
+                        log_pml_drive_id = find_drive_file(
+                            service=service,
+                            filename=get_log_pml_filename(int(year), int(month)),
+                            parent_id=PML_DRIVE_ID,
+                            mime_type="application/vnd.google-apps.spreadsheet"
+                        )
 
-                    PML_DRIVE_ID = pml_drive
+                        base_info = {
+                            "department": department,
+                            "account_with": account_with,
+                            "cedant_company": cedant_company,
+                            "pic": pic,
+                            "curr": curr,
+                            "subject_email": subject_email,
+                            "email_date": email_date,
+                            "source_pml": selected_pml_id
+                        }
 
-                    # Cari file
-                    pml_file_id = find_drive_file(
-                        service=service,
-                        filename=selected_pml_id,
-                        parent_id=PML_DRIVE_ID
-                    )
+                        results = split_upload_with_log(
+                            service=service,
+                            sheets_service=sheets_service,
+                            df=df,
+                            split_column=selected_column,
+                            period_drive_id=PERIOD_DRIVE_ID,
+                            pml_folder_id=PML_DRIVE_ID,
+                            log_pml_drive_id=log_pml_drive_id,
+                            year=int(year),
+                            month=int(month),
+                            biz_type=biz_type,
+                            base_info=base_info,
+                            columns_template=columns_template
+                        )
 
-                    if not pml_file_id:
-                        st.error("File PML tidak ditemukan")
-                        st.stop()
+                        # 🔥 UPDATE STATUS PML LAMA
+                        update_pml_status_to_splitted(
+                            service=sheets_service,
+                            spreadsheet_id=log_pml_drive_id,
+                            pml_id=selected_pml_id
+                        )
 
-                    # Download & baca
-                    file_stream = download_file_from_drive(service, pml_file_id)
-                    df = pd.read_excel(file_stream)
+                        st.success("✅ Split selesai & status diupdate!")
 
-                    st.write("Preview Data:", df.head())
+                        for r in results:
+                            st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
 
-                    selected_column = st.selectbox(
-                        "Pilih kolom untuk split",
-                        df.columns.tolist()
-                    )
-
-                    if st.button("🚀 Split & Generate PML Baru"):
-
-                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
-
-                        try:
-                            sheets_service = init_sheets_service(creds)
-
-                            log_pml_drive_id = find_drive_file(
-                                service=service,
-                                filename=get_log_pml_filename(int(year), int(month)),
-                                parent_id=PML_DRIVE_ID,
-                                mime_type="application/vnd.google-apps.spreadsheet"
-                            )
-
-                            base_info = {
-                                "department": department,
-                                "account_with": account_with,
-                                "cedant_company": cedant_company,
-                                "pic": pic,
-                                "curr": curr,
-                                "subject_email": subject_email,
-                                "email_date": email_date,
-                                "source_pml": selected_pml_id
-                            }
-
-                            results = split_upload_with_log(
-                                service=service,
-                                sheets_service=sheets_service,
-                                df=df,
-                                split_column=selected_column,
-                                period_drive_id=PERIOD_DRIVE_ID,
-                                pml_folder_id=PML_DRIVE_ID,
-                                log_pml_drive_id=log_pml_drive_id,
-                                year=int(year),
-                                month=int(month),
-                                biz_type=biz_type,
-                                base_info=base_info,
-                                columns_template=columns_template
-                            )
-
-                            # 🔥 UPDATE STATUS PML LAMA
-                            update_pml_status_to_splitted(
-                                service=sheets_service,
-                                spreadsheet_id=log_pml_drive_id,
-                                pml_id=selected_pml_id
-                            )
-
-                            st.success("✅ Split selesai & status diupdate!")
-
-                            for r in results:
-                                st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
-
-                        finally:
-                            release_drive_lock(service, PERIOD_DRIVE_ID)
+                    finally:
+                        release_drive_lock(service, PERIOD_DRIVE_ID)
             
             else:
                 st.write("Silakan pilih baris terlebih dahulu.")
