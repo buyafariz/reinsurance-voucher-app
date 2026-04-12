@@ -797,7 +797,7 @@ with tab_calc:
         st.stop()
 
     # ==========================
-    # FILTER POSTED
+    # FILTER STATUS POSTED
     # ==========================
     df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
 
@@ -806,7 +806,7 @@ with tab_calc:
         st.stop()
 
     # ==========================
-    # SEARCH
+    # SEARCH (OPSIONAL)
     # ==========================
     search = st.text_input("🔍 Cari PML ID")
 
@@ -818,106 +818,57 @@ with tab_calc:
     st.write(f"Total PML POSTED: {len(df_posted)}")
 
     # ==========================
-    # ADD CHECKBOX COLUMN
+    # UI SELECT (SAMA DENGAN SPLIT)
     # ==========================
-    df_posted["Select"] = False
+    st.markdown("### 📋 Pilih Data PML untuk Di-Calculate")
+    st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
-    edited_df = st.data_editor(
-        df_posted,
-        use_container_width=True,
-        num_rows="dynamic"
-    )
+    if not df_posted.empty:
 
-    # ==========================
-    # GET SELECTED DATA
-    # ==========================
-    selected_df = edited_df[edited_df["Select"] == True]
+        # Tambahkan checkbox column
+        df_to_edit = df_posted.copy()
+        df_to_edit.insert(0, "Pilih", False)
 
-    if not selected_df.empty:
-        st.write("📌 Selected PML:")
-        st.dataframe(selected_df)
+        # Data editor (CONSISTENT UI)
+        edited_df = st.data_editor(
+            df_to_edit,
+            column_config={
+                "Pilih": st.column_config.CheckboxColumn(
+                    "Pilih",
+                    help="Pilih baris ini untuk di-calculate",
+                    default=False,
+                ),
+                "PML ID": st.column_config.Column(disabled=True),
+                "STATUS": st.column_config.Column(disabled=True),
+                "Product": st.column_config.Column(disabled=True),
+                "Total Contribution": st.column_config.NumberColumn(
+                    "Total Contribution",
+                    format="#,##0",
+                    disabled=True
+                ),
+            },
+            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
+            hide_index=True,
+            use_container_width=True,
+        )
 
-    # ==========================
-    # FORM PROCESS (ANTI RERUN)
-    # ==========================
-    with st.form("calculate_form_multi"):
+        # ==========================
+        # AMBIL YANG DIPILIH
+        # ==========================
+        selected_rows = edited_df[edited_df["Pilih"] == True]
 
-        submitted = st.form_submit_button("🚀 Calculate Selected")
+        # ==========================
+        # VALIDASI
+        # ==========================
+        if len(selected_rows) > 1:
+            st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses calculate.")
 
-    # ==========================
-    # PROCESS
-    # ==========================
-    if submitted:
+        elif len(selected_rows) == 1:
+            selected_pml_id = selected_rows.iloc[0]["PML ID"]
+            st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
 
-        if selected_df.empty:
-            st.warning("⚠️ Pilih minimal 1 PML")
-            st.stop()
-
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-
-        total = len(selected_df)
-
-        with st.spinner("⏳ Processing selected PML..."):
-
-            for i, (_, row) in enumerate(selected_df.iterrows()):
-
-                pml_id = row["PML ID"]
-
-                status_text.text(f"Processing {i+1}/{total} → {pml_id}")
-                progress_bar.progress((i + 1) / total)
-
-                # ==========================
-                # FIND FILE
-                # ==========================
-                pml_file_id = find_drive_file(
-                    service=service,
-                    filename=f"{pml_id}.xlsx",
-                    parent_id=PML_DRIVE_ID
-                )
-
-                if not pml_file_id:
-                    st.warning(f"❌ File tidak ditemukan: {pml_id}")
-                    continue
-
-                # ==========================
-                # DOWNLOAD FILE
-                # ==========================
-                file_stream = download_file_from_drive(service, pml_file_id)
-
-                df_pml = pd.read_excel(file_stream)
-
-                if df_pml.empty:
-                    st.warning(f"⚠️ File kosong: {pml_id}")
-                    continue
-
-                # ==========================
-                # NORMALIZE
-                # ==========================
-                df_pml.columns = df_pml.columns.str.strip().str.lower()
-
-                # ==========================
-                # CALCULATION
-                # ==========================
-                total_premium = df_pml.get("reins total premium", pd.Series()).sum()
-                total_commission = df_pml.get("reins total comm", pd.Series()).sum()
-                overriding = df_pml.get("reins overriding", pd.Series()).sum()
-
-                gross_income = total_premium - (total_commission + overriding)
-
-                # ==========================
-                # RESULT
-                # ==========================
-                st.success(f"✅ {pml_id}")
-                st.write({
-                    "Total Premium": total_premium,
-                    "Commission": total_commission,
-                    "Overriding": overriding,
-                    "Gross Income": gross_income
-                })
-
-        progress_bar.progress(1.0)
-        status_text.text("✅ Selesai!")
+        else:
+            st.info("Silakan pilih satu baris untuk melanjutkan.")
 
 
 # ==========================
