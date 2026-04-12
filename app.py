@@ -2211,16 +2211,20 @@ with tab_update:
 
                 st.write("Preview Data:", df.head())
 
-                selected_column = st.selectbox(
-                    "Pilih kolom untuk split",
+                selected_columns = st.multiselect(
+                    "Pilih kolom untuk split (bisa lebih dari 1)",
                     df.columns.tolist()
                 )
 
+                if not selected_columns:
+                    st.warning("Pilih minimal 1 kolom untuk split")
+                    st.stop()
+
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
-                    with st.spinner("⏳ Sedang memproses split PML, mohon tunggu..."):
 
-                        # 🔥 INIT PROGRESS UI
+                    with st.spinner(f"⏳ Split {selected_pml_id} sedang diproses..."):
+
                         progress_bar = st.progress(0)
                         status_text = st.empty()
 
@@ -2251,7 +2255,7 @@ with tab_update:
                                 service=service,
                                 sheets_service=sheets_service,
                                 df=df,
-                                split_column=selected_column,
+                                split_columns=selected_columns,
                                 period_drive_id=PERIOD_DRIVE_ID,
                                 pml_folder_id=PML_DRIVE_ID,
                                 log_pml_drive_id=log_pml_drive_id,
@@ -2259,7 +2263,9 @@ with tab_update:
                                 month=int(month),
                                 biz_type=biz_type,
                                 base_info=base_info,
-                                columns_template=columns_template
+                                columns_template=columns_template,
+                                progress_bar=progress_bar,
+                                status_text=status_text
                             )
 
                             # 🔥 UPDATE STATUS PML LAMA
@@ -2269,6 +2275,9 @@ with tab_update:
                                 pml_id=selected_pml_id
                             )
 
+                            progress_bar.progress(1.0)
+                            status_text.text("✅ Selesai!")
+
                             st.success("✅ Split selesai & status diupdate!")
 
                             for r in results:
@@ -2276,7 +2285,7 @@ with tab_update:
 
                         finally:
                             release_drive_lock(service, PERIOD_DRIVE_ID)
-            
+                                        
             else:
                 st.write("Silakan pilih baris terlebih dahulu.")
 

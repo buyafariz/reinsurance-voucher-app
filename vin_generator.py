@@ -402,11 +402,17 @@ def generate_pml_id(seq_no, year, month):
     pml_id = f"PML{year}{str(month).zfill(2)}LIS{str(new_seq).zfill(4)}"
     return pml_id, new_seq
 
+def format_split_key(split_columns, key):
+    if isinstance(key, tuple):
+        return ", ".join([f"{col}={val}" for col, val in zip(split_columns, key)])
+    else:
+        return f"{split_columns[0]}={key}"
+
 def split_upload_with_log(
     service,
     sheets_service,
     df,
-    split_column,
+    split_columns,
     period_drive_id,
     pml_folder_id,
     log_pml_drive_id,
@@ -421,9 +427,9 @@ def split_upload_with_log(
     results = []
 
     df.columns = df.columns.str.strip()
-    df = df.dropna(subset=[split_column])
+    df = df.dropna(subset=[split_columns])
 
-    grouped = list(df.groupby(split_column))
+    grouped = list(df.groupby(split_columns))
     total = len(grouped)
 
     # 🔥 ambil sequence SEKALI
@@ -434,9 +440,10 @@ def split_upload_with_log(
         if group.empty:
             continue
 
+        formatted_key = format_split_key(split_columns, key)
         # 🔥 UPDATE UI
         if status_text:
-            status_text.text(f"Processing {i+1}/{total} → {split_column} = {key}")
+            status_text.text(f"Processing {i+1}/{total} → {formatted_key}")
 
         if progress_bar:
             progress_bar.progress((i + 1) / total)
@@ -518,7 +525,7 @@ def split_upload_with_log(
         results.append({
             "pml_id": pml_id,
             "rows": len(group),
-            "split_value": key
+            "split_value": formatted_key
         })
 
     return results
