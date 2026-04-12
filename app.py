@@ -2185,6 +2185,8 @@ with tab_update:
                         mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
+                    st.write(pml_drive_id)
+
                     # 2. Melakukan logika split berdasarkan kolom tertentu
                     # 3. Menghasilkan beberapa PML baru
                     st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")
