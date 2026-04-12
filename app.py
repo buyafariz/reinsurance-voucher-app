@@ -2173,7 +2173,7 @@ with tab_update:
                     st.write("Selected:", selected_pml_id)
 
                     pml_drive = get_or_create_folder(
-                        service=drive_service,
+                        service=service,
                         folder_name="Folder PML",
                         parent_id=PERIOD_DRIVE_ID
                     )
@@ -2182,14 +2182,13 @@ with tab_update:
 
                     st.write(PML_DRIVE_ID)
 
-                    pml_drive_id = find_drive_file(
-                        service=drive_service,
-                        filename=selected_pml_id,
-                        parent_id=pml_drive
-                        # mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    pml_file_id = find_drive_file(
+                        service=service,
+                        filename=voucher_filename,
+                        parent_id=PML_DRIVE_ID
                     )
 
-                    st.write(pml_drive_id)
+                    st.write(pml_file_id)
 
                     # 2. Melakukan logika split berdasarkan kolom tertentu
                     # 3. Menghasilkan beberapa PML baru
