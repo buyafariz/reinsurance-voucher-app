@@ -372,6 +372,36 @@ def create_cancel_row(original_row, new_voucher, seq_no, year, month, user, reas
 def now_wib_naive():
     return datetime.now(ZoneInfo("Asia/Jakarta")).replace(tzinfo=None)
 
+def get_last_seq_no(sheets_service, spreadsheet_id):
+    result = sheets_service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range="A:Z"
+    ).execute()
+
+    values = result.get("values", [])
+
+    if len(values) <= 1:
+        return 0
+
+    headers = values[0]
+    seq_col = headers.index("Seq No")
+
+    seq_numbers = []
+    for row in values[1:]:
+        if len(row) > seq_col:
+            try:
+                seq_numbers.append(int(row[seq_col]))
+            except:
+                continue
+
+    return max(seq_numbers) if seq_numbers else 0
+
+
+def generate_pml_id(seq_no, year, month):
+    new_seq = seq_no + 1
+    pml_id = f"PML{year}{str(month).zfill(2)}{str(new_seq).zfill(4)}"
+    return pml_id, new_seq
+
 def split_upload_with_log(
     service,
     sheets_service,
@@ -411,14 +441,19 @@ def split_upload_with_log(
         # ==========================
         # GENERATE PML
         # ==========================
-        pml_id, seq_no = generate_pml_from_drive(
-            service=service,
-            period_folder_id=period_drive_id,
-            year=year,
-            month=month,
-            find_drive_file=find_drive_file,
-            biz_type=biz_type
-        )
+        current_seq = get_last_seq_no(sheets_service, log_pml_drive_id)
+
+        for key, group in grouped:
+
+            if group.empty:
+                continue
+
+            # 🔥 generate dari counter lokal
+            pml_id, current_seq = generate_pml_id(
+                current_seq,
+                year,
+                month
+            )
 
         total_contribution = group["Reins Total Premium"].sum()
         commission = group["Reins Total Comm"].sum()
