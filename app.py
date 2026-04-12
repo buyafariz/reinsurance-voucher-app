@@ -2356,22 +2356,41 @@ with tab_update:
                                 "source_pml": selected_rows.iloc[0]["PML ID"]
                             }
 
-                            results = split_upload_with_log(
-                                service=service,
-                                sheets_service=sheets_service,
-                                df=df,
-                                split_columns=selected_columns,
-                                period_drive_id=PERIOD_DRIVE_ID,
-                                pml_folder_id=PML_DRIVE_ID,
-                                log_pml_drive_id=log_pml_drive_id,
-                                year=int(year),
-                                month=int(month),
-                                biz_type=biz_type,
-                                base_info=base_info,
-                                columns_template=columns_template,
-                                progress_bar=progress_bar,
-                                status_text=status_text
-                            )
+                            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                                results = split_upload_with_log(
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=biz_type,
+                                    base_info=base_info,
+                                    columns_template=columns_template,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
+
+                            elif biz_type == "Claim":
+                                    results = split_upload_with_log(
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=biz_type,
+                                    base_info=base_info,
+                                    columns_template=columns_template_claim,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
 
                             # 🔥 UPDATE STATUS
                             update_pml_status_to_splitted(

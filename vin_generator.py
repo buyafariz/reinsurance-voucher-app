@@ -467,45 +467,82 @@ def split_upload_with_log(
         # ==========================
         # HITUNG NILAI
         # ==========================
-        total_contribution = group["Reins Total Premium"].sum()
-        commission = group["Reins Total Comm"].sum()
-        overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
-        total_commission = commission + overriding
-        tabarru = group["Reins Tabarru"].sum()
-        ujrah = group["Reins Ujrah"].sum()
+        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            total_contribution = group["Reins Total Premium"].sum()
+            commission = group["Reins Total Comm"].sum()
+            overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
+            total_commission = commission + overriding
+            tabarru = group["Reins Tabarru"].sum()
+            ujrah = group["Reins Ujrah"].sum()
 
-        # ==========================
-        # LOG
-        # ==========================
-        log_pml = {
-            "Seq No": current_seq,
-            "Department": base_info["department"],
-            "Biz Type": biz_type,
-            "PML ID": pml_id,
-            "Account With": base_info["account_with"],
-            "Cedant Company": base_info["cedant_company"],
-            "PIC": base_info["pic"],
-            "Curr": base_info["curr"],
-            "Total Contribution": total_contribution,
-            "Commission": commission,
-            "Overriding": overriding,
-            "Total Commission": total_commission,
-            "Gross Premium Income": total_contribution - total_commission,
-            "Tabarru": tabarru,
-            "Ujrah": ujrah,
-            "Claim": 0,
-            "Balance": total_contribution - total_commission,
-            "REMARKS": f"Split from {base_info['source_pml']}",
-            "STATUS": "POSTED",
-            "CREATED AT": now_wib_naive(),
-            "CREATED BY": base_info["pic"],
-            "Subject Email": base_info["subject_email"],
-            "Email Date": base_info["email_date"],
-            "CANCELED AT": "-",
-            "CANCELED BY": "-",
-            "CANCEL OF VOUCHER": "-",
-            "CANCEL REASON": "-"
-        }
+            # ==========================
+            # LOG
+            # ==========================
+            log_pml = {
+                "Seq No": current_seq,
+                "Department": base_info["department"],
+                "Biz Type": biz_type,
+                "PML ID": pml_id,
+                "Account With": base_info["account_with"],
+                "Cedant Company": base_info["cedant_company"],
+                "PIC": base_info["pic"],
+                "Curr": base_info["curr"],
+                "Total Contribution": total_contribution,
+                "Commission": commission,
+                "Overriding": overriding,
+                "Total Commission": total_commission,
+                "Gross Premium Income": total_contribution - total_commission,
+                "Tabarru": tabarru,
+                "Ujrah": ujrah,
+                "Claim": 0,
+                "Balance": total_contribution - total_commission,
+                "REMARKS": f"Split from {base_info['source_pml']}",
+                "STATUS": "POSTED",
+                "CREATED AT": now_wib_naive(),
+                "CREATED BY": base_info["pic"],
+                "Subject Email": base_info["subject_email"],
+                "Email Date": base_info["email_date"],
+                "CANCELED AT": "-",
+                "CANCELED BY": "-",
+                "CANCEL OF VOUCHER": "-",
+                "CANCEL REASON": "-"
+            }
+
+        elif biz_type == "Claim":
+            claim = group["Marein Share IDR"].sum()
+
+            # ==========================
+            # LOG
+            # ==========================
+            log_pml = {
+                "Seq No": current_seq,
+                "Department": base_info["department"],
+                "Biz Type": biz_type,
+                "PML ID": pml_id,
+                "Account With": base_info["account_with"],
+                "Cedant Company": base_info["cedant_company"],
+                "PIC": base_info["pic"],
+                "Curr": base_info["curr"],
+                "Total Contribution": 0,
+                "Commission": 0,
+                "Overriding": 0,
+                "Total Commission": 0,
+                "Gross Premium Income": total_contribution - total_commission,
+                "Tabarru": 0,
+                "Ujrah": 0,
+                "Claim": claim,
+                "Balance": total_contribution - total_commission,
+                "REMARKS": f"Split from {base_info['source_pml']}",
+                "STATUS": "POSTED",
+                "CREATED AT": now_wib_naive(),
+                "CREATED BY": base_info["pic"],
+                "Subject Email": base_info["subject_email"],
+                "Email Date": base_info["email_date"],
+                "CANCELED AT": "-",
+                "CANCELED BY": "-",
+                "CANCEL OF VOUCHER": "-",
+                "CANCEL REASON": "-"
+            }
 
         # ==========================
         # APPEND LOG
