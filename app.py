@@ -2184,7 +2184,7 @@ with tab_update:
 
                     pml_file_id = find_drive_file(
                         service=service,
-                        filename=voucher_filename,
+                        filename=selected_pml_id,
                         parent_id=PML_DRIVE_ID
                     )
 
