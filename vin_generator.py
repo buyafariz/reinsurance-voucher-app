@@ -164,32 +164,19 @@ def generate_pml_from_drive(
         next_seq = 1
 
     else:
-        log_df = load_log_from_gsheet(
+        current_seq = get_last_seq_no(
             service=service,
             spreadsheet_id=file_id
         )
 
-        if log_df.empty or "Seq No" not in log_df.columns:
-            next_seq = 1
-        else:
-            seq_series = pd.to_numeric(log_df["Seq No"], errors="coerce")
-            seq_series = seq_series.dropna()
+        pml_id, next_seq = generate_pml_id(
+            current_seq,
+            year,
+            month,
+            biz_type
+        )
 
-            if seq_series.empty:
-                next_seq = 1
-            else:
-                next_seq = int(seq_series.max()) + 1
-
-    # ==========================
-    # Format Voucher
-    # ==========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-        voucher = f"PML{year}{month:02d}LIS{next_seq:04d}"
-
-    elif biz_type == "Claim":
-        voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
-
-    return voucher, next_seq
+    return pml_id, next_seq
 
 
 def generate_vou_from_drive(
@@ -397,10 +384,15 @@ def get_last_seq_no(sheets_service, spreadsheet_id):
     return max(seq_numbers) if seq_numbers else 0
 
 
-def generate_pml_id(seq_no, year, month):
+def generate_pml_id(seq_no, year, month, biz_type):
     new_seq = seq_no + 1
-    pml_id = f"PML{year}{str(month).zfill(2)}LIS{str(new_seq).zfill(4)}"
-    return pml_id, new_seq
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        voucher = f"PML{year}{month:02d}LST{new_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"PLA{year}{month:02d}LSC{new_seq:04d}"
+
+    return voucher, new_seq
 
 def format_split_key(split_columns, key):
     if isinstance(key, tuple):
@@ -454,7 +446,8 @@ def split_upload_with_log(
         pml_id, current_seq = generate_pml_id(
             current_seq,
             year,
-            month
+            month,
+            biz_type
         )
 
         # ==========================
