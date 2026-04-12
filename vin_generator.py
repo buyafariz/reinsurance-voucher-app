@@ -139,7 +139,7 @@ def generate_vin_from_drive(
     elif biz_type == "Claim":
         voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
 
-    return voucher, next_seq
+    return voucher, next_seq, file_id
 
 def generate_pml_from_drive(
     service,
