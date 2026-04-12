@@ -398,8 +398,8 @@ def get_last_seq_no(sheets_service, spreadsheet_id):
 
 
 def generate_pml_id(seq_no, year, month):
-    new_seq = seq_no + 1
-    pml_id = f"PML{year}{str(month).zfill(2)}{str(new_seq).zfill(4)}"
+    new_seq = seq_no
+    pml_id = f"PML{year}{str(month).zfill(2)}LIS{str(new_seq).zfill(4)}"
     return pml_id, new_seq
 
 def split_upload_with_log(
@@ -426,12 +426,15 @@ def split_upload_with_log(
     grouped = list(df.groupby(split_column))
     total = len(grouped)
 
+    # 🔥 ambil sequence SEKALI
+    current_seq = get_last_seq_no(sheets_service, log_pml_drive_id)
+
     for i, (key, group) in enumerate(grouped):
 
         if group.empty:
             continue
 
-        # 🔥 UPDATE PROGRESS UI
+        # 🔥 UPDATE UI
         if status_text:
             status_text.text(f"Processing {i+1}/{total} → {split_column} = {key}")
 
@@ -439,22 +442,17 @@ def split_upload_with_log(
             progress_bar.progress((i + 1) / total)
 
         # ==========================
-        # GENERATE PML
+        # GENERATE PML (BENAR)
         # ==========================
-        current_seq = get_last_seq_no(sheets_service, log_pml_drive_id)
+        pml_id, current_seq = generate_pml_id(
+            current_seq,
+            year,
+            month
+        )
 
-        for key, group in grouped:
-
-            if group.empty:
-                continue
-
-            # 🔥 generate dari counter lokal
-            pml_id, current_seq = generate_pml_id(
-                current_seq,
-                year,
-                month
-            )
-
+        # ==========================
+        # HITUNG NILAI
+        # ==========================
         total_contribution = group["Reins Total Premium"].sum()
         commission = group["Reins Total Comm"].sum()
         overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
@@ -462,6 +460,9 @@ def split_upload_with_log(
         tabarru = group["Reins Tabarru"].sum()
         ujrah = group["Reins Ujrah"].sum()
 
+        # ==========================
+        # LOG
+        # ==========================
         log_pml = {
             "Seq No": current_seq,
             "Department": base_info["department"],
@@ -492,12 +493,18 @@ def split_upload_with_log(
             "CANCEL REASON": "-"
         }
 
+        # ==========================
+        # APPEND LOG
+        # ==========================
         append_gsheet(
             service=sheets_service,
             spreadsheet_id=log_pml_drive_id,
             row_dict=log_pml
         )
 
+        # ==========================
+        # UPLOAD FILE
+        # ==========================
         upload_dataframe_to_drive(
             service=service,
             df=group,
