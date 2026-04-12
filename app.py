@@ -2218,59 +2218,64 @@ with tab_update:
 
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                    with st.spinner("⏳ Sedang memproses split PML, mohon tunggu..."):
 
-                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
+                        # 🔥 INIT PROGRESS UI
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
 
-                    try:
-                        sheets_service = init_sheets_service(creds)
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                        log_pml_drive_id = find_drive_file(
-                            service=service,
-                            filename=get_log_pml_filename(int(year), int(month)),
-                            parent_id=PML_DRIVE_ID,
-                            mime_type="application/vnd.google-apps.spreadsheet"
-                        )
+                        try:
+                            sheets_service = init_sheets_service(creds)
 
-                        base_info = {
-                            "department": selected_rows.iloc[0]["Department"],
-                            "account_with": selected_rows.iloc[0]["Account With"],
-                            "cedant_company": selected_rows.iloc[0]["Cedant Company"],
-                            "pic": selected_rows.iloc[0]["PIC"],
-                            "curr": selected_rows.iloc[0]["Curr"],
-                            "subject_email": selected_rows.iloc[0]["Subject Email"],
-                            "email_date": selected_rows.iloc[0]["Email Date"],
-                            "source_pml": selected_rows.iloc[0]["PML ID"]
-                        }
+                            log_pml_drive_id = find_drive_file(
+                                service=service,
+                                filename=get_log_pml_filename(int(year), int(month)),
+                                parent_id=PML_DRIVE_ID,
+                                mime_type="application/vnd.google-apps.spreadsheet"
+                            )
 
-                        results = split_upload_with_log(
-                            service=service,
-                            sheets_service=sheets_service,
-                            df=df,
-                            split_column=selected_column,
-                            period_drive_id=PERIOD_DRIVE_ID,
-                            pml_folder_id=PML_DRIVE_ID,
-                            log_pml_drive_id=log_pml_drive_id,
-                            year=int(year),
-                            month=int(month),
-                            biz_type=biz_type,
-                            base_info=base_info,
-                            columns_template=columns_template
-                        )
+                            base_info = {
+                                "department": selected_rows.iloc[0]["Department"],
+                                "account_with": selected_rows.iloc[0]["Account With"],
+                                "cedant_company": selected_rows.iloc[0]["Cedant Company"],
+                                "pic": selected_rows.iloc[0]["PIC"],
+                                "curr": selected_rows.iloc[0]["Curr"],
+                                "subject_email": selected_rows.iloc[0]["Subject Email"],
+                                "email_date": selected_rows.iloc[0]["Email Date"],
+                                "source_pml": selected_rows.iloc[0]["PML ID"]
+                            }
 
-                        # 🔥 UPDATE STATUS PML LAMA
-                        update_pml_status_to_splitted(
-                            service=sheets_service,
-                            spreadsheet_id=log_pml_drive_id,
-                            pml_id=selected_pml_id
-                        )
+                            results = split_upload_with_log(
+                                service=service,
+                                sheets_service=sheets_service,
+                                df=df,
+                                split_column=selected_column,
+                                period_drive_id=PERIOD_DRIVE_ID,
+                                pml_folder_id=PML_DRIVE_ID,
+                                log_pml_drive_id=log_pml_drive_id,
+                                year=int(year),
+                                month=int(month),
+                                biz_type=biz_type,
+                                base_info=base_info,
+                                columns_template=columns_template
+                            )
 
-                        st.success("✅ Split selesai & status diupdate!")
+                            # 🔥 UPDATE STATUS PML LAMA
+                            update_pml_status_to_splitted(
+                                service=sheets_service,
+                                spreadsheet_id=log_pml_drive_id,
+                                pml_id=selected_pml_id
+                            )
 
-                        for r in results:
-                            st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
+                            st.success("✅ Split selesai & status diupdate!")
 
-                    finally:
-                        release_drive_lock(service, PERIOD_DRIVE_ID)
+                            for r in results:
+                                st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
+
+                        finally:
+                            release_drive_lock(service, PERIOD_DRIVE_ID)
             
             else:
                 st.write("Silakan pilih baris terlebih dahulu.")

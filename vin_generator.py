@@ -384,21 +384,33 @@ def split_upload_with_log(
     month,
     biz_type,
     base_info,
-    columns_template
+    columns_template,
+    progress_bar=None,
+    status_text=None
 ):
     results = []
 
     df.columns = df.columns.str.strip()
     df = df.dropna(subset=[split_column])
 
-    grouped = df.groupby(split_column)
+    grouped = list(df.groupby(split_column))
+    total = len(grouped)
 
-    for key, group in grouped:
+    for i, (key, group) in enumerate(grouped):
 
         if group.empty:
             continue
 
-        # 🔥 Generate PML baru
+        # 🔥 UPDATE PROGRESS UI
+        if status_text:
+            status_text.text(f"Processing {i+1}/{total} → {split_column} = {key}")
+
+        if progress_bar:
+            progress_bar.progress((i + 1) / total)
+
+        # ==========================
+        # GENERATE PML
+        # ==========================
         pml_id, seq_no = generate_pml_from_drive(
             service=service,
             period_folder_id=period_drive_id,
@@ -443,14 +455,12 @@ def split_upload_with_log(
             "CANCEL REASON": "-"
         }
 
-        # Append ke log
         append_gsheet(
             service=sheets_service,
             spreadsheet_id=log_pml_drive_id,
             row_dict=log_pml
         )
 
-        # Upload file split
         upload_dataframe_to_drive(
             service=service,
             df=group,
