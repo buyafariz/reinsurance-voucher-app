@@ -2062,123 +2062,123 @@ with tab_update:
     drive_service = get_drive_service()
     sheets_service = init_sheets_service(creds)
 
-    # if action_type == "Split Voucher":
-    #     # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
-    #     PERIOD_DRIVE_ID = None
-    #     df_posted = pd.DataFrame() # Default kosong agar tidak NameError
+    if action_type == "Split Voucher":
+        # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
+        PERIOD_DRIVE_ID = None
+        df_posted = pd.DataFrame() # Default kosong agar tidak NameError
         
-    #     # Ambil Folder ID berdasarkan Tahun/Bulan
-    #     drive_folders = get_period_drive_folders(
-    #         year=int(year),
-    #         month=int(month),
-    #         root_folder_id=ROOT_DRIVE_FOLDER_ID
-    #     )
-    #     PERIOD_DRIVE_ID = drive_folders.get("period_id")
+        # Ambil Folder ID berdasarkan Tahun/Bulan
+        drive_folders = get_period_drive_folders(
+            year=int(year),
+            month=int(month),
+            root_folder_id=ROOT_DRIVE_FOLDER_ID
+        )
+        PERIOD_DRIVE_ID = drive_folders.get("period_id")
 
-    #     if not PERIOD_DRIVE_ID:
-    #         st.error("Folder periode tidak ditemukan di Drive.")
-    #         st.stop()
+        if not PERIOD_DRIVE_ID:
+            st.error("Folder periode tidak ditemukan di Drive.")
+            st.stop()
 
-    #     try:
-    #         # 2. LOCKING (Gunakan Drive Service)
-    #         acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
+        try:
+            # 2. LOCKING (Gunakan Drive Service)
+            acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-    #         # 3. MENCARI & MEMBACA DATA
-    #         # Cari Folder PML
-    #         pml_drive_id = get_or_create_folder(
-    #             service=drive_service,
-    #             folder_name="Folder PML",
-    #             parent_id=PERIOD_DRIVE_ID
-    #         )
+            # 3. MENCARI & MEMBACA DATA
+            # Cari Folder PML
+            pml_drive_id = get_or_create_folder(
+                service=drive_service,
+                folder_name="Folder PML",
+                parent_id=PERIOD_DRIVE_ID
+            )
 
-    #         # Cari File Log Spreadsheet
-    #         log_pml_drive_id = find_drive_file(
-    #             service=drive_service,
-    #             filename=get_log_pml_filename(int(year), int(month)),
-    #             parent_id=pml_drive_id,
-    #             mime_type="application/vnd.google-apps.spreadsheet"
-    #         )
+            # Cari File Log Spreadsheet
+            log_pml_drive_id = find_drive_file(
+                service=drive_service,
+                filename=get_log_pml_filename(int(year), int(month)),
+                parent_id=pml_drive_id,
+                mime_type="application/vnd.google-apps.spreadsheet"
+            )
 
-    #         if log_pml_drive_id:
-    #             # PENTING: Baca isi pakai SHEETS SERVICE
-    #             # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
-    #             df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
+            if log_pml_drive_id:
+                # PENTING: Baca isi pakai SHEETS SERVICE
+                # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
+                df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
                 
-    #             if not df_log.empty and 'STATUS' in df_log.columns:
-    #                 # Filter hanya yang POSTED
-    #                 df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
-    #             else:
-    #                 st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
-    #         else:
-    #             st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
+                if not df_log.empty and 'STATUS' in df_log.columns:
+                    # Filter hanya yang POSTED
+                    df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
+                else:
+                    st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
+            else:
+                st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
 
-    #     except Exception as e:
-    #         st.error(f"Terjadi kesalahan saat memproses data: {e}")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memproses data: {e}")
         
-    #     finally:
-    #         # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
-    #         if PERIOD_DRIVE_ID:
-    #             release_drive_lock(drive_service, PERIOD_DRIVE_ID)
+        finally:
+            # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
+            if PERIOD_DRIVE_ID:
+                release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-    #     # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
-    #     st.markdown("### 📋 Pilih Data PML untuk Di-Split")
-    #     st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
+        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
-    #     if not df_posted.empty:
-    #         # 1. Tambahkan kolom Checkbox (default False)
-    #         df_to_edit = df_posted.copy()
-    #         df_to_edit.insert(0, "Pilih", False)
+        if not df_posted.empty:
+            # 1. Tambahkan kolom Checkbox (default False)
+            df_to_edit = df_posted.copy()
+            df_to_edit.insert(0, "Pilih", False)
 
-    #         # 2. Konfigurasi Tampilan Kolom (Formatting)
-    #         # Pastikan kolom angka tetap rapi
-    #         format_dict = {"Total Contribution": "{:,.0f}"}
+            # 2. Konfigurasi Tampilan Kolom (Formatting)
+            # Pastikan kolom angka tetap rapi
+            format_dict = {"Total Contribution": "{:,.0f}"}
 
-    #         # 3. Gunakan st.data_editor agar bisa dicentang
-    #         edited_df = st.data_editor(
-    #             df_to_edit,
-    #             column_config={
-    #                 "Pilih": st.column_config.CheckboxColumn(
-    #                     "Pilih",
-    #                     help="Pilih baris ini untuk di-split",
-    #                     default=False,
-    #                 ),
-    #                 # Kunci kolom lain agar tidak bisa diedit oleh user
-    #                 "PML ID": st.column_config.Column(disabled=True),
-    #                 "STATUS": st.column_config.Column(disabled=True),
-    #                 "Product": st.column_config.Column(disabled=True),
-    #                 "Total Contribution": st.column_config.NumberColumn(
-    #                     "Total Contribution", format="#,##0", disabled=True
-    #                 ),
-    #             },
-    #             disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
-    #             hide_index=True,
-    #             use_container_width=True,
-    #         )
+            # 3. Gunakan st.data_editor agar bisa dicentang
+            edited_df = st.data_editor(
+                df_to_edit,
+                column_config={
+                    "Pilih": st.column_config.CheckboxColumn(
+                        "Pilih",
+                        help="Pilih baris ini untuk di-split",
+                        default=False,
+                    ),
+                    # Kunci kolom lain agar tidak bisa diedit oleh user
+                    "PML ID": st.column_config.Column(disabled=True),
+                    "STATUS": st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column(disabled=True),
+                    "Total Contribution": st.column_config.NumberColumn(
+                        "Total Contribution", format="#,##0", disabled=True
+                    ),
+                },
+                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
+                hide_index=True,
+                use_container_width=True,
+            )
 
-    #         # 4. Filter Baris yang Dipilih
-    #         selected_rows = edited_df[edited_df["Pilih"] == True]
+            # 4. Filter Baris yang Dipilih
+            selected_rows = edited_df[edited_df["Pilih"] == True]
 
-    #         # 5. Logika Validasi Pilihan
-    #         if len(selected_rows) > 1:
-    #             st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
+            # 5. Logika Validasi Pilihan
+            if len(selected_rows) > 1:
+                st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
             
-    #         elif len(selected_rows) == 1:
-    #             selected_pml_id = selected_rows.iloc[0]["PML ID"]
-    #             st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
+            elif len(selected_rows) == 1:
+                selected_pml_id = selected_rows.iloc[0]["PML ID"]
+                st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
                 
-    #             # --- TOMBOL PROSES SPLIT ---
-    #             if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
-    #                 # Di sini Anda bisa memanggil fungsi untuk:
-    #                 # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
-    #                 # 2. Melakukan logika split berdasarkan kolom tertentu
-    #                 # 3. Menghasilkan beberapa PML baru
-    #                 st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")
+                # --- TOMBOL PROSES SPLIT ---
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                    # Di sini Anda bisa memanggil fungsi untuk:
+                    # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                    # 2. Melakukan logika split berdasarkan kolom tertentu
+                    # 3. Menghasilkan beberapa PML baru
+                    st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")
             
-    #         else:
-    #             st.write("Silakan pilih baris terlebih dahulu.")
+            else:
+                st.write("Silakan pilih baris terlebih dahulu.")
 
-    #     else:
-    #         st.info("Tidak ada data dengan status 'POSTED'.")
+        else:
+            st.info("Tidak ada data dengan status 'POSTED'.")
 
     if action_type == "Delete Voucher":
         prod_year = st.selectbox(
