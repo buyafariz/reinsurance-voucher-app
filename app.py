@@ -222,6 +222,43 @@ with tab_upload:
         "Ref Voucher ID"
     ]
 
+    columns_template_claim = [
+        "BookYear",
+        "BookMonth",
+        "CedBookYear",
+        "CedBookMonth",
+        "Company Name",
+        "Policy Holder No",
+        "Policy Holder",
+        "Certificate No",
+        "Insured Name",
+        "Birth Date",
+        "Age",
+        "Gender",
+        "Sum Insured IDR",
+        "Sum Reinsured IDR",
+        "medicalcategory",
+        "Product",
+        "Coverage Code",
+        "ClassOfBusiness",
+        "PayPeriodType",
+        "Issue Date",
+        "Term Year",
+        "Term Month",
+        "End Date Policy",
+        "Claim Date",
+        "Claim Register Date",
+        "Payment Date",
+        "Currency",
+        "ExchangeRate",
+        "Amount of Claim IDR",
+        "Reins Claim IDR",
+        "Marein Share IDR",
+        "Cause Of Claim",
+        "Voucher ID",
+        "References No"        
+    ]
+
 
     if uploaded_file:
         # ==========================
@@ -540,8 +577,6 @@ with tab_upload:
                         biz_type = biz_type
                     )
 
-                    st.write(file_id)
-
                     # Upload voucher (selalu CREATE)
                     log_pml_drive_id = find_drive_file(
                         service=service,
@@ -645,15 +680,27 @@ with tab_upload:
                         row_dict=log_pml
                     )
 
-                    upload_dataframe_to_drive(
-                        service=service,
-                        df=df,
-                        template_columns=columns_template,
-                        voucher_id=pml_id,
-                        filename=f"{pml_id}.xlsx",
-                        folder_id=PML_DRIVE_ID,
-                        file_type = "PML"
-                    )
+                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        upload_dataframe_to_drive(
+                            service=service,
+                            df=df,
+                            template_columns=columns_template,
+                            voucher_id=pml_id,
+                            filename=f"{pml_id}.xlsx",
+                            folder_id=PML_DRIVE_ID,
+                            file_type = "PML"
+                        )
+
+                    elif biz_type == "Claim" :
+                        upload_dataframe_to_drive(
+                            service=service,
+                            df=df,
+                            template_columns=columns_template_claim,
+                            voucher_id=pml_id,
+                            filename=f"{pml_id}.xlsx",
+                            folder_id=PML_DRIVE_ID,
+                            file_type="PML"
+                        )
 
                     end_time = time.time()
                     duration = end_time - start_time
@@ -735,6 +782,43 @@ with tab_post:
         "References No",
         "Elapse No",
         "Ref Voucher ID"
+    ]
+
+    columns_template_claim = [
+        "BookYear",
+        "BookMonth",
+        "CedBookYear",
+        "CedBookMonth",
+        "Company Name",
+        "Policy Holder No",
+        "Policy Holder",
+        "Certificate No",
+        "Insured Name",
+        "Birth Date",
+        "Age",
+        "Gender",
+        "Sum Insured IDR",
+        "Sum Reinsured IDR",
+        "medicalcategory",
+        "Product",
+        "Coverage Code",
+        "ClassOfBusiness",
+        "PayPeriodType",
+        "Issue Date",
+        "Term Year",
+        "Term Month",
+        "End Date Policy",
+        "Claim Date",
+        "Claim Register Date",
+        "Payment Date",
+        "Currency",
+        "ExchangeRate",
+        "Amount of Claim IDR",
+        "Reins Claim IDR",
+        "Marein Share IDR",
+        "Cause Of Claim",
+        "Voucher ID",
+        "References No"        
     ]
 
     # ===== ROW 1 =====
@@ -1289,7 +1373,7 @@ with tab_post:
                             spreadsheet_id=log_drive_id,
                             row_dict=log_entry
                         )
-
+                
                         upload_dataframe_to_drive(
                             service=service,
                             df=df,
