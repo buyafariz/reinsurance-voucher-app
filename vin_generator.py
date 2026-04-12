@@ -1,6 +1,7 @@
 import io
 import os
 import pandas as pd
+import streamlit as st
 from datetime import datetime
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaIoBaseUpload
@@ -164,19 +165,35 @@ def generate_pml_from_drive(
         next_seq = 1
 
     else:
-        current_seq = get_last_seq_no(
+        log_df = load_log_from_gsheet(
             service=service,
             spreadsheet_id=file_id
         )
 
-        pml_id, next_seq = generate_pml_id(
-            current_seq,
-            year,
-            month,
-            biz_type
-        )
+        if log_df.empty or "Seq No" not in log_df.columns:
+            next_seq = 1
+        else:
+            seq_series = pd.to_numeric(log_df["Seq No"], errors="coerce")
+            seq_series = seq_series.dropna()
 
-    return pml_id, next_seq
+            if seq_series.empty:
+                next_seq = 1
+            else:
+                next_seq = int(seq_series.max()) + 1
+
+    st.write("COLUMNS:", log_df.columns.tolist())
+    st.write("DATA:", log_df.head())
+
+    # ==========================
+    # Format Voucher
+    # ==========================
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        voucher = f"PML{year}{month:02d}LIS{next_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
+
+    return voucher, next_seq
 
 
 def generate_vou_from_drive(
