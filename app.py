@@ -525,7 +525,7 @@ with tab_upload:
 
                     pml_id, seq_no, file_id = generate_pml_from_drive(
                         service=service,
-                        period_folder_id=PERIOD_DRIVE_ID,
+                        period_folder_id=PML_folders,
                         year=int(year),
                         month=int(month),
                         find_drive_file=find_drive_file,
