@@ -2167,8 +2167,6 @@ with tab_update:
                 st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
 
                 # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
-                st.write("Selected:", selected_pml_id)
-
                 pml_drive = get_or_create_folder(
                     service=service,
                     folder_name="Folder PML",
