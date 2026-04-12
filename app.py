@@ -820,7 +820,7 @@ with tab_calc:
     # ==========================
     # UI SELECT (SAMA DENGAN SPLIT)
     # ==========================
-    st.markdown("### 📋 Pilih Data PML untuk Di-Calculate")
+    # st.markdown("### 📋 Pilih Data PML untuk Di-Calculate")
     st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
     if not df_posted.empty:
