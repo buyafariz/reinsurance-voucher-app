@@ -92,6 +92,7 @@ if "log_period" not in st.session_state:
 
 ROOT_DRIVE_FOLDER_ID = st.secrets["drive_folder_id"]
 CONFIG_FOLDER_ID = st.secrets["config_folder_id"]
+RATE_FOLDER_ID = st.secrets["rate_folder_id"]
 
 
 st.title("📄 Retakaful Voucher Tools")
@@ -869,6 +870,33 @@ with tab_calc:
 
         else:
             st.info("Silakan pilih satu baris untuk melanjutkan.")
+
+        
+
+        selected_account = selected_rows.iloc[0]["Account With"]
+
+        rate_file_id = find_drive_file(
+            service=service,
+            filename=f"{selected_account}.xlsx",
+            parent_id=RATE_FOLDER_ID
+        )
+
+        has_rate = rate_file_id is not None
+
+        st.markdown("### ⚙️ Metode Calculate")
+
+        calculate_method = st.radio(
+            "Pilih metode:",
+            ["Ceding Calculate", "Our Calculate"],
+            horizontal=True
+        )
+
+        if not has_rate:
+            st.info("ℹ️ Rate belum tersedia untuk account ini → hanya Ceding Calculate yang bisa digunakan")
+
+        if calculate_method == "Our Calculate" and not has_rate:
+            st.warning("⚠️ Tidak bisa menggunakan Our Calculate karena rate belum tersedia")
+            st.stop()
 
 
 # ==========================
