@@ -2356,7 +2356,7 @@ with tab_update:
                                 "source_pml": selected_rows.iloc[0]["PML ID"]
                             }
 
-                            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            if selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                                 results = split_upload_with_log(
                                     service=service,
                                     sheets_service=sheets_service,
@@ -2367,14 +2367,14 @@ with tab_update:
                                     log_pml_drive_id=log_pml_drive_id,
                                     year=int(year),
                                     month=int(month),
-                                    biz_type=biz_type,
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
                                     base_info=base_info,
                                     columns_template=columns_template,
                                     progress_bar=progress_bar,
                                     status_text=status_text
                                 )
 
-                            elif biz_type == "Claim":
+                            elif selected_rows.iloc[0]["Biz Type"] == "Claim":
                                     results = split_upload_with_log(
                                     service=service,
                                     sheets_service=sheets_service,
@@ -2385,7 +2385,7 @@ with tab_update:
                                     log_pml_drive_id=log_pml_drive_id,
                                     year=int(year),
                                     month=int(month),
-                                    biz_type=biz_type,
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
                                     base_info=base_info,
                                     columns_template=columns_template_claim,
                                     progress_bar=progress_bar,
