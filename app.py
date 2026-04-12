@@ -17,6 +17,8 @@ from st_aggrid import JsCode
 from datetime import date
 from google.oauth2 import service_account
 
+if "is_processing_split" not in st.session_state:
+    st.session_state.is_processing_split = False
 
 creds = service_account.Credentials.from_service_account_info(
     st.secrets["gcp_service_account"],
@@ -2223,6 +2225,13 @@ with tab_update:
                 # --- TOMBOL PROSES SPLIT ---
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
 
+                    # 🔥 PREVENT DOUBLE RUN
+                    if st.session_state.is_processing_split:
+                        st.warning("⏳ Proses masih berjalan...")
+                        st.stop()
+
+                    st.session_state.is_processing_split = True
+
                     with st.spinner(f"⏳ Split {selected_pml_id} sedang diproses..."):
 
                         progress_bar = st.progress(0)
@@ -2285,7 +2294,8 @@ with tab_update:
 
                         finally:
                             release_drive_lock(service, PERIOD_DRIVE_ID)
-                                        
+                            st.session_state.is_processing_split = False
+
             else:
                 st.write("Silakan pilih baris terlebih dahulu.")
 
