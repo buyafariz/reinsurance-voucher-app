@@ -2180,11 +2180,13 @@ with tab_update:
 
                     PML_DRIVE_ID = pml_drive
 
+                    st.write(PML_DRIVE_ID)
+
                     pml_drive_id = find_drive_file(
                         service=drive_service,
                         filename=selected_pml_id,
-                        parent_id=pml_drive,
-                        mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        parent_id=pml_drive
+                        # mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
                     st.write(pml_drive_id)
