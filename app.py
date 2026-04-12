@@ -2170,6 +2170,21 @@ with tab_update:
                 if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
                     # Di sini Anda bisa memanggil fungsi untuk:
                     # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                    pml_drive = get_or_create_folder(
+                        service=service,
+                        folder_name="Folder PML",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    PML_DRIVE_ID = pml_drive
+
+                    pml_drive_id = find_drive_file(
+                        service=drive_service,
+                        filename=selected_pml_id,
+                        parent_id=pml_drive,
+                        mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
                     # 2. Melakukan logika split berdasarkan kolom tertentu
                     # 3. Menghasilkan beberapa PML baru
                     st.write("Sedang memproses split... (Lanjutkan logika Anda di sini)")
