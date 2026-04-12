@@ -427,7 +427,7 @@ def split_upload_with_log(
     results = []
 
     df.columns = df.columns.str.strip()
-    df = df.dropna(subset=[split_columns])
+    df = df.dropna(subset=split_columns)
 
     grouped = list(df.groupby(split_columns))
     total = len(grouped)
