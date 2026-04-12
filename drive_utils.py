@@ -165,7 +165,7 @@ def get_or_create_outward_folders(
 
 def find_drive_file(service, filename, parent_id, mime_type=None):
     query = (
-        f"name='{filename}' "
+        f"name contains'{filename}' "
         f"and '{parent_id}' in parents "
         f"and trashed=false"
     )
