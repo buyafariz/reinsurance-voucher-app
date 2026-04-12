@@ -2232,14 +2232,14 @@ with tab_update:
                         )
 
                         base_info = {
-                            "department": department,
-                            "account_with": account_with,
-                            "cedant_company": cedant_company,
-                            "pic": pic,
-                            "curr": curr,
-                            "subject_email": subject_email,
-                            "email_date": email_date,
-                            "source_pml": selected_pml_id
+                            "department": selected_rows.iloc[0]["Department"],
+                            "account_with": selected_rows.iloc[0]["Account With"],
+                            "cedant_company": selected_rows.iloc[0]["Cedant Company"],
+                            "pic": selected_rows.iloc[0]["PIC"],
+                            "curr": selected_rows.iloc[0]["Curr"],
+                            "subject_email": selected_rows.iloc[0]["Subject Email"],
+                            "email_date": selected_rows.iloc[0]["Email Date"],
+                            "source_pml": selected_rows.iloc[0]["PML ID"]
                         }
 
                         results = split_upload_with_log(
