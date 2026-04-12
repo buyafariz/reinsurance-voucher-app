@@ -181,9 +181,6 @@ def generate_pml_from_drive(
             else:
                 next_seq = int(seq_series.max()) + 1
 
-        st.write("COLUMNS:", log_df.columns.tolist())
-        st.write("DATA:", log_df.head())
-
     # ==========================
     # Format Voucher
     # ==========================
@@ -193,7 +190,7 @@ def generate_pml_from_drive(
     elif biz_type == "Claim":
         voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
 
-    return voucher, next_seq
+    return voucher, next_seq, file_id
 
 
 def generate_vou_from_drive(

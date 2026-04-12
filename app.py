@@ -1113,7 +1113,7 @@ with tab_post:
                         # else:
                         #     log_df = pd.DataFrame()
 
-                        voucher, seq_no = generate_vin_from_drive(
+                        voucher, seq_no, file_id = generate_vin_from_drive(
                             service=service,
                             period_folder_id=PERIOD_DRIVE_ID,
                             year=int(oby),
@@ -1121,6 +1121,8 @@ with tab_post:
                             find_drive_file=find_drive_file,
                             biz_type=biz_type
                         )
+
+                        st.write(file_id)
 
                         ceding_folder_name = normalize_folder_name(account_with)
 
