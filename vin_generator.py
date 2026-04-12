@@ -424,6 +424,8 @@ def split_upload_with_log(
         commission = group["Reins Total Comm"].sum()
         overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
         total_commission = commission + overriding
+        tabarru = group["Tabarru"].sum()
+        ujrah = group["Ujrah"].sum()
 
         log_pml = {
             "Seq No": seq_no,
@@ -439,11 +441,11 @@ def split_upload_with_log(
             "Overriding": overriding,
             "Total Commission": total_commission,
             "Gross Premium Income": total_contribution - total_commission,
-            "Tabarru": group["reins tabarru"].sum() if "reins tabarru" in group.columns else 0,
-            "Ujrah": group["reins ujrah"].sum() if "reins ujrah" in group.columns else 0,
+            "Tabarru": tabarru,
+            "Ujrah": ujrah,
             "Claim": 0,
             "Balance": total_contribution - total_commission,
-            "REMARKS": f"SPLIT FROM {base_info['source_pml']} ({split_column}={key})",
+            "REMARKS": f"Split from {base_info['source_pml']} ({split_column}={key})",
             "STATUS": "POSTED",
             "CREATED AT": now_wib_naive(),
             "CREATED BY": base_info["pic"],
