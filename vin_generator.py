@@ -420,9 +420,9 @@ def split_upload_with_log(
             biz_type=biz_type
         )
 
-        total_contribution = group["reins total premium"].sum()
-        commission = group["reins total comm"].sum()
-        overriding = group["reins overriding"].sum() if "reins overriding" in group.columns else 0
+        total_contribution = group["Reins Total Premium"].sum()
+        commission = group["Reins Total Comm"].sum()
+        overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
         total_commission = commission + overriding
 
         log_pml = {
