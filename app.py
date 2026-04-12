@@ -885,7 +885,7 @@ with tab_calc:
 
         has_rate = rate_file_id is not None
 
-        st.markdown("### ⚙️ Pilih Metode Calculate")
+        # st.markdown("### ⚙️ Pilih Metode Calculate")
 
         col1, col2 = st.columns(2)
 
