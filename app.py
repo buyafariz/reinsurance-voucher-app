@@ -523,17 +523,6 @@ with tab_upload:
                     # else:
                     #     log_df = pd.DataFrame()
 
-                    pml_id, seq_no, file_id = generate_pml_from_drive(
-                        service=service,
-                        period_folder_id=PML_folders,
-                        year=int(year),
-                        month=int(month),
-                        find_drive_file=find_drive_file,
-                        biz_type = biz_type
-                    )
-
-                    st.write(file_id)
-
                     pml_drive = get_or_create_folder(
                         service=service,
                         folder_name="Folder PML",
@@ -541,6 +530,17 @@ with tab_upload:
                     )
 
                     PML_DRIVE_ID = pml_drive
+
+                    pml_id, seq_no, file_id = generate_pml_from_drive(
+                        service=service,
+                        period_folder_id=PML_DRIVE_ID,
+                        year=int(year),
+                        month=int(month),
+                        find_drive_file=find_drive_file,
+                        biz_type = biz_type
+                    )
+
+                    st.write(file_id)
 
                     # Upload voucher (selalu CREATE)
                     log_pml_drive_id = find_drive_file(
