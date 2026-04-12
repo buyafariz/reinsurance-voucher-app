@@ -889,7 +889,7 @@ with tab_calc:
         # ==========================
         # LAYOUT 4 KOLOM
         # ==========================
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        col1, col2, col3, col4 = st.columns([1, 1, 1.5, 1.5])
 
         with col3:
             ceding_clicked = st.button(
