@@ -523,7 +523,7 @@ with tab_upload:
                     # else:
                     #     log_df = pd.DataFrame()
 
-                    pml_id, seq_no = generate_pml_from_drive(
+                    pml_id, seq_no, file_id = generate_pml_from_drive(
                         service=service,
                         period_folder_id=PERIOD_DRIVE_ID,
                         year=int(year),
@@ -531,6 +531,8 @@ with tab_upload:
                         find_drive_file=find_drive_file,
                         biz_type = biz_type
                     )
+
+                    st.write(file_id)
 
                     pml_drive = get_or_create_folder(
                         service=service,
