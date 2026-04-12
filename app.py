@@ -526,9 +526,6 @@ with tab_upload:
         if st.button("💾 Simpan File"):
             start_time = time.time()
 
-            year = st.session_state["log_period"]["year"]
-            month = st.session_state["log_period"]["month"]
-
             if not remarks.strip() or not subject_email.strip():
                 st.error("Product, Subject Email, dan Remarks wajib diisi")
                 st.stop()
@@ -731,6 +728,9 @@ with tab_calc:
     # ==========================
     service = get_drive_service()
     sheets_service = init_sheets_service(creds)
+
+    year = st.session_state["log_period"]["year"]
+    month = st.session_state["log_period"]["month"]
 
     # ==========================
     # GET PERIOD FOLDER
