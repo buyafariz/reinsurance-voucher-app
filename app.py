@@ -960,7 +960,7 @@ with tab_calc:
                         biz_type=selected_rows.iloc[0]["Biz Type"]
                     )
 
-                    st.write(file_id)
+                    st.write(f"File ID: {file_id}")
 
                     ceding_folder_name = normalize_folder_name(selected_rows.iloc[0]["Account With"])
 
@@ -982,6 +982,8 @@ with tab_calc:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
+                    st.write(f"Log drive id: {log_drive_id}")
+
                     rate_exchange = get_exchange_rate(
                         service=service,
                         config_folder_id=CONFIG_FOLDER_ID,
@@ -996,12 +998,12 @@ with tab_calc:
                         service=service
                     )
 
-                    selected_rows.iloc[0]["PML ID"]
+                    st.write(f"PML ID: {selected_rows.iloc[0]["PML ID"]}")
 
                     # Cari file
                     pml_file_id = find_drive_file(
                         service=service,
-                        filename=selected_rows.iloc[0]["PML ID"],
+                        filename= str(selected_rows.iloc[0]["PML ID"]).strip(),
                         parent_id=PML_DRIVE_ID
                     )
 
