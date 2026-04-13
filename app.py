@@ -898,6 +898,7 @@ with tab_calc:
             ceding_clicked = st.button(
                 "📥 Ceding Calculation",
                 use_container_width=True,
+                disabled = (selected_account is None),
                 type="primary"
             )
 
@@ -905,7 +906,7 @@ with tab_calc:
             our_clicked = st.button(
                 "🧮 Our Calculation",
                 use_container_width=True,
-                disabled=not has_rate,
+                disabled= (selected_account is None or not has_rate),
                 help="Rate belum tersedia"
             )
 
