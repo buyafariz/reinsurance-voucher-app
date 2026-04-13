@@ -974,15 +974,15 @@ with tab_calc:
 
 
                     # Upload voucher (selalu CREATE)
-                    log_drive_id = find_drive_file(
+                    log_pml_drive_id = find_drive_file(
                         service=service,
-                        filename=get_log_filename(int(year), int(month)),
+                        filename=get_log_pml_filename(int(year), int(month)),
                         # filename="log_produksi.xlsx",
-                        parent_id=PERIOD_DRIVE_ID,
+                        parent_id=PML_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write(f"Log drive id: {log_drive_id}")
+                    st.write(f"Log PML drive id: {log_pml_drive_id}")
 
                     rate_exchange = get_exchange_rate(
                         service=service,
@@ -1121,6 +1121,15 @@ with tab_calc:
                             "CANCEL OF VOUCHER": "-",
                             "CANCEL REASON": "-"
                         }
+
+                    # Upload voucher (selalu CREATE)
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename=get_log_filename(int(year), int(month)),
+                        # filename="log_produksi.xlsx",
+                        parent_id=PERIOD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
+                    )
 
                     if not log_drive_id:
                         log_drive_id = create_log_gsheet(
