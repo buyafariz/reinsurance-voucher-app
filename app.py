@@ -98,7 +98,7 @@ RATE_FOLDER_ID = st.secrets["rate_folder_id"]
 st.title("📄 Retakaful Voucher Tools")
 st.write("")
 
-tab_upload, tab_calc, tab_update, _tab_post = st.tabs([
+tab_upload, tab_calc, tab_update = st.tabs([
     "📤 Upload File",
     "🧮 Calculate",
     "🔄 Update Voucher",
