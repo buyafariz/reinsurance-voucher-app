@@ -875,7 +875,11 @@ with tab_calc:
         # ==========================
         # CEK RATE FILE
         # ==========================
-        selected_account = selected_rows.iloc[0]["Account With"]
+        if not selected_rows.empty:
+            selected_account = selected_rows.iloc[0]["Account With"]
+        else:
+            st.warning("Tidak ada data yang dipilih / ditemukan")
+            selected_account = None
 
         rate_file_id = find_drive_file(
             service=service,
