@@ -1091,7 +1091,7 @@ with tab_calc:
                             "KOB": df["KindOfBusiness"].iloc[0],
                             "COB": df["ClassOfBusiness"].iloc[0],
                             "MOP": df["PayPeriodType"].iloc[0],
-                            "Curr": df["Ccy Code"].iloc[0],
+                            "Curr": df["Currency"].iloc[0],
                             "Total Contribution": 0,
                             "Commission": 0,
                             "Overriding": 0,
