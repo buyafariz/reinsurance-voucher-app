@@ -1150,16 +1150,28 @@ with tab_calc:
                         spreadsheet_id=log_drive_id,
                         row_dict=log_entry
                     )
-            
-                    upload_dataframe_to_drive(
-                        service=service,
-                        df=df,
-                        template_columns=columns_template,
-                        voucher_id=voucher,
-                        filename=f"{voucher}.xlsx",
-                        folder_id=CEDING_DRIVE_ID,
-                        file_type="Voucher"
-                    )
+
+                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        upload_dataframe_to_drive(
+                            service=service,
+                            df=df,
+                            template_columns=columns_template,
+                            voucher_id=voucher,
+                            filename=f"{voucher}.xlsx",
+                            folder_id=CEDING_DRIVE_ID,
+                            file_type="Voucher"
+                        )
+
+                    elif biz_type == "Claim":
+                        upload_dataframe_to_drive(
+                            service=service,
+                            df=df,
+                            template_columns=columns_template_claim,
+                            voucher_id=voucher,
+                            filename=f"{voucher}.xlsx",
+                            folder_id=CEDING_DRIVE_ID,
+                            file_type="Voucher"
+                        )
 
                     end_time = time.time()
                     duration = end_time - start_time
