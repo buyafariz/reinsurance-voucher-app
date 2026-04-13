@@ -870,8 +870,8 @@ with tab_calc:
             st.success(f"✅ {len(selected_rows)} baris terpilih")
 
             # tampilkan list PML biar user yakin
-            st.write("PML terpilih:")
-            st.write(selected_rows["PML ID"].tolist())
+            # st.write("PML terpilih:")
+            # st.write(selected_rows["PML ID"].tolist())
 
     
         # ==========================
