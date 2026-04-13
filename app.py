@@ -98,11 +98,11 @@ RATE_FOLDER_ID = st.secrets["rate_folder_id"]
 st.title("📄 Retakaful Voucher Tools")
 st.write("")
 
-tab_upload, tab_calc, tab_post, tab_update = st.tabs([
+tab_upload, tab_calc, tab_update, _tab_post = st.tabs([
     "📤 Upload File",
     "🧮 Calculate",
-    "📥 Create Voucher",
     "🔄 Update Voucher",
+    # "📥 Create Voucher",
 ])
 
 
@@ -950,8 +950,6 @@ with tab_calc:
 
                     PML_DRIVE_ID = pml_drive
 
-                    st.write("PML_DRIVE_ID:", PML_DRIVE_ID)
-
                     _, _, file_id = generate_vin_from_drive(
                         service=service,
                         period_folder_id=PML_DRIVE_ID,
@@ -960,8 +958,6 @@ with tab_calc:
                         find_drive_file=find_drive_file,
                         biz_type=selected_row["Biz Type"]
                     )
-
-                    st.write(f"File ID: {file_id}")
 
                     ceding_folder_name = normalize_folder_name(selected_row["Account With"])
 
@@ -983,7 +979,6 @@ with tab_calc:
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
-                    st.write(f"Log PML drive id: {log_pml_drive_id}")
 
                     rate_exchange = get_exchange_rate(
                         service=service,
@@ -998,8 +993,6 @@ with tab_calc:
                         month=month,
                         service=service
                     )
-
-                    st.write(f"PML ID: {selected_row["PML ID"]}")
 
                     # Cari file
                     pml_file_id = find_drive_file(
