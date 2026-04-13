@@ -857,6 +857,7 @@ with tab_calc:
         # AMBIL YANG DIPILIH
         # ==========================
         selected_rows = edited_df[edited_df["Pilih"] == True]
+        selected_row = selected_rows.iloc[0]
 
         # ==========================
         # VALIDASI
@@ -865,7 +866,7 @@ with tab_calc:
             st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses calculate.")
 
         elif len(selected_rows) == 1:
-            selected_pml_id = selected_rows.iloc[0]["PML ID"]
+            selected_pml_id = selected_row["PML ID"]
             st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
 
         else:
@@ -876,7 +877,7 @@ with tab_calc:
         # CEK RATE FILE
         # ==========================
         if not selected_rows.empty:
-            selected_account = selected_rows.iloc[0]["Account With"]
+            selected_account = selected_row["Account With"]
         else:
             selected_account = None
 
@@ -957,12 +958,12 @@ with tab_calc:
                         year=int(year),
                         month=int(month),
                         find_drive_file=find_drive_file,
-                        biz_type=selected_rows.iloc[0]["Biz Type"]
+                        biz_type=selected_row["Biz Type"]
                     )
 
                     st.write(f"File ID: {file_id}")
 
-                    ceding_folder_name = normalize_folder_name(selected_rows.iloc[0]["Account With"])
+                    ceding_folder_name = normalize_folder_name(selected_row["Account With"])
 
                     ceding_drive = get_or_create_ceding_folders(
                         service=service,
@@ -987,23 +988,23 @@ with tab_calc:
                     rate_exchange = get_exchange_rate(
                         service=service,
                         config_folder_id=CONFIG_FOLDER_ID,
-                        currency=selected_rows.iloc[0]["Curr"],
+                        currency=selected_row["Curr"],
                         month=month
                     )
 
                     due_date = calculate_due_date(
-                        account_with=selected_rows.iloc[0]["Account With"],
+                        account_with=selected_row["Account With"],
                         year=year,
                         month=month,
                         service=service
                     )
 
-                    st.write(f"PML ID: {selected_rows.iloc[0]["PML ID"]}")
+                    st.write(f"PML ID: {selected_row["PML ID"]}")
 
                     # Cari file
                     pml_file_id = find_drive_file(
                         service=service,
-                        filename= str(selected_rows.iloc[0]["PML ID"]).strip(),
+                        filename= str(selected_row["PML ID"]).strip(),
                         parent_id=PML_DRIVE_ID
                     )
 
@@ -1015,18 +1016,18 @@ with tab_calc:
                     file_stream = download_file_from_drive(service, pml_file_id)
                     df = pd.read_excel(file_stream)
 
-                    biz_type = selected_rows.iloc[0]["Biz Type"]
+                    biz_type = selected_row["Biz Type"]
 
 
                     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                         log_entry = {
                             "Seq No": seq_no,
-                            "Department":selected_rows.iloc[0]["Department"],
-                            "Biz Type": selected_rows.iloc[0]["Biz Type"],
+                            "Department":selected_row["Department"],
+                            "Biz Type": selected_row["Biz Type"],
                             "Voucher No": voucher,
-                            "Account With": selected_rows.iloc[0]["Account With"],
-                            "Cedant Company": selected_rows.iloc[0]["Cedant Company"],
-                            "PIC": selected_rows.iloc[0]["PIC"],
+                            "Account With": selected_row["Account With"],
+                            "Cedant Company": selected_row["Cedant Company"],
+                            "PIC": selected_row["PIC"],
                             "Product": df["References No"],
                             "CBY": df["CBY"],
                             "CBM": df["CBM"],
@@ -1057,13 +1058,13 @@ with tab_calc:
                             "Claim (IDR)": 0,
                             "Balance (IDR)": (df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum() - (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0) - (df["Claim"].sum() if "Claim" in df.columns else 0))*rate_exchange,
                             "Check Balance (IDR)":"",
-                            "REMARKS": selected_rows.iloc[0]["REMARKS"],
+                            "REMARKS": selected_row["REMARKS"],
                             "STATUS": "POSTED",
                             "CREATED AT": now_wib_naive(),
-                            "CREATED BY": selected_rows.iloc[0]["PIC"],
+                            "CREATED BY": selected_row["PIC"],
                             "Due Date": due_date,
-                            "Subject Email": selected_rows.iloc[0]["Subject Email"],
-                            "Email Date": selected_rows.iloc[0]["Email Date"],
+                            "Subject Email": selected_row["Subject Email"],
+                            "Email Date": selected_row["Email Date"],
                             "CANCELED AT": "-",
                             "CANCELED BY": "-",
                             "CANCEL OF VOUCHER": "-",
@@ -1073,12 +1074,12 @@ with tab_calc:
                     elif biz_type == "Claim":
                         log_entry = {
                             "Seq No": seq_no,
-                            "Department":selected_rows.iloc[0]["Department"],
-                            "Biz Type": selected_rows.iloc[0]["Biz Type"],
+                            "Department":selected_row["Department"],
+                            "Biz Type": selected_row["Biz Type"],
                             "Voucher No": voucher,
-                            "Account With": selected_rows.iloc[0]["Account With"],
-                            "Cedant Company": selected_rows.iloc[0]["Cedant Company"],
-                            "PIC": selected_rows.iloc[0]["PIC"],
+                            "Account With": selected_row["Account With"],
+                            "Cedant Company": selected_row["Cedant Company"],
+                            "PIC": selected_row["PIC"],
                             "Product": df["References No"],
                             "CBY": df["CBY"],
                             "CBM": df["CBM"],
@@ -1109,13 +1110,13 @@ with tab_calc:
                             "Claim (IDR)": (df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0)*rate_exchange,
                             "Balance (IDR)": 0 - (df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0)*rate_exchange,
                             "Check Balance (IDR)": "",
-                            "REMARKS": selected_rows.iloc[0]["REMARKS"],
+                            "REMARKS": selected_row["REMARKS"],
                             "STATUS": "POSTED",
                             "CREATED AT": now_wib_naive(),
-                            "CREATED BY": selected_rows.iloc[0]["PIC"],
+                            "CREATED BY": selected_row["PIC"],
                             "Due Date": due_date,
-                            "Subject Email": selected_rows.iloc[0]["Subject Email"],
-                            "Email Date": selected_rows.iloc[0]["Email Date"],
+                            "Subject Email": selected_row["Subject Email"],
+                            "Email Date": selected_row["Email Date"],
                             "CANCELED AT": "-",
                             "CANCELED BY": "-",
                             "CANCEL OF VOUCHER": "-",
