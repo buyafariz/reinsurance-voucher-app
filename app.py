@@ -952,7 +952,7 @@ with tab_calc:
 
                     # acquire_drive_lock(service, PML_DRIVE_ID)
 
-                    voucher, seq_no, file_id = generate_vin_from_drive(
+                    _, _, file_id = generate_vin_from_drive(
                         service=service,
                         period_folder_id=PML_DRIVE_ID,
                         year=int(year),
@@ -1017,6 +1017,15 @@ with tab_calc:
                     df = pd.read_excel(file_stream)
 
                     biz_type = selected_row["Biz Type"]
+
+                    voucher, seq_no, _ = generate_vin_from_drive(
+                        service=service,
+                        period_folder_id=PERIOD_DRIVE_ID,
+                        year=int(year),
+                        month=int(month),
+                        find_drive_file=find_drive_file,
+                        biz_type=selected_row["Biz Type"]
+                    )
 
 
                     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
