@@ -723,7 +723,7 @@ with tab_upload:
 # TAB SPLIT
 # ==========================
 with tab_split:
-    st.subheader("📤 Upload File")
+    st.subheader("🧩 Split File")
 
     drive_service = get_drive_service()
     sheets_service = init_sheets_service(creds)
