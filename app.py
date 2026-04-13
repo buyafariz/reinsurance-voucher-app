@@ -1057,10 +1057,17 @@ with tab_calc:
                             # ==========================
                             if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
 
+                                total_contribution = df["Reins Total Premium"].sum()
+                                commission = df["Reins Total Comm"].sum()
+                                overriding = df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0
+                                total_commission = commission + overriding
+                                claim_amount = df["Claim"].sum() if "Claim" in df.columns else 0
+                                balance = total_contribution - total_commission - claim_amount
+
                                 log_entry = {
                                     "Seq No": seq_no,
                                     "Department": row["Department"],
-                                    "Biz Type": biz_type,
+                                    "Biz Type": row["Biz Type"],
                                     "Voucher No": voucher,
                                     "Account With": row["Account With"],
                                     "Cedant Company": row["Cedant Company"],
@@ -1074,35 +1081,102 @@ with tab_calc:
                                     "COB": df["COB"].iloc[0],
                                     "MOP": df["Pay Period Type"].iloc[0],
                                     "Curr": df["Ccy Code"].iloc[0],
-                                    "Total Contribution": df["Reins Total Premium"].sum(),
-                                    "Commission": df["Reins Total Comm"].sum(),
-                                    "Overriding": df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0,
-                                    "Total Commission": df["Reins Total Comm"].sum() + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0),
-                                    "Gross Premium Income": df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum(),
+
+                                    "Total Contribution": total_contribution,
+                                    "Commission": commission,
+                                    "Overriding": overriding,
+                                    "Total Commission": total_commission,
+                                    "Gross Premium Income": total_contribution - total_commission,
                                     "Tabarru": df["Reins Tabarru"].sum(),
                                     "Ujrah": df["Reins Ujrah"].sum(),
                                     "Claim": 0,
-                                    "Balance": df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum(),
+                                    "Balance": balance,
+                                    "Check Balance": "",
+
                                     "Rate Exchange": rate_exchange,
+
+                                    "Kontribusi (IDR)": total_contribution * rate_exchange,
+                                    "Commission (IDR)": commission * rate_exchange,
+                                    "Overiding (IDR)": overriding * rate_exchange,
+                                    "Total Commission (IDR)": total_commission * rate_exchange,
+                                    "Gross Premium Income (IDR)": (total_contribution - total_commission) * rate_exchange,
+                                    "Tabarru (IDR)": df["Reins Tabarru"].sum() * rate_exchange,
+                                    "Ujrah (IDR)": df["Reins Ujrah"].sum() * rate_exchange,
+                                    "Claim (IDR)": 0,
+                                    "Balance (IDR)": balance * rate_exchange,
+                                    "Check Balance (IDR)": "",
+
                                     "REMARKS": row["REMARKS"],
                                     "STATUS": "POSTED",
                                     "CREATED AT": now_wib_naive(),
                                     "CREATED BY": row["PIC"],
                                     "Due Date": due_date,
+                                    "Subject Email": row["Subject Email"],
+                                    "Email Date": row["Email Date"],
+                                    "CANCELED AT": "-",
+                                    "CANCELED BY": "-",
+                                    "CANCEL OF VOUCHER": "-",
+                                    "CANCEL REASON": "-"
                                 }
 
-                            else:
+                            elif biz_type == "Claim":
+
+                                claim_amount = df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0
+                                balance = -claim_amount
+
                                 log_entry = {
                                     "Seq No": seq_no,
                                     "Department": row["Department"],
-                                    "Biz Type": biz_type,
+                                    "Biz Type": row["Biz Type"],
                                     "Voucher No": voucher,
                                     "Account With": row["Account With"],
+                                    "Cedant Company": row["Cedant Company"],
                                     "PIC": row["PIC"],
-                                    "Claim": df["Marein Share IDR"].sum(),
+                                    "Product": df["References No"].iloc[0],
+                                    "CBY": df["CedBookYear"].iloc[0],
+                                    "CBM": df["CedBookMonth"].iloc[0],
+                                    "OBY": int(year),
+                                    "OBM": int(month),
+                                    "KOB": df["KindOfBusiness"].iloc[0],
+                                    "COB": df["ClassOfBusiness"].iloc[0],
+                                    "MOP": df["PayPeriodType"].iloc[0],
+                                    "Curr": df["Currency"].iloc[0],
+
+                                    "Total Contribution": 0,
+                                    "Commission": 0,
+                                    "Overriding": 0,
+                                    "Total Commission": 0,
+                                    "Gross Premium Income": 0,
+                                    "Tabarru": 0,
+                                    "Ujrah": 0,
+                                    "Claim": claim_amount,
+                                    "Balance": balance,
+                                    "Check Balance": "",
+
                                     "Rate Exchange": rate_exchange,
+
+                                    "Kontribusi (IDR)": 0,
+                                    "Commission (IDR)": 0,
+                                    "Overiding (IDR)": 0,
+                                    "Total Commission (IDR)": 0,
+                                    "Gross Premium Income (IDR)": 0,
+                                    "Tabarru (IDR)": 0,
+                                    "Ujrah (IDR)": 0,
+                                    "Claim (IDR)": claim_amount * rate_exchange,
+                                    "Balance (IDR)": balance * rate_exchange,
+                                    "Check Balance (IDR)": "",
+
+                                    "REMARKS": row["REMARKS"],
                                     "STATUS": "POSTED",
                                     "CREATED AT": now_wib_naive(),
+                                    "CREATED BY": row["PIC"],
+                                    "Due Date": due_date,
+                                    "Subject Email": row["Subject Email"],
+                                    "Email Date": row["Email Date"],
+                                    "CANCELED AT": "-",
+                                    "CANCELED BY": "-",
+                                    "CANCEL OF VOUCHER": "-",
+                                    "CANCEL REASON": "-"
                                 }
 
                             # ==========================
