@@ -100,7 +100,7 @@ st.write("")
 
 tab_upload, tab_split, tab_calc, tab_update = st.tabs([
     "📤 Upload File",
-    "📤 Split File",
+    "🧩 Split File",
     "🧮 Calculate",
     "🔄 Update Voucher",
     # "📥 Create Voucher",
