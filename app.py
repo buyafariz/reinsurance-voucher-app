@@ -940,6 +940,8 @@ with tab_calc:
 
                     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
+                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
                     pml_drive = get_or_create_folder(
                         service=service,
                         folder_name="Folder PML",
@@ -949,8 +951,6 @@ with tab_calc:
                     PML_DRIVE_ID = pml_drive
 
                     st.write("PML_DRIVE_ID:", PML_DRIVE_ID)
-
-                    # acquire_drive_lock(service, PML_DRIVE_ID)
 
                     _, _, file_id = generate_vin_from_drive(
                         service=service,
