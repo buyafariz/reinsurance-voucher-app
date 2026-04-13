@@ -727,6 +727,9 @@ with tab_split:
 
     drive_service = get_drive_service()
 
+    year = st.session_state["log_period"]["year"]
+    month = st.session_state["log_period"]["month"]
+
     # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
     PERIOD_DRIVE_ID = None
     df_posted = pd.DataFrame() # Default kosong agar tidak NameError
