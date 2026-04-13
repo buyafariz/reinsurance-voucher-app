@@ -728,6 +728,8 @@ with tab_split:
     drive_service = get_drive_service()
     sheets_service = init_sheets_service(creds)
 
+    service = get_drive_service()
+
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
 
