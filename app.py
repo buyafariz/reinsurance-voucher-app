@@ -726,6 +726,7 @@ with tab_split:
     st.subheader("📤 Upload File")
 
     drive_service = get_drive_service()
+    sheets_service = init_sheets_service(creds)
 
     year = st.session_state["log_period"]["year"]
     month = st.session_state["log_period"]["month"]
