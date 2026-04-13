@@ -1083,7 +1083,7 @@ with tab_calc:
                             "Account With": selected_row["Account With"],
                             "Cedant Company": selected_row["Cedant Company"],
                             "PIC": selected_row["PIC"],
-                            "Product": df["References No"],
+                            "Product": df["References No"].iloc[0],
                             "CBY": df["CedBookYear"].iloc[0],
                             "CBM": df["CedBookMonth"].iloc[0],
                             "OBY": int(year),
