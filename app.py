@@ -858,41 +858,54 @@ with tab_calc:
         # AMBIL YANG DIPILIH
         # ==========================
         selected_rows = edited_df[edited_df["Pilih"] == True]
-        selected_row = selected_rows.iloc[0]
 
         # ==========================
         # VALIDASI
         # ==========================
-        if len(selected_rows) > 1:
-            st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses calculate.")
-
-        elif len(selected_rows) == 1:
-            selected_pml_id = selected_row["PML ID"]
-            st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
+        if selected_rows.empty:
+            st.info("Silakan pilih minimal satu baris untuk melanjutkan.")
+            selected_rows = None
 
         else:
-            st.info("Silakan pilih satu baris untuk melanjutkan.")
+            st.success(f"✅ {len(selected_rows)} baris terpilih")
+
+            # tampilkan list PML biar user yakin
+            st.write("PML terpilih:")
+            st.write(selected_rows["PML ID"].tolist())
 
     
         # ==========================
         # CEK RATE FILE
         # ==========================
-        if not selected_rows.empty:
-            selected_account = selected_row["Account With"]
-        else:
+        if selected_rows is None or selected_rows.empty:
             selected_account = None
 
-        rate_file_id = find_drive_file(
-            service=service,
-            filename=f"{selected_account}.xlsx",
-            parent_id=RATE_FOLDER_ID
-        )
+        else:
+            # Ambil unique account
+            unique_accounts = selected_rows["Account With"].dropna().unique()
+
+            if len(unique_accounts) > 1:
+                st.error("❌ Account With harus sama untuk proses calculate")
+                selected_account = None
+            else:
+                selected_account = unique_accounts[0]
+
+        # ==========================
+        # CEK RATE FILE DI DRIVE
+        # ==========================
+        rate_file_id = None
+
+        if selected_account:
+            rate_file_id = find_drive_file(
+                service=service,
+                filename=f"{selected_account}.xlsx",
+                parent_id=RATE_FOLDER_ID
+            )
 
         has_rate = rate_file_id is not None
 
-        # st.markdown("### ⚙️ Pilih Metode Calculate")
         # ==========================
-        # LAYOUT 4 KOLOM
+        # LAYOUT BUTTON
         # ==========================
         col1, col2, col3, col4 = st.columns([1, 1, 1.5, 1.5])
 
@@ -900,7 +913,7 @@ with tab_calc:
             ceding_clicked = st.button(
                 "📥 Ceding Calculation",
                 use_container_width=True,
-                disabled = (selected_account is None),
+                disabled=(selected_account is None),
                 type="primary"
             )
 
@@ -908,30 +921,33 @@ with tab_calc:
             our_clicked = st.button(
                 "🧮 Our Calculation",
                 use_container_width=True,
-                disabled= (selected_account is None or not has_rate),
+                disabled=(selected_account is None or not has_rate),
                 help="Rate belum tersedia"
             )
 
         # ==========================
-        # INFO JIKA RATE BELUM ADA
+        # INFO RATE
         # ==========================
-        if not has_rate:
-            st.info("ℹ️ Rate belum tersedia → Our Calculate dinonaktifkan")
+        if selected_account is None:
+            st.info("ℹ️ Pilih data terlebih dahulu (dan pastikan Account With sama)")
+
+        elif not has_rate:
+            st.info("ℹ️ Rate belum tersedia → Our Calculation dinonaktifkan")
+
+        else:
+            st.success(f"✅ Rate ditemukan untuk account: {selected_account}")
 
 
         # ==========================
-        # POST VOUCHER (LOCKED)
+        # POST VOUCHER (MULTI - LOCKED)
         # ==========================
         if ceding_clicked:
             start_time = time.time()
 
-            #lock_path = log_path + ".lock"
-            service = get_drive_service()
-
             with st.spinner("⏳ Calculation sedang berjalan, mohon tunggu..."):
 
                 try:
-                    service = get_drive_service()                    
+                    service = get_drive_service()
 
                     drive_folders = get_period_drive_folders(
                         year=int(year),
@@ -941,247 +957,193 @@ with tab_calc:
 
                     PERIOD_DRIVE_ID = drive_folders["period_id"]
 
+                    # 🔒 LOCK SEKALI SAJA
                     acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
+                    # ==========================
+                    # PREPARE GLOBAL (SEKALI)
+                    # ==========================
                     pml_drive = get_or_create_folder(
                         service=service,
                         folder_name="Folder PML",
                         parent_id=PERIOD_DRIVE_ID
                     )
-
                     PML_DRIVE_ID = pml_drive
 
-                    _, _, file_id = generate_vin_from_drive(
-                        service=service,
-                        period_folder_id=PML_DRIVE_ID,
-                        year=int(year),
-                        month=int(month),
-                        find_drive_file=find_drive_file,
-                        biz_type=selected_row["Biz Type"]
-                    )
-
-                    ceding_folder_name = normalize_folder_name(selected_row["Account With"])
+                    ceding_folder_name = normalize_folder_name(selected_account)
 
                     ceding_drive = get_or_create_ceding_folders(
                         service=service,
                         period_folder_id=PERIOD_DRIVE_ID,
                         ceding_name=ceding_folder_name
                     )
-
                     CEDING_DRIVE_ID = ceding_drive["ceding_id"]
-
-
-                    # Upload voucher (selalu CREATE)
-                    log_pml_drive_id = find_drive_file(
-                        service=service,
-                        filename=get_log_pml_filename(int(year), int(month)),
-                        # filename="log_produksi.xlsx",
-                        parent_id=PML_DRIVE_ID,
-                        mime_type="application/vnd.google-apps.spreadsheet"
-                    )
-
 
                     rate_exchange = get_exchange_rate(
                         service=service,
                         config_folder_id=CONFIG_FOLDER_ID,
-                        currency=selected_row["Curr"],
+                        currency=selected_rows.iloc[0]["Curr"],
                         month=month
                     )
 
                     due_date = calculate_due_date(
-                        account_with=selected_row["Account With"],
+                        account_with=selected_account,
                         year=year,
                         month=month,
                         service=service
                     )
 
-                    # Cari file
-                    pml_file_id = find_drive_file(
-                        service=service,
-                        filename= str(selected_row["PML ID"]).strip(),
-                        parent_id=PML_DRIVE_ID
-                    )
-
-                    if not pml_file_id:
-                        st.error("File PML tidak ditemukan")
-                        st.stop()
-
-                    # Load file PML
-                    file_stream = download_file_from_drive(service, pml_file_id)
-                    df = pd.read_excel(file_stream)
-
-                    biz_type = selected_row["Biz Type"]
-
-                    voucher, seq_no, _ = generate_vin_from_drive(
-                        service=service,
-                        period_folder_id=PERIOD_DRIVE_ID,
-                        year=int(year),
-                        month=int(month),
-                        find_drive_file=find_drive_file,
-                        biz_type=selected_row["Biz Type"]
-                    )
-
-
-                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-                        log_entry = {
-                            "Seq No": seq_no,
-                            "Department":selected_row["Department"],
-                            "Biz Type": selected_row["Biz Type"],
-                            "Voucher No": voucher,
-                            "Account With": selected_row["Account With"],
-                            "Cedant Company": selected_row["Cedant Company"],
-                            "PIC": selected_row["PIC"],
-                            "Product": df["References No"].iloc[0],
-                            "CBY": df["CBY"].iloc[0],
-                            "CBM": df["CBM"].iloc[0],
-                            "OBY": int(year),
-                            "OBM": int(month),
-                            "KOB": df["K.O.B Code"].iloc[0],
-                            "COB": df["COB"].iloc[0],
-                            "MOP": df["Pay Period Type"].iloc[0],
-                            "Curr": df["Ccy Code"].iloc[0],
-                            "Total Contribution": df["Reins Total Premium"].sum(),
-                            "Commission": df["Reins Total Comm"].sum(),
-                            "Overriding": df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0,
-                            "Total Commission": (df["Reins Total Comm"].sum()) + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0),
-                            "Gross Premium Income": df["Reins Total Premium"].sum() - ((df["Reins Total Comm"].sum()) + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0)),
-                            "Tabarru": df["Reins Tabarru"].sum(),
-                            "Ujrah": df["Reins Ujrah"].sum(),
-                            "Claim": 0,
-                            "Balance": df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum() - (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0) - (df["Claim"].sum() if "Claim" in df.columns else 0),
-                            "Check Balance": "",
-                            "Rate Exchange": rate_exchange,
-                            "Kontribusi (IDR)": (df["Reins Total Premium"].sum())*rate_exchange,
-                            "Commission (IDR)": (df["Reins Total Comm"].sum())*rate_exchange,
-                            "Overiding (IDR)": (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0)*rate_exchange,
-                            "Total Commission (IDR)": ((df["Reins Total Comm"].sum()) + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0))*rate_exchange,
-                            "Gross Premium Income (IDR)": (df["Reins Total Premium"].sum() - ((df["Reins Total Comm"].sum()) + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0)))*rate_exchange,
-                            "Tabarru (IDR)": (df["Reins Tabarru"].sum())*rate_exchange,
-                            "Ujrah (IDR)": (df["Reins Ujrah"].sum())*rate_exchange,
-                            "Claim (IDR)": 0,
-                            "Balance (IDR)": (df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum() - (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0) - (df["Claim"].sum() if "Claim" in df.columns else 0))*rate_exchange,
-                            "Check Balance (IDR)":"",
-                            "REMARKS": selected_row["REMARKS"],
-                            "STATUS": "POSTED",
-                            "CREATED AT": now_wib_naive(),
-                            "CREATED BY": selected_row["PIC"],
-                            "Due Date": due_date,
-                            "Subject Email": selected_row["Subject Email"],
-                            "Email Date": selected_row["Email Date"],
-                            "CANCELED AT": "-",
-                            "CANCELED BY": "-",
-                            "CANCEL OF VOUCHER": "-",
-                            "CANCEL REASON":"-"
-                        }
-
-                    elif biz_type == "Claim":
-                        log_entry = {
-                            "Seq No": seq_no,
-                            "Department":selected_row["Department"],
-                            "Biz Type": selected_row["Biz Type"],
-                            "Voucher No": voucher,
-                            "Account With": selected_row["Account With"],
-                            "Cedant Company": selected_row["Cedant Company"],
-                            "PIC": selected_row["PIC"],
-                            "Product": df["References No"].iloc[0],
-                            "CBY": df["CedBookYear"].iloc[0],
-                            "CBM": df["CedBookMonth"].iloc[0],
-                            "OBY": int(year),
-                            "OBM": int(month),
-                            "KOB": df["KindOfBusiness"].iloc[0],
-                            "COB": df["ClassOfBusiness"].iloc[0],
-                            "MOP": df["PayPeriodType"].iloc[0],
-                            "Curr": df["Currency"].iloc[0],
-                            "Total Contribution": 0,
-                            "Commission": 0,
-                            "Overriding": 0,
-                            "Total Commission": 0,
-                            "Gross Premium Income": 0,
-                            "Tabarru": 0,
-                            "Ujrah": 0,
-                            "Claim": df["Marein Share IDR"].sum(),
-                            "Balance": 0 - (df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0),
-                            "Check Balance": "",
-                            "Rate Exchange": rate_exchange,
-                            "Kontribusi (IDR)": 0,
-                            "Commission (IDR)": 0,
-                            "Overiding (IDR)": 0,
-                            "Total Commission (IDR)": 0,
-                            "Gross Premium Income (IDR)": 0,
-                            "Tabarru (IDR)": 0,
-                            "Ujrah (IDR)": 0,
-                            "Claim (IDR)": (df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0)*rate_exchange,
-                            "Balance (IDR)": 0 - (df["Marein Share IDR"].sum() if "Marein Share IDR" in df.columns else 0)*rate_exchange,
-                            "Check Balance (IDR)": "",
-                            "REMARKS": selected_row["REMARKS"],
-                            "STATUS": "POSTED",
-                            "CREATED AT": now_wib_naive(),
-                            "CREATED BY": selected_row["PIC"],
-                            "Due Date": due_date,
-                            "Subject Email": selected_row["Subject Email"],
-                            "Email Date": selected_row["Email Date"],
-                            "CANCELED AT": "-",
-                            "CANCELED BY": "-",
-                            "CANCEL OF VOUCHER": "-",
-                            "CANCEL REASON": "-"
-                        }
-
-                    # Upload voucher (selalu CREATE)
+                    # ==========================
+                    # LOAD / CREATE LOG SEKALI
+                    # ==========================
                     log_drive_id = find_drive_file(
                         service=service,
                         filename=get_log_filename(int(year), int(month)),
-                        # filename="log_produksi.xlsx",
                         parent_id=PERIOD_DRIVE_ID,
                         mime_type="application/vnd.google-apps.spreadsheet"
                     )
 
                     if not log_drive_id:
+                        # pakai struktur kosong dulu
                         log_drive_id = create_log_gsheet(
                             service=service,
                             parent_id=PERIOD_DRIVE_ID,
                             filename=get_log_filename(int(year), int(month)),
-                            columns=list(log_entry.keys())
+                            columns=[]
                         )
 
                     sheets_service = init_sheets_service(creds)
 
-                    append_gsheet(
-                        service=sheets_service,
-                        spreadsheet_id=log_drive_id,
-                        row_dict=log_entry
-                    )
+                    success_count = 0
 
-                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-                        upload_dataframe_to_drive(
-                            service=service,
-                            df=df,
-                            template_columns=columns_template,
-                            voucher_id=voucher,
-                            filename=f"{voucher}.xlsx",
-                            folder_id=CEDING_DRIVE_ID,
-                            file_type="Voucher"
-                        )
+                    # ==========================
+                    # 🔁 LOOP PER PML
+                    # ==========================
+                    for _, row in selected_rows.iterrows():
 
-                    elif biz_type == "Claim":
-                        upload_dataframe_to_drive(
-                            service=service,
-                            df=df,
-                            template_columns=columns_template_claim,
-                            voucher_id=voucher,
-                            filename=f"{voucher}.xlsx",
-                            folder_id=CEDING_DRIVE_ID,
-                            file_type="Voucher"
-                        )
+                        try:
+                            # ==========================
+                            # GET PML FILE
+                            # ==========================
+                            pml_file_id = find_drive_file(
+                                service=service,
+                                filename=str(row["PML ID"]).strip(),
+                                parent_id=PML_DRIVE_ID
+                            )
 
+                            if not pml_file_id:
+                                st.warning(f"⚠️ PML tidak ditemukan: {row['PML ID']}")
+                                continue
+
+                            file_stream = download_file_from_drive(service, pml_file_id)
+                            df = pd.read_excel(file_stream)
+
+                            biz_type = row["Biz Type"]
+
+                            # ==========================
+                            # GENERATE VOUCHER (PER PML)
+                            # ==========================
+                            voucher, seq_no, _ = generate_vin_from_drive(
+                                service=service,
+                                period_folder_id=PERIOD_DRIVE_ID,
+                                year=int(year),
+                                month=int(month),
+                                find_drive_file=find_drive_file,
+                                biz_type=biz_type
+                            )
+
+                            # ==========================
+                            # BUILD LOG ENTRY
+                            # ==========================
+                            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+
+                                log_entry = {
+                                    "Seq No": seq_no,
+                                    "Department": row["Department"],
+                                    "Biz Type": biz_type,
+                                    "Voucher No": voucher,
+                                    "Account With": row["Account With"],
+                                    "Cedant Company": row["Cedant Company"],
+                                    "PIC": row["PIC"],
+                                    "Product": df["References No"].iloc[0],
+                                    "CBY": df["CBY"].iloc[0],
+                                    "CBM": df["CBM"].iloc[0],
+                                    "OBY": int(year),
+                                    "OBM": int(month),
+                                    "KOB": df["K.O.B Code"].iloc[0],
+                                    "COB": df["COB"].iloc[0],
+                                    "MOP": df["Pay Period Type"].iloc[0],
+                                    "Curr": df["Ccy Code"].iloc[0],
+                                    "Total Contribution": df["Reins Total Premium"].sum(),
+                                    "Commission": df["Reins Total Comm"].sum(),
+                                    "Overriding": df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0,
+                                    "Total Commission": df["Reins Total Comm"].sum() + (df["Reins Overriding"].sum() if "Reins Overriding" in df.columns else 0),
+                                    "Gross Premium Income": df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum(),
+                                    "Tabarru": df["Reins Tabarru"].sum(),
+                                    "Ujrah": df["Reins Ujrah"].sum(),
+                                    "Claim": 0,
+                                    "Balance": df["Reins Total Premium"].sum() - df["Reins Total Comm"].sum(),
+                                    "Rate Exchange": rate_exchange,
+                                    "REMARKS": row["REMARKS"],
+                                    "STATUS": "POSTED",
+                                    "CREATED AT": now_wib_naive(),
+                                    "CREATED BY": row["PIC"],
+                                    "Due Date": due_date,
+                                }
+
+                            else:
+                                log_entry = {
+                                    "Seq No": seq_no,
+                                    "Department": row["Department"],
+                                    "Biz Type": biz_type,
+                                    "Voucher No": voucher,
+                                    "Account With": row["Account With"],
+                                    "PIC": row["PIC"],
+                                    "Claim": df["Marein Share IDR"].sum(),
+                                    "Rate Exchange": rate_exchange,
+                                    "STATUS": "POSTED",
+                                    "CREATED AT": now_wib_naive(),
+                                }
+
+                            # ==========================
+                            # APPEND LOG
+                            # ==========================
+                            append_gsheet(
+                                service=sheets_service,
+                                spreadsheet_id=log_drive_id,
+                                row_dict=log_entry
+                            )
+
+                            # ==========================
+                            # UPLOAD VOUCHER FILE
+                            # ==========================
+                            upload_dataframe_to_drive(
+                                service=service,
+                                df=df,
+                                template_columns=columns_template if biz_type != "Claim" else columns_template_claim,
+                                voucher_id=voucher,
+                                filename=f"{voucher}.xlsx",
+                                folder_id=CEDING_DRIVE_ID,
+                                file_type="Voucher"
+                            )
+
+                            success_count += 1
+
+                        except Exception as e:
+                            st.error(f"❌ Error PML {row['PML ID']}: {e}")
+                            continue
+
+                    # ==========================
+                    # DONE
+                    # ==========================
                     end_time = time.time()
-                    duration = end_time - start_time
+                    duration = int(end_time - start_time)
 
-                    st.success(f"✅ Voucher berhasil diposting: {voucher} ({int(duration)} seconds)")
-                    st.code(voucher)
+                    st.success(f"✅ {success_count} voucher berhasil diposting ({duration} detik)")
 
-                except RuntimeError as e:
-                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
-                        st.stop()
+                except RuntimeError:
+                    st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                    st.stop()
 
                 finally:
                     release_drive_lock(service, PERIOD_DRIVE_ID)
