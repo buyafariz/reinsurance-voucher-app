@@ -1115,7 +1115,9 @@ with tab_calc:
         df_to_edit["Total Contribution"] = (
             df_to_edit["Total Contribution"]
             .astype(str)
-            .str.replace(",", "", regex=False)
+            .str.replace(".", "", regex=False)   # hapus pemisah ribuan versi Indo
+            .str.replace(",", "", regex=False)   # kalau ada koma juga
+            .str.replace(" ", "", regex=False)   # spasi
         )
 
         df_to_edit["Total Contribution"] = pd.to_numeric(
