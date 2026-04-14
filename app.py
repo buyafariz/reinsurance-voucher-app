@@ -1120,9 +1120,12 @@ with tab_calc:
             .str.replace(" ", "", regex=False)   # spasi
         )
 
-        df_to_edit["Total Contribution"] = pd.to_numeric(
-            df_to_edit["Total Contribution"], errors="coerce"
-        )
+        cols_numeric = ["Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+
+        for col in cols_numeric:
+            df_to_edit[col] = pd.to_numeric(
+                df_to_edit[col], errors="coerce"
+            )
 
         edited_df = st.data_editor(
             df_to_edit,
@@ -1139,8 +1142,32 @@ with tab_calc:
                     "Total Contribution",
                     format="%,.0f"
                 ),
+                "Total Contribution": st.column_config.NumberColumn(
+                    "Total Contribution",
+                    format="%,.0f"
+                ),
+                "Gross Premium Income": st.column_config.NumberColumn(
+                    "Gross Premium Income",
+                    format="%,.0f"
+                ),
+                "Tabarru": st.column_config.NumberColumn(
+                    "Tabarru",
+                    format="%,.0f"
+                ),
+                "Ujrah": st.column_config.NumberColumn(
+                    "Ujrah",
+                    format="%,.0f"
+                ),
+                "Claim": st.column_config.NumberColumn(
+                    "Claim",
+                    format="%,.0f"
+                ),
+                "Balance": st.column_config.NumberColumn(
+                    "Balance",
+                    format="%,.0f"
+                ),
             },
-            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
+            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
             hide_index=True,
             use_container_width=True,
         )
