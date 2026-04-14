@@ -1112,17 +1112,19 @@ with tab_calc:
 
         # Data editor (CONSISTENT UI)
 
-        df_to_edit["Total Contribution"] = (
-            df_to_edit["Total Contribution"]
-            .astype(str)
-            .str.replace(".", "", regex=False)   # hapus pemisah ribuan versi Indo
-            .str.replace(",", "", regex=False)   # kalau ada koma juga
-            .str.replace(" ", "", regex=False)   # spasi
-        )
-
         cols_numeric = ["Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
         for col in cols_numeric:
+
+            df_to_edit[col] = (
+                df_to_edit[col]
+                .astype(str)
+                .str.replace(".", "", regex=False)   # hapus pemisah ribuan versi Indo
+                .str.replace(",", "", regex=False)   # kalau ada koma juga
+                .str.replace(" ", "", regex=False)   # spasi
+            )
+
+
             df_to_edit[col] = pd.to_numeric(
                 df_to_edit[col], errors="coerce"
             )
