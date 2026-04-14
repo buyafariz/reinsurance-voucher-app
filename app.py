@@ -1111,6 +1111,17 @@ with tab_calc:
         df_to_edit.insert(0, "Pilih", False)
 
         # Data editor (CONSISTENT UI)
+
+        df_to_edit["Total Contribution"] = (
+            df_to_edit["Total Contribution"]
+            .astype(str)
+            .str.replace(",", "", regex=False)
+        )
+
+        df_to_edit["Total Contribution"] = pd.to_numeric(
+            df_to_edit["Total Contribution"], errors="coerce"
+        )
+
         edited_df = st.data_editor(
             df_to_edit,
             column_config={
