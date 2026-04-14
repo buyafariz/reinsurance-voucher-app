@@ -1137,8 +1137,7 @@ with tab_calc:
                 "Product": st.column_config.Column(disabled=True),
                 "Total Contribution": st.column_config.NumberColumn(
                     "Total Contribution",
-                    format="#,##0",
-                    disabled=True
+                    format="%,.0f"
                 ),
             },
             disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
