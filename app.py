@@ -262,23 +262,23 @@ with tab_upload:
         "References No"        
     ]
 
-LOG_COLUMNS = [
-    "Seq No", "Department", "Biz Type", "Voucher No",
-    "Account With", "Cedant Company", "PIC",
-    "Product", "CBY", "CBM", "OBY", "OBM",
-    "KOB", "COB", "MOP", "Curr",
-    "Total Contribution", "Commission", "Overriding",
-    "Total Commission", "Gross Premium Income",
-    "Tabarru", "Ujrah", "Claim", "Balance", "Check Balance",
-    "Rate Exchange",
-    "Kontribusi (IDR)", "Commission (IDR)", "Overiding (IDR)",
-    "Total Commission (IDR)", "Gross Premium Income (IDR)",
-    "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
-    "Balance (IDR)", "Check Balance (IDR)",
-    "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
-    "Due Date", "Subject Email", "Email Date",
-    "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
-]
+    LOG_COLUMNS = [
+        "Seq No", "Department", "Biz Type", "Voucher No",
+        "Account With", "Cedant Company", "PIC",
+        "Product", "CBY", "CBM", "OBY", "OBM",
+        "KOB", "COB", "MOP", "Curr",
+        "Total Contribution", "Commission", "Overriding",
+        "Total Commission", "Gross Premium Income",
+        "Tabarru", "Ujrah", "Claim", "Balance", "Check Balance",
+        "Rate Exchange",
+        "Kontribusi (IDR)", "Commission (IDR)", "Overiding (IDR)",
+        "Total Commission (IDR)", "Gross Premium Income (IDR)",
+        "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
+        "Balance (IDR)", "Check Balance (IDR)",
+        "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
+        "Due Date", "Subject Email", "Email Date",
+        "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
+    ]
 
 
     if uploaded_file:
