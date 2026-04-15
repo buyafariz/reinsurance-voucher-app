@@ -1444,7 +1444,7 @@ with tab_calc:
                                     "Balance (IDR)": balance * rate_exchange,
                                     "Check Balance (IDR)": "",
 
-                                    "REMARKS": row["REMARKS"],
+                                    "REMARKS": "-",
                                     "STATUS": "POSTED",
                                     "CREATED AT": now_wib_naive(),
                                     "CREATED BY": row["PIC"],
@@ -1504,7 +1504,7 @@ with tab_calc:
                                     "Balance (IDR)": balance * rate_exchange,
                                     "Check Balance (IDR)": "",
 
-                                    "REMARKS": row["REMARKS"],
+                                    "REMARKS": "-",
                                     "STATUS": "POSTED",
                                     "CREATED AT": now_wib_naive(),
                                     "CREATED BY": row["PIC"],
