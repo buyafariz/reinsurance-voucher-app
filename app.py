@@ -98,11 +98,11 @@ RATE_FOLDER_ID = st.secrets["rate_folder_id"]
 st.title("📄 Retakaful Voucher Tools")
 st.write("")
 
-tab_upload, tab_split, tab_calc, tab_update = st.tabs([
+tab_upload, tab_split, tab_calc = st.tabs([
     "📤 Upload File",
     "🧩 Split File",
     "🧮 Calculate",
-    "🔄 Update Voucher",
+    #"🔄 Update Voucher",
     # "📥 Create Voucher",
 ])
 
@@ -2969,36 +2969,36 @@ with tab_calc:
 #                         release_drive_lock(service, OUTWARD_DRIVE_ID)
 
 
-with tab_update:
-    st.subheader("🔄 Update  Voucher")
-    PROD_PERIOD_ID = None
-    NOW_PERIOD_ID = None
+# with tab_update:
+#     st.subheader("🔄 Update  Voucher")
+#     PROD_PERIOD_ID = None
+#     NOW_PERIOD_ID = None
 
-    service = get_drive_service()
+#     service = get_drive_service()
 
-    # ==============================
-    # PILIH PERIODE PRODUKSI
-    # ==============================
-    action_type = st.radio(
-        "Pilih Opsi",
-        [#"Split Voucher", 
-         "Delete Voucher", "Cancel Voucher"],
-        key="action_type"
-    )
+#     # ==============================
+#     # PILIH PERIODE PRODUKSI
+#     # ==============================
+#     action_type = st.radio(
+#         "Pilih Opsi",
+#         [#"Split Voucher", 
+#          "Delete Voucher", "Cancel Voucher"],
+#         key="action_type"
+#     )
 
-    year = st.session_state["log_period"]["year"]
-    month = st.session_state["log_period"]["month"]
+#     year = st.session_state["log_period"]["year"]
+#     month = st.session_state["log_period"]["month"]
 
-    prod_year = int(year)
-    prod_month = int(month)
+#     prod_year = int(year)
+#     prod_month = int(month)
 
-    years = list(range(2026, datetime.now().year + 1))
-    months = list(range(1, 13))
+#     years = list(range(2026, datetime.now().year + 1))
+#     months = list(range(1, 13))
 
-    # --- 0. INISIALISASI SERVICE ---
-    # Pastikan fungsi ini didefinisikan di drive_utils.py atau di atas
-    drive_service = get_drive_service()
-    sheets_service = init_sheets_service(creds)
+#     # --- 0. INISIALISASI SERVICE ---
+#     # Pastikan fungsi ini didefinisikan di drive_utils.py atau di atas
+#     drive_service = get_drive_service()
+#     sheets_service = init_sheets_service(creds)
 
     # if action_type == "Split Voucher":
     #     # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
@@ -3264,20 +3264,20 @@ with tab_update:
     #     else:
     #         st.info("Tidak ada data dengan status 'POSTED'.")
 
-    if action_type == "Delete Voucher":
-        prod_year = st.selectbox(
-            "Tahun Produksi",
-            [year],
-            key="prod_year",
-            disabled=True
-        )
+    # if action_type == "Delete Voucher":
+    #     prod_year = st.selectbox(
+    #         "Tahun Produksi",
+    #         [year],
+    #         key="prod_year",
+    #         disabled=True
+    #     )
 
-        prod_month = st.selectbox(
-            "Bulan Produksi",
-            [month],
-            key="prod_month",
-            disabled=True
-        )
+    #     prod_month = st.selectbox(
+    #         "Bulan Produksi",
+    #         [month],
+    #         key="prod_month",
+    #         disabled=True
+    #     )
 
     # elif action_type == 'Cancel Voucher':
 
