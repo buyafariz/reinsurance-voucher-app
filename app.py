@@ -1197,6 +1197,8 @@ with tab_calc:
         # ==========================
         selected_rows = edited_df[edited_df["Pilih"] == True]
 
+        st.write(selected_rows)
+
         # ==========================
         # VALIDASI
         # ==========================
