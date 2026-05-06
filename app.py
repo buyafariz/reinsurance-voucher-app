@@ -1285,7 +1285,12 @@ with tab_calc:
             with st.spinner("⏳ Calculation sedang berjalan, mohon tunggu..."):
 
                 try:
+                    sheets_service = init_sheets_service(creds)
+
+
+
                     service = get_drive_service()
+
 
                     drive_folders = get_period_drive_folders(
                         year=int(year),

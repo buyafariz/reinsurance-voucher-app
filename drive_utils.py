@@ -234,6 +234,40 @@ def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
     return False
 
 
+def update_pml_status_to_calculated(service, spreadsheet_id, pml_id):
+    result = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id,
+        range="A:Z"
+    ).execute()
+
+    values = result.get("values", [])
+
+    if not values:
+        return False
+
+    headers = values[0]
+
+    pml_col = headers.index("PML ID")
+    status_col = headers.index("STATUS")
+
+    for i, row in enumerate(values[1:], start=2):
+        if len(row) > pml_col and row[pml_col] == pml_id:
+
+            col_letter = chr(65 + status_col)
+            range_update = f"{col_letter}{i}"
+
+            service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id,
+                range=range_update,
+                valueInputOption="RAW",
+                body={"values": [["CALCULATED"]]}
+            ).execute()
+
+            return True
+
+    return False
+
+
 def delete_drive_file(file_id: str):
     service = get_drive_service()
 
