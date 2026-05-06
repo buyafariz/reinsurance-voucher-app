@@ -251,7 +251,7 @@ def update_pml_status_to_calculated(service, spreadsheet_id, pml_id):
     status_col = headers.index("STATUS")
 
     for i, row in enumerate(values[1:], start=2):
-        if len(row) > pml_col and row[pml_col] == pml_id:
+        if len(row) > pml_col and row[pml_col] in pml_id:
 
             col_letter = chr(65 + status_col)
             range_update = f"{col_letter}{i}"
