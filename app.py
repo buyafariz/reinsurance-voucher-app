@@ -1137,15 +1137,12 @@ with tab_calc:
             df_to_edit[col] = (
                 df_to_edit[col]
                 .astype(str)
-                .str.replace(".", "", regex=False)   # hapus pemisah ribuan versi Indo
-                .str.replace(",", "", regex=False)   # kalau ada koma juga
-                .str.replace(" ", "", regex=False)   # spasi
+                .str.replace(r"[^\d\-]", "", regex=True)
             )
-
 
             df_to_edit[col] = pd.to_numeric(
                 df_to_edit[col], errors="coerce"
-            )
+            ).fillna(0)
 
         edited_df = st.data_editor(
             df_to_edit,
@@ -1158,10 +1155,7 @@ with tab_calc:
                 "PML ID": st.column_config.Column(disabled=True),
                 "STATUS": st.column_config.Column(disabled=True),
                 "Product": st.column_config.Column(disabled=True),
-                "Total Contribution": st.column_config.NumberColumn(
-                    "Total Contribution",
-                    format="%,.0f"
-                ),
+
                 "Total Contribution": st.column_config.NumberColumn(
                     "Total Contribution",
                     format="%,.0f"
