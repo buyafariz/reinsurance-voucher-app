@@ -1293,7 +1293,7 @@ with tab_calc:
                     update_pml_status_to_calculated(
                         service=sheets_service,
                         spreadsheet_id=log_pml_drive_id,
-                        pml_id=selected_rows["PML ID"].tolist()
+                        pml_id=selected_rows["PML ID"].astype(str).tolist()
                     )
 
                     service = get_drive_service()
