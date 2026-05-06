@@ -813,32 +813,84 @@ with tab_split:
     st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
     if not df_posted.empty:
-        # 1. Tambahkan kolom Checkbox (default False)
+
+        # Tambahkan checkbox column
         df_to_edit = df_posted.copy()
         df_to_edit.insert(0, "Pilih", False)
 
-        # 2. Konfigurasi Tampilan Kolom (Formatting)
-        # Pastikan kolom angka tetap rapi
-        format_dict = {"Total Contribution": "{:,.0f}"}
+        # Data editor (CONSISTENT UI)
 
-        # 3. Gunakan st.data_editor agar bisa dicentang
+        cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+
+        for col in cols_numeric:
+
+            def clean_number(x):
+                x = str(x)
+
+                # kalau ada dua separator → anggap titik ribuan, koma desimal
+                if "." in x and "," in x:
+                    x = x.replace(".", "").replace(",", ".")
+                else:
+                    x = x.replace(",", "")
+
+                return pd.to_numeric(x, errors="coerce")
+
+            df_to_edit[col] = df_to_edit[col].apply(clean_number)
+
         edited_df = st.data_editor(
             df_to_edit,
             column_config={
                 "Pilih": st.column_config.CheckboxColumn(
                     "Pilih",
-                    help="Pilih baris ini untuk di-split",
+                    help="Pilih baris ini untuk di-calculate",
                     default=False,
                 ),
-                # Kunci kolom lain agar tidak bisa diedit oleh user
                 "PML ID": st.column_config.Column(disabled=True),
                 "STATUS": st.column_config.Column(disabled=True),
                 "Product": st.column_config.Column(disabled=True),
+
                 "Total Contribution": st.column_config.NumberColumn(
-                    "Total Contribution", format="#,##0", disabled=True
+                    "Total Contribution",
+                    format="%,.0f"
+                ),
+
+                "Commission": st.column_config.NumberColumn(
+                    "Commission",
+                    format="%,.0f"
+                ),
+
+                "Overriding": st.column_config.NumberColumn(
+                    "Overriding",
+                    format="%,.0f"
+                ),
+
+                "Total Commission": st.column_config.NumberColumn(
+                    "Total Commission",
+                    format="%,.0f"
+                ),
+
+                "Gross Premium Income": st.column_config.NumberColumn(
+                    "Gross Premium Income",
+                    format="%,.0f"
+                ),
+                "Tabarru": st.column_config.NumberColumn(
+                    "Tabarru",
+                    format="%,.0f"
+                ),
+                "Ujrah": st.column_config.NumberColumn(
+                    "Ujrah",
+                    format="%,.0f"
+                ),
+                "Claim": st.column_config.NumberColumn(
+                    "Claim",
+                    format="%,.0f"
+                ),
+                "Balance": st.column_config.NumberColumn(
+                    "Balance",
+                    format="%,.0f"
                 ),
             },
-            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution"],
+            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
             hide_index=True,
             use_container_width=True,
         )
