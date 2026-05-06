@@ -1134,15 +1134,18 @@ with tab_calc:
 
         for col in cols_numeric:
 
-            df_to_edit[col] = (
-                df_to_edit[col]
-                .astype(str)
-                .str.replace(r"[^\d\-]", "", regex=True)
-            )
+            def clean_number(x):
+                x = str(x)
 
-            df_to_edit[col] = pd.to_numeric(
-                df_to_edit[col], errors="coerce"
-            ).fillna(0)
+                # kalau ada dua separator → anggap titik ribuan, koma desimal
+                if "." in x and "," in x:
+                    x = x.replace(".", "").replace(",", ".")
+                else:
+                    x = x.replace(",", "")
+
+                return pd.to_numeric(x, errors="coerce")
+
+            df_to_edit[col] = df_to_edit[col].apply(clean_number)
 
         edited_df = st.data_editor(
             df_to_edit,
