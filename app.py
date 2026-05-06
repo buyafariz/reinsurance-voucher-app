@@ -1098,7 +1098,7 @@ with tab_calc:
     # ==========================
     # FILTER STATUS POSTED
     # ==========================
-    df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
+    df_posted = log_df[log_df["STATUS"] != "CALCULATED"].copy()
 
     if df_posted.empty:
         st.info("Tidak ada data dengan status POSTED")
