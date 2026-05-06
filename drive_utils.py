@@ -234,7 +234,7 @@ def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
     return False
 
 
-def update_pml_status_to_calculated(service, spreadsheet_id, pml_ids):
+def update_pml_status_to_calculated(service, spreadsheet_id, pml_id):
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
         range="A:Z"
@@ -253,7 +253,7 @@ def update_pml_status_to_calculated(service, spreadsheet_id, pml_ids):
     updated = False  # flag
 
     for i, row in enumerate(values[1:], start=2):
-        if len(row) > pml_col and str(row[pml_col]) in pml_ids:
+        if len(row) > pml_col and str(row[pml_col]) in pml_id:
 
             col_letter = chr(65 + status_col)
             range_update = f"{col_letter}{i}"
