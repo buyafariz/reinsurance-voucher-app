@@ -289,7 +289,7 @@ with tab_upload:
         original_columns = df.columns.tolist()
         df.columns = df.columns.str.strip().str.lower()
 
-        for col in ["certificate no", "pol holder no"]:
+        for col in ["certificate no", "main pol no", "pol holder no"]:
             if col in df.columns:
                 df[col] = df[col].astype(str).str.strip()
 
