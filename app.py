@@ -951,7 +951,7 @@ with tab_split:
             file_stream = download_file_from_drive(service, pml_file_id)
             df = pd.read_excel(file_stream)
 
-            st.write("Preview Data:", df.head())
+            # st.write("Preview Data:", df.head())
 
             # ==========================
             # SELECT MULTI COLUMN
