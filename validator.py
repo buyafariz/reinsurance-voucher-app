@@ -66,7 +66,7 @@ REQUIRED_COLUMNS_OUTWARD = [
     "retro overriding",
     "retro nett premium",
     "valuation date",
-    "inw vouc id"
+    "inw vouc id",
     "retro type"
 ]
 
