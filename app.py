@@ -349,7 +349,8 @@ with tab_upload:
                     ACCOUNTING_COLS = [
                         "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
                         "reins premium", "reins em premium", "reins er premium", "reins total premium",
-                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
+                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium",
+                        "sum insured idr", "sum reinsured idr", "amount of claim idr", "reins claim idr", "marein share idr"
                     ]
 
                     # Buat dictionary formatter untuk kolom yang ada saja
@@ -864,7 +865,7 @@ with tab_upload:
             "Voucher Desc"
         ]
 
-        LOG_COLUMNS_OUTWAR = [
+        LOG_COLUMNS_OUTWARD = [
             "Seq No",
             "Department",
             "Biz Type",
