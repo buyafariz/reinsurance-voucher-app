@@ -1900,7 +1900,7 @@ with tab_split:
                 # LOAD FILE
                 # ==========================
                 file_stream = download_file_from_drive(service, pml_file_id)
-                df = pd.read_excel(file_stream).head()
+                df = pd.read_excel(file_stream).head().lower()
 
                 ACCOUNTING_COLS = [
                     "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
