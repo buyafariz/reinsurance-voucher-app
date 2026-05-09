@@ -834,6 +834,7 @@ with tab_upload:
 
         columns_template_claim_outward = [
             "No",
+            "Retro Type",
             "Cedant Name",
             "DLA Out Voucher ID",
             "Main Pol No",
