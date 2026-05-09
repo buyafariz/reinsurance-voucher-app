@@ -1347,9 +1347,8 @@ with tab_split:
         "Reinsurance Type",
         ["INWARD", "OUTWARD"],
         key="reins_type_upload",
-        index=0 #INWARD
+        index=0) #INWARD
         #disabled=True
-    )
 
     if reins_type == "INWARD":
 
