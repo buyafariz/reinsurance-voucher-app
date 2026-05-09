@@ -67,7 +67,8 @@ REQUIRED_COLUMNS_OUTWARD = [
     "retro nett premium",
     "valuation date",
     "inw vouc id",
-    "retro type"
+    "retro type",
+    "cob"
 ]
 
 # Claim
@@ -141,6 +142,7 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
     "reinsurer name",
     "voucher id",
     "voucher desc",
+    "method of payment"
 ]
 
 # Admin
