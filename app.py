@@ -1346,7 +1346,7 @@ with tab_split:
     reins_type = st.selectbox(
         "Reinsurance Type",
         ["INWARD", "OUTWARD"],
-        key="reins_type_upload",
+        key="reins_type_split",
         index=0) #INWARD
         #disabled=True
 
