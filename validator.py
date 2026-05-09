@@ -140,7 +140,6 @@ REQUIRED_COLUMNS_CLAIM_OUTWARD = [
     "reinsurer name",
     "voucher id",
     "voucher desc",
-    "inw vouc id"
 ]
 
 # Admin

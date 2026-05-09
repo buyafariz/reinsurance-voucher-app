@@ -443,7 +443,7 @@ with tab_upload:
                             "HANNOVER RETAKAFUL",
                             "MAREIN SYARIAH",
                             "MUNICH RE RETAKAFUL",
-                            "SCOR SE LABUAN BRANCH",
+                            "SCOR RE LABUAN BRANCH",
                             "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                         ]
                     )
@@ -482,7 +482,7 @@ with tab_upload:
                             "HANNOVER RETAKAFUL",
                             "MAREIN SYARIAH",
                             "MUNICH RE RETAKAFUL",
-                            "SCOR SE LABUAN BRANCH",
+                            "SCOR RE LABUAN BRANCH",
                             "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                         ]
                     )
@@ -552,7 +552,7 @@ with tab_upload:
                 start_time = time.time()
 
                 if not remarks.strip() or not subject_email.strip():
-                    st.error("Product, Subject Email, dan Remarks wajib diisi")
+                    st.error("Subject Email dan Remarks wajib diisi")
                     st.stop()
 
                 #lock_path = log_path + ".lock"
@@ -982,11 +982,15 @@ with tab_upload:
 
                     # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
                     # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
-                    
+
                     ACCOUNTING_COLS = [
                         "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
-                        "reins premium", "reins em premium", "reins er premium", "reins total premium",
-                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
+                        "marein sum insured", "marein sum at risk", "own retention", "excess or",
+                        "retro sum insured", "retro sum at risk",
+                        "retro premium", "retro em premium", "retro er premium", "retro oth premium", "retro total premium",
+                        "retro comm", "retro em comm", "retro er comm", "retro oth comm", "retro profit share", "retro total comm", 
+                        "retro tabarru", "retro ujrah", "retro overriding", "retro sliding scale", "retro inw brokerage", "reins nett premium", "retro nett premium",
+                        "reins claim", "your share"
                     ]
 
                     # Buat dictionary formatter untuk kolom yang ada saja
@@ -1044,41 +1048,12 @@ with tab_upload:
                     account_with = st.selectbox(
                         "Account With",
                         [
-                            "AIA FINANCIAL SYARIAH",
-                            "AJS KITABISA (D/H AMANAH GITHA)",
-                            "ALLIANZ LIFE SYARIAH",
-                            "ALLIANZ LIFE SYARIAH (Health)",
-                            "ALLIANZ LIFE SYARIAH (FlexiCare)",
-                            "ALLIANZ LIFE SYARIAH (HSCP)",
-                            "ALLIANZ LIFE SYARIAH (Individu DMTM)",
-                            "ASTRA AVIVA LIFE",
-                            "AVRIST ASSURANCE SYARIAH",
-                            "AXA FINANCIAL INDONESIA SYARIAH",
-                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
-                            "BNI LIFE SYARIAH",
-                            "BRINGIN LIFE SYARIAH",
-                            "BUMIPUTERA SYARIAH",
-                            "CAPITAL LIFE SYARIAH",
-                            "CENTRAL ASIA RAYA SYARIAH",
-                            "FWD LIFE INDONESIA SYARIAH",
-                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
-                            "GREAT EASTERN LIFE SYARIAH",
-                            "JASA MITRA ABADI SYARIAH",
-                            "MANULIFE INDONESIA SYARIAH",
-                            "PFI MEGA LIFE INSURANCE SYARIAH",
-                            "PRUDENTIAL LIFE SYARIAH",
-                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
                             "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
-                            "RELIANCE SYARIAH",
-                            "SINARMAS SYARIAH",
-                            "SUN LIFE SYARIAH",
-                            "SYARIAH AL-AMIN",
-                            "TAKAFUL KELUARGA",
-                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "REASURANSI NASIONAL INDONESIA SYARIAH"
                             "HANNOVER RETAKAFUL",
                             "MAREIN SYARIAH",
                             "MUNICH RE RETAKAFUL",
-                            "SCOR SE LABUAN BRANCH",
+                            "SCOR RE LABUAN BRANCH",
                             "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                         ]
                     )
@@ -1117,7 +1092,7 @@ with tab_upload:
                             "HANNOVER RETAKAFUL",
                             "MAREIN SYARIAH",
                             "MUNICH RE RETAKAFUL",
-                            "SCOR SE LABUAN BRANCH",
+                            "SCOR RE LABUAN BRANCH",
                             "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
                         ]
                     )
@@ -1129,9 +1104,9 @@ with tab_upload:
 
                 with col2:
                     
-                    subject_email = st.text_area("Subject Email")
+                    subject_email = st.text_area("Subject Email", disabled=True)
 
-                    email_date = st.date_input("Email Date",value=date.today())
+                    email_date = st.date_input("Email Date",value=date.today(), disabled=True)
 
                     remarks = st.text_area("Remarks")
 
@@ -1146,30 +1121,30 @@ with tab_upload:
                     "Keterangan": [
                         "Total Contribution",
                         "Commission",
+                        "Overriding",
                         "Tabarru",
                         "Ujrah",
                         "Nett Premium"
                     ],
                     "Nilai": [
-                        df["reins total premium"].sum(),
-                        df["reins total comm"].sum(),
-                        df["reins tabarru"].sum(),
-                        df["reins ujrah"].sum(),
-                        df["reins nett premium"].sum(),
+                        df["retro total premium"].sum(),
+                        df["retro total comm"].sum(),
+                        df["retro overriding"].sum(),
+                        df["retro tabarru"].sum(),
+                        df["retro ujrah"].sum(),
+                        df["retro nett premium"].sum(),
                     ]
                 })
 
             elif biz_type == "Claim":
                 summary_df = pd.DataFrame({
                     "Keterangan": [
-                        "Amount of Claim IDR",
-                        "Reins Claim IDR",
-                        "Marein Share IDR"
+                        "Reins Claim",
+                        "Retro Share"
                     ],
                     "Nilai": [
-                        df["amount of claim idr"].sum(),
-                        df["reins claim idr"].sum(),
-                        df["marein share idr"].sum()
+                        df["reins claim"].sum(),
+                        df["your share"].sum()
                         ]
                 })
                 
@@ -1186,8 +1161,8 @@ with tab_upload:
             if st.button("💾 Simpan File"):
                 start_time = time.time()
 
-                if not remarks.strip() or not subject_email.strip():
-                    st.error("Product, Subject Email, dan Remarks wajib diisi")
+                if not remarks.strip():
+                    st.error("Remarks wajib diisi")
                     st.stop()
 
                 #lock_path = log_path + ".lock"
@@ -1222,7 +1197,7 @@ with tab_upload:
 
                         pml_drive = get_or_create_folder(
                             service=service,
-                            folder_name="Folder PML",
+                            folder_name="Folder PML (Outward)",
                             parent_id=PERIOD_DRIVE_ID
                         )
 
@@ -1240,7 +1215,7 @@ with tab_upload:
                         # Upload voucher (selalu CREATE)
                         log_pml_drive_id = find_drive_file(
                             service=service,
-                            filename=get_log_pml_filename(int(year), int(month)),
+                            filename=f"{get_log_pml_filename(int(year), int(month))} (Outward)",
                             # filename="log_produksi.xlsx",
                             parent_id=PML_DRIVE_ID,
                             mime_type="application/vnd.google-apps.spreadsheet"
@@ -1263,15 +1238,15 @@ with tab_upload:
                                 "Cedant Company": cedant_company,
                                 "PIC": pic,
                                 "Curr":curr,
-                                "Total Contribution": df["reins total premium"].sum(),
-                                "Commission": df["reins total comm"].sum(),
-                                "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
-                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
-                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
-                                "Tabarru": df["reins tabarru"].sum(),
-                                "Ujrah": df["reins ujrah"].sum(),
+                                "Total Contribution": df["retro total premium"].sum(),
+                                "Commission": df["retro total comm"].sum(),
+                                "Overriding": df["retro overriding"].sum() if "retro overriding" in df.columns else 0,
+                                "Total Commission": (df["retro total comm"].sum()) + (df["retro overriding"].sum() if "retro overriding" in df.columns else 0),
+                                "Gross Premium Income": df["retro total premium"].sum() - ((df["retro total comm"].sum()) + (df["retro overriding"].sum() if "retro overriding" in df.columns else 0)),
+                                "Tabarru": df["retro tabarru"].sum(),
+                                "Ujrah": df["retro ujrah"].sum(),
                                 "Claim": 0,
-                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "Balance": df["retro total premium"].sum() - df["retro total comm"].sum() - (df["retro overriding"].sum() if "retro overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
                                 "REMARKS": remarks,
                                 "STATUS": "POSTED",
                                 #"ENTRY_TYPE": entry_type,
@@ -1302,8 +1277,8 @@ with tab_upload:
                                 "Gross Premium Income": 0,
                                 "Tabarru": 0,
                                 "Ujrah": 0,
-                                "Claim": df["marein share idr"].sum(),
-                                "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
+                                "Claim": df["your share"].sum(),
+                                "Balance": 0 - (df["your share"].sum() if "your share" in df.columns else 0),
                                 "REMARKS": remarks,
                                 "STATUS": "POSTED",
                                 #"ENTRY_TYPE": entry_type,
@@ -1328,7 +1303,7 @@ with tab_upload:
                             log_pml_drive_id = create_log_gsheet(
                                 service=service,
                                 parent_id=PML_DRIVE_ID,
-                                filename=get_log_pml_filename(int(year), int(month)),
+                                filename=f"{get_log_pml_filename(int(year), int(month))} (Outward)",
                                 columns=list(log_pml.keys())
                             )
 
