@@ -161,580 +161,1180 @@ with tab_upload:
         key="upload_post_upload"
     )
 
-    columns_template = [
-        "No",
-        "TL Detail ID",
-        "Trans Category",
-        "Policy Category",
-        "Certificate No",
-        "Insured Full Name",
-        "Gender",
-        "Main Pol No",
-        "Main Policy",
-        "Pol Holder No",
-        "Policy Holder",
-        "Birth Date",
-        "Age At",
-        "Issue Date",
-        "Term Year",
-        "Term Month",
-        "Expired Date",
-        "Medical",
-        "Ced Risk Code",
-        "Life Risk Name",
-        "K.O.B Code",
-        "Ced Product Code",
-        "Ced Coverage Code",
-        "Ced Product Desc",
-        "Ccy Code",
-        "Sum Insured",
-        "Sum At Risk",
-        "Reins Sum Insured",
-        "Ced Retention",
-        "Reins Sum At Risk",
-        "Pay Period Type",
-        "Ced EM Rate",
-        "Ced ER Rate",
-        "Reins Premium",
-        "Reins EM Premium",
-        "Reins ER Premium",
-        "Reins Oth. Premium",
-        "Reins Total Premium",
-        "Reins Comm",
-        "Reins EM Comm",
-        "Reins ER Comm",
-        "Reins Oth. Comm",
-        "Reins Profit Share",
-        "Reins Overriding",
-        "Reins Broker Fee",
-        "Reins Total Comm",
-        "Reins Tabarru",
-        "Reins Ujrah",
-        "Reins Nett Premium",
-        "Valuation Date",
-        "Terminate Date",
-        "TL Detail Remarks",
-        "CBY",
-        "CBM",
-        "COB",
-        "Voucher ID",
-        "PML ID",
-        "References No",
-        "Elapse No",
-        "Ref Voucher ID"
-    ]
+    if reins_type == "INWARD":
 
-    columns_template_claim = [
-        "BookYear",
-        "BookMonth",
-        "CedBookYear",
-        "CedBookMonth",
-        "Company Name",
-        "Policy Holder No",
-        "Policy Holder",
-        "Certificate No",
-        "Insured Name",
-        "Birth Date",
-        "Age",
-        "Gender",
-        "Sum Insured IDR",
-        "Sum Reinsured IDR",
-        "medicalcategory",
-        "Product",
-        "Coverage Code",
-        "ClassOfBusiness",
-        "PayPeriodType",
-        "KindOfBusiness",
-        "Issue Date",
-        "Term Year",
-        "Term Month",
-        "End Date Policy",
-        "Claim Date",
-        "Claim Register Date",
-        "Payment Date",
-        "Currency",
-        "ExchangeRate",
-        "Amount of Claim IDR",
-        "Reins Claim IDR",
-        "Marein Share IDR",
-        "Cause Of Claim",
-        "Voucher ID",
-        "References No"        
-    ]
+        columns_template = [
+            "No",
+            "TL Detail ID",
+            "Trans Category",
+            "Policy Category",
+            "Certificate No",
+            "Insured Full Name",
+            "Gender",
+            "Main Pol No",
+            "Main Policy",
+            "Pol Holder No",
+            "Policy Holder",
+            "Birth Date",
+            "Age At",
+            "Issue Date",
+            "Term Year",
+            "Term Month",
+            "Expired Date",
+            "Medical",
+            "Ced Risk Code",
+            "Life Risk Name",
+            "K.O.B Code",
+            "Ced Product Code",
+            "Ced Coverage Code",
+            "Ced Product Desc",
+            "Ccy Code",
+            "Sum Insured",
+            "Sum At Risk",
+            "Reins Sum Insured",
+            "Ced Retention",
+            "Reins Sum At Risk",
+            "Pay Period Type",
+            "Ced EM Rate",
+            "Ced ER Rate",
+            "Reins Premium",
+            "Reins EM Premium",
+            "Reins ER Premium",
+            "Reins Oth. Premium",
+            "Reins Total Premium",
+            "Reins Comm",
+            "Reins EM Comm",
+            "Reins ER Comm",
+            "Reins Oth. Comm",
+            "Reins Profit Share",
+            "Reins Overriding",
+            "Reins Broker Fee",
+            "Reins Total Comm",
+            "Reins Tabarru",
+            "Reins Ujrah",
+            "Reins Nett Premium",
+            "Valuation Date",
+            "Terminate Date",
+            "TL Detail Remarks",
+            "CBY",
+            "CBM",
+            "COB",
+            "Voucher ID",
+            "PML ID",
+            "References No",
+            "Elapse No",
+            "Ref Voucher ID"
+        ]
 
-    LOG_COLUMNS = [
-        "Seq No", "Department", "Biz Type", "Voucher No",
-        "Account With", "Cedant Company", "PIC",
-        "Product", "CBY", "CBM", "OBY", "OBM",
-        "KOB", "COB", "MOP", "Curr",
-        "Total Contribution", "Commission", "Overriding",
-        "Total Commission", "Gross Premium Income",
-        "Tabarru", "Ujrah", "Claim", "Balance", "Check Balance",
-        "Rate Exchange",
-        "Kontribusi (IDR)", "Commission (IDR)", "Overiding (IDR)",
-        "Total Commission (IDR)", "Gross Premium Income (IDR)",
-        "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
-        "Balance (IDR)", "Check Balance (IDR)",
-        "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
-        "Due Date", "Subject Email", "Email Date",
-        "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
-    ]
+        columns_template_claim = [
+            "BookYear",
+            "BookMonth",
+            "CedBookYear",
+            "CedBookMonth",
+            "Company Name",
+            "Policy Holder No",
+            "Policy Holder",
+            "Certificate No",
+            "Insured Name",
+            "Birth Date",
+            "Age",
+            "Gender",
+            "Sum Insured IDR",
+            "Sum Reinsured IDR",
+            "medicalcategory",
+            "Product",
+            "Coverage Code",
+            "ClassOfBusiness",
+            "PayPeriodType",
+            "KindOfBusiness",
+            "Issue Date",
+            "Term Year",
+            "Term Month",
+            "End Date Policy",
+            "Claim Date",
+            "Claim Register Date",
+            "Payment Date",
+            "Currency",
+            "ExchangeRate",
+            "Amount of Claim IDR",
+            "Reins Claim IDR",
+            "Marein Share IDR",
+            "Cause Of Claim",
+            "Voucher ID",
+            "References No"        
+        ]
 
-
-    if uploaded_file:
-        # ==========================
-        # READ FILE
-        # ==========================
-        df = pd.read_excel(uploaded_file)
-        original_columns = df.columns.tolist()
-        df.columns = df.columns.str.strip().str.lower()
-
-        for col in ["certificate no", "main pol no", "pol holder no"]:
-            if col in df.columns:
-                df[col] = df[col].astype(str).str.strip()
-
-        # ==========================
-        # VALIDATION
-        # ==========================
-        errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
-
-        if errors:
-            st.error("❌ VALIDASI GAGAL")
-            for err in errors:
-                st.write(f"- {err}")
-            st.stop()
-
-        st.success("✅ Validasi berhasil")
+        LOG_COLUMNS = [
+            "Seq No", "Department", "Biz Type", "Voucher No",
+            "Account With", "Cedant Company", "PIC",
+            "Product", "CBY", "CBM", "OBY", "OBM",
+            "KOB", "COB", "MOP", "Curr",
+            "Total Contribution", "Commission", "Overriding",
+            "Total Commission", "Gross Premium Income",
+            "Tabarru", "Ujrah", "Claim", "Balance", "Check Balance",
+            "Rate Exchange",
+            "Kontribusi (IDR)", "Commission (IDR)", "Overiding (IDR)",
+            "Total Commission (IDR)", "Gross Premium Income (IDR)",
+            "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
+            "Balance (IDR)", "Check Balance (IDR)",
+            "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
+            "Due Date", "Subject Email", "Email Date",
+            "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
+        ]
 
 
-        # ==========================
-        # PREVIEW + FILTER (DINAMIS)
-        # ==========================
+        if uploaded_file:
+            # ==========================
+            # READ FILE
+            # ==========================
+            df = pd.read_excel(uploaded_file)
+            original_columns = df.columns.tolist()
+            df.columns = df.columns.str.strip().str.lower()
 
-        def get_non_empty_columns(df: pd.DataFrame):
-            valid_cols = []
-            for col in df.columns:
-                series = df[col]
-                non_na = series.dropna()
+            for col in ["certificate no", "main pol no", "pol holder no"]:
+                if col in df.columns:
+                    df[col] = df[col].astype(str).str.strip()
 
-                if non_na.empty:
-                    continue
+            # ==========================
+            # VALIDATION
+            # ==========================
+            errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
 
-                if series.dtype == "object":
-                    if non_na.astype(str).str.strip().ne("").any():
-                        valid_cols.append(col)
-                else:
-                    valid_cols.append(col)
-
-            return valid_cols
-
-
-        # ==========================
-        # PREVIEW + FILTER
-        # ==========================
-        with st.expander("📊 Preview Data Voucher", expanded=True):
-            if not df.empty:
-                # 1. Batasi jumlah baris agar aplikasi tetap cepat
-                MAX_PREVIEW = 1000
-                total_rows = len(df)
-                preview_df = df.head(MAX_PREVIEW).copy()
-
-                st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
-
-                # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
-                # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
-                
-                ACCOUNTING_COLS = [
-                    "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
-                    "reins premium", "reins em premium", "reins er premium", "reins total premium",
-                    "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
-                ]
-
-                # Buat dictionary formatter untuk kolom yang ada saja
-                format_dict = {}
-                for col in ACCOUNTING_COLS:
-                    if col in preview_df.columns:
-                        # Pastikan data adalah numerik sebelum diformat
-                        preview_df[col] = pd.to_numeric(preview_df[col], errors='coerce').fillna(0)
-                        format_dict[col] = "{:,.2f}"
-
-                # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
-                try:
-                    st.dataframe(
-                        preview_df.style.format(format_dict),
-                        use_container_width=True,
-                        height=450 # Memberikan scrollbar internal jika data banyak
-                    )
-                except Exception as e:
-                    st.error(f"Gagal menampilkan preview: {e}")
-                    st.dataframe(preview_df) # Fallback ke tabel mentah jika styling gagal
-            else:
-                st.info("Belum ada data untuk ditampilkan. Silakan upload file terlebih dahulu.")
-
-
-        # ==========================
-        # PERIOD & LOG
-        # ==========================
-        year = st.session_state["log_period"]["year"]
-        month = st.session_state["log_period"]["month"]
-
-        # ==========================
-        # DRIVE FOLDER PER PERIODE (STEP 3)
-        # ==========================
-        drive_folders = get_period_drive_folders(
-            year=year,
-            month=month,
-            root_folder_id=ROOT_DRIVE_FOLDER_ID
-        )
-
-        PERIOD_DRIVE_ID = drive_folders["period_id"]
-
-
-        # ==========================
-        # FORM INPUT
-        # ==========================
-
-        with st.expander("🧾 Informasi Voucher", expanded=True):
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-
-                pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
-
-                account_with = st.selectbox(
-                    "Account With",
-                    [
-                        "AIA FINANCIAL SYARIAH",
-                        "AJS KITABISA (D/H AMANAH GITHA)",
-                        "ALLIANZ LIFE SYARIAH",
-                        "ALLIANZ LIFE SYARIAH (Health)",
-                        "ALLIANZ LIFE SYARIAH (FlexiCare)",
-                        "ALLIANZ LIFE SYARIAH (HSCP)",
-                        "ALLIANZ LIFE SYARIAH (Individu DMTM)",
-                        "ASTRA AVIVA LIFE",
-                        "AVRIST ASSURANCE SYARIAH",
-                        "AXA FINANCIAL INDONESIA SYARIAH",
-                        "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
-                        "BNI LIFE SYARIAH",
-                        "BRINGIN LIFE SYARIAH",
-                        "BUMIPUTERA SYARIAH",
-                        "CAPITAL LIFE SYARIAH",
-                        "CENTRAL ASIA RAYA SYARIAH",
-                        "FWD LIFE INDONESIA SYARIAH",
-                        "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
-                        "GREAT EASTERN LIFE SYARIAH",
-                        "JASA MITRA ABADI SYARIAH",
-                        "MANULIFE INDONESIA SYARIAH",
-                        "PFI MEGA LIFE INSURANCE SYARIAH",
-                        "PRUDENTIAL LIFE SYARIAH",
-                        "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
-                        "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
-                        "RELIANCE SYARIAH",
-                        "SINARMAS SYARIAH",
-                        "SUN LIFE SYARIAH",
-                        "SYARIAH AL-AMIN",
-                        "TAKAFUL KELUARGA",
-                        "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
-                        "HANNOVER RETAKAFUL",
-                        "MAREIN SYARIAH",
-                        "MUNICH RE RETAKAFUL",
-                        "SCOR SE LABUAN BRANCH",
-                        "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
-                    ]
-                )
-
-                cedant_company = st.selectbox(
-                    "Cedant Company",
-                    [
-                        "AIA FINANCIAL SYARIAH",
-                        "AJS KITABISA (D/H AMANAH GITHA)",
-                        "ALLIANZ LIFE SYARIAH",
-                        "ASTRA AVIVA LIFE",
-                        "AVRIST ASSURANCE SYARIAH",
-                        "AXA FINANCIAL INDONESIA SYARIAH",
-                        "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
-                        "BNI LIFE SYARIAH",
-                        "BRINGIN LIFE SYARIAH",
-                        "BUMIPUTERA SYARIAH",
-                        "CAPITAL LIFE SYARIAH",
-                        "CENTRAL ASIA RAYA SYARIAH",
-                        "FWD LIFE INDONESIA SYARIAH",
-                        "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
-                        "GREAT EASTERN LIFE SYARIAH",
-                        "JASA MITRA ABADI SYARIAH",
-                        "MANULIFE INDONESIA SYARIAH",
-                        "PANIN DAICHI LIFE SYARIAH",
-                        "PFI MEGA LIFE INSURANCE SYARIAH",
-                        "PRUDENTIAL LIFE SYARIAH",
-                        "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
-                        "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
-                        "RELIANCE SYARIAH",
-                        "SINARMAS SYARIAH",
-                        "SUN LIFE SYARIAH",
-                        "SYARIAH AL-AMIN",
-                        "TAKAFUL KELUARGA",
-                        "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
-                        "HANNOVER RETAKAFUL",
-                        "MAREIN SYARIAH",
-                        "MUNICH RE RETAKAFUL",
-                        "SCOR SE LABUAN BRANCH",
-                        "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
-                    ]
-                )
-
-                curr = st.selectbox(
-                    "Currency",
-                    ["IDR", "USD"]
-                )
-
-            with col2:
-                
-                subject_email = st.text_area("Subject Email")
-
-                email_date = st.date_input("Email Date",value=date.today())
-
-                remarks = st.text_area("Remarks")
-
-
-        # ==========================
-        # FINANCIAL SUMMARY
-        # ==========================
-        st.subheader("💰 Summary Financial")
-
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-            summary_df = pd.DataFrame({
-                "Keterangan": [
-                    "Total Contribution",
-                    "Commission",
-                    "Tabarru",
-                    "Ujrah",
-                    "Nett Premium"
-                ],
-                "Nilai": [
-                    df["reins total premium"].sum(),
-                    df["reins total comm"].sum(),
-                    df["reins tabarru"].sum(),
-                    df["reins ujrah"].sum(),
-                    df["reins nett premium"].sum(),
-                ]
-            })
-
-        elif biz_type == "Claim":
-            summary_df = pd.DataFrame({
-                "Keterangan": [
-                    "Amount of Claim IDR",
-                    "Reins Claim IDR",
-                    "Marein Share IDR"
-                ],
-                "Nilai": [
-                    df["amount of claim idr"].sum(),
-                    df["reins claim idr"].sum(),
-                    df["marein share idr"].sum()
-                    ]
-            })
-            
-
-        st.dataframe(
-            summary_df.style.format({"Nilai": "{:,.2f}"}),
-            use_container_width=True
-        )
-
-
-        # ==========================
-        # POST VOUCHER (LOCKED)
-        # ==========================
-        if st.button("💾 Simpan File"):
-            start_time = time.time()
-
-            if not remarks.strip() or not subject_email.strip():
-                st.error("Product, Subject Email, dan Remarks wajib diisi")
+            if errors:
+                st.error("❌ VALIDASI GAGAL")
+                for err in errors:
+                    st.write(f"- {err}")
                 st.stop()
 
-            #lock_path = log_path + ".lock"
-            service = get_drive_service()
+            st.success("✅ Validasi berhasil")
 
-            with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
 
-                try:
-                    service = get_drive_service()                    
+            # ==========================
+            # PREVIEW + FILTER (DINAMIS)
+            # ==========================
 
-                    drive_folders = get_period_drive_folders(
-                        year=int(year),
-                        month=int(month),
-                        root_folder_id=ROOT_DRIVE_FOLDER_ID
+            def get_non_empty_columns(df: pd.DataFrame):
+                valid_cols = []
+                for col in df.columns:
+                    series = df[col]
+                    non_na = series.dropna()
+
+                    if non_na.empty:
+                        continue
+
+                    if series.dtype == "object":
+                        if non_na.astype(str).str.strip().ne("").any():
+                            valid_cols.append(col)
+                    else:
+                        valid_cols.append(col)
+
+                return valid_cols
+
+
+            # ==========================
+            # PREVIEW + FILTER
+            # ==========================
+            with st.expander("📊 Preview Data Voucher", expanded=True):
+                if not df.empty:
+                    # 1. Batasi jumlah baris agar aplikasi tetap cepat
+                    MAX_PREVIEW = 1000
+                    total_rows = len(df)
+                    preview_df = df.head(MAX_PREVIEW).copy()
+
+                    st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
+
+                    # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
+                    # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
+                    
+                    ACCOUNTING_COLS = [
+                        "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
+                        "reins premium", "reins em premium", "reins er premium", "reins total premium",
+                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
+                    ]
+
+                    # Buat dictionary formatter untuk kolom yang ada saja
+                    format_dict = {}
+                    for col in ACCOUNTING_COLS:
+                        if col in preview_df.columns:
+                            # Pastikan data adalah numerik sebelum diformat
+                            preview_df[col] = pd.to_numeric(preview_df[col], errors='coerce').fillna(0)
+                            format_dict[col] = "{:,.2f}"
+
+                    # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
+                    try:
+                        st.dataframe(
+                            preview_df.style.format(format_dict),
+                            use_container_width=True,
+                            height=450 # Memberikan scrollbar internal jika data banyak
+                        )
+                    except Exception as e:
+                        st.error(f"Gagal menampilkan preview: {e}")
+                        st.dataframe(preview_df) # Fallback ke tabel mentah jika styling gagal
+                else:
+                    st.info("Belum ada data untuk ditampilkan. Silakan upload file terlebih dahulu.")
+
+
+            # ==========================
+            # PERIOD & LOG
+            # ==========================
+            year = st.session_state["log_period"]["year"]
+            month = st.session_state["log_period"]["month"]
+
+            # ==========================
+            # DRIVE FOLDER PER PERIODE (STEP 3)
+            # ==========================
+            drive_folders = get_period_drive_folders(
+                year=year,
+                month=month,
+                root_folder_id=ROOT_DRIVE_FOLDER_ID
+            )
+
+            PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+
+            # ==========================
+            # FORM INPUT
+            # ==========================
+
+            with st.expander("🧾 Informasi Voucher", expanded=True):
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+
+                    account_with = st.selectbox(
+                        "Account With",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ALLIANZ LIFE SYARIAH (Health)",
+                            "ALLIANZ LIFE SYARIAH (FlexiCare)",
+                            "ALLIANZ LIFE SYARIAH (HSCP)",
+                            "ALLIANZ LIFE SYARIAH (Individu DMTM)",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
                     )
 
-                    PML_folders = get_period_drive_folders(
-                        year=int(year),
-                        month=int(month),
-                        root_folder_id=ROOT_DRIVE_FOLDER_ID
+                    cedant_company = st.selectbox(
+                        "Cedant Company",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PANIN DAICHI LIFE SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
                     )
 
-                    PERIOD_DRIVE_ID = drive_folders["period_id"]
-
-                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
-
-                    # reload log terbaru setelah lock
-                    # if os.path.exists(log_path):
-                    #     log_df = pd.read_excel(log_path)
-                    # else:
-                    #     log_df = pd.DataFrame()
-
-                    pml_drive = get_or_create_folder(
-                        service=service,
-                        folder_name="Folder PML",
-                        parent_id=PERIOD_DRIVE_ID
+                    curr = st.selectbox(
+                        "Currency",
+                        ["IDR", "USD"]
                     )
 
-                    PML_DRIVE_ID = pml_drive
+                with col2:
+                    
+                    subject_email = st.text_area("Subject Email")
 
-                    pml_id, seq_no, file_id = generate_pml_from_drive(
-                        service=service,
-                        period_folder_id=PML_DRIVE_ID,
-                        year=int(year),
-                        month=int(month),
-                        find_drive_file=find_drive_file,
-                        biz_type = biz_type
-                    )
+                    email_date = st.date_input("Email Date",value=date.today())
 
-                    # Upload voucher (selalu CREATE)
-                    log_pml_drive_id = find_drive_file(
-                        service=service,
-                        filename=get_log_pml_filename(int(year), int(month)),
-                        # filename="log_produksi.xlsx",
-                        parent_id=PML_DRIVE_ID,
-                        mime_type="application/vnd.google-apps.spreadsheet"
-                    )
+                    remarks = st.text_area("Remarks")
 
-                    rate_exchange = get_exchange_rate(
-                        service=service,
-                        config_folder_id=CONFIG_FOLDER_ID,
-                        currency=curr,
-                        month=month
-                    )
 
-                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-                        log_pml = {
-                            "Seq No": seq_no,
-                            "Department":department,
-                            "Biz Type": biz_type,
-                            "PML ID": pml_id,
-                            "Account With": account_with,
-                            "Cedant Company": cedant_company,
-                            "PIC": pic,
-                            "Curr":curr,
-                            "Total Contribution": df["reins total premium"].sum(),
-                            "Commission": df["reins total comm"].sum(),
-                            "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
-                            "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
-                            "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
-                            "Tabarru": df["reins tabarru"].sum(),
-                            "Ujrah": df["reins ujrah"].sum(),
-                            "Claim": 0,
-                            "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
-                            "REMARKS": remarks,
-                            "STATUS": "POSTED",
-                            #"ENTRY_TYPE": entry_type,
-                            "CREATED AT": now_wib_naive(),
-                            "CREATED BY": pic,
-                            "Subject Email": subject_email,
-                            "Email Date": email_date,
-                            "CANCELED AT": "-",
-                            "CANCELED BY": "-",
-                            "CANCEL OF VOUCHER": "-",
-                            "CANCEL REASON":"-"
-                        }
+            # ==========================
+            # FINANCIAL SUMMARY
+            # ==========================
+            st.subheader("💰 Summary Financial")
 
-                    elif biz_type == "Claim":
-                        log_pml = {
-                            "Seq No": seq_no,
-                            "Department":department,
-                            "Biz Type": biz_type,
-                            "PML ID": pml_id,
-                            "Account With": account_with,
-                            "Cedant Company": cedant_company,
-                            "PIC": pic,
-                            "Curr":curr,
-                            "Total Contribution": 0,
-                            "Commission": 0,
-                            "Overriding": 0,
-                            "Total Commission": 0,
-                            "Gross Premium Income": 0,
-                            "Tabarru": 0,
-                            "Ujrah": 0,
-                            "Claim": df["marein share idr"].sum(),
-                            "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
-                            "REMARKS": remarks,
-                            "STATUS": "POSTED",
-                            #"ENTRY_TYPE": entry_type,
-                            "CREATED AT": now_wib_naive(),
-                            "CREATED BY": pic,
-                            "Subject Email": subject_email,
-                            "Email Date": email_date,
-                            "CANCELED AT": "-",
-                            "CANCELED BY": "-",
-                            "CANCEL OF VOUCHER": "-",
-                            "CANCEL REASON": "-"
-                        }
+            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Total Contribution",
+                        "Commission",
+                        "Tabarru",
+                        "Ujrah",
+                        "Nett Premium"
+                    ],
+                    "Nilai": [
+                        df["reins total premium"].sum(),
+                        df["reins total comm"].sum(),
+                        df["reins tabarru"].sum(),
+                        df["reins ujrah"].sum(),
+                        df["reins nett premium"].sum(),
+                    ]
+                })
 
-                    # log_drive_id = find_drive_file(
-                    #     service=service,
-                    #     filename=get_log_filename(int(oby), int(obm)),
-                    #     parent_id=PERIOD_DRIVE_ID,
-                    #     mime_type="application/vnd.google-apps.spreadsheet"
-                    # )
+            elif biz_type == "Claim":
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Amount of Claim IDR",
+                        "Reins Claim IDR",
+                        "Marein Share IDR"
+                    ],
+                    "Nilai": [
+                        df["amount of claim idr"].sum(),
+                        df["reins claim idr"].sum(),
+                        df["marein share idr"].sum()
+                        ]
+                })
+                
 
-                    if not log_pml_drive_id:
-                        log_pml_drive_id = create_log_gsheet(
+            st.dataframe(
+                summary_df.style.format({"Nilai": "{:,.2f}"}),
+                use_container_width=True
+            )
+
+
+            # ==========================
+            # POST VOUCHER (LOCKED)
+            # ==========================
+            if st.button("💾 Simpan File"):
+                start_time = time.time()
+
+                if not remarks.strip() or not subject_email.strip():
+                    st.error("Product, Subject Email, dan Remarks wajib diisi")
+                    st.stop()
+
+                #lock_path = log_path + ".lock"
+                service = get_drive_service()
+
+                with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
+
+                    try:
+                        service = get_drive_service()                    
+
+                        drive_folders = get_period_drive_folders(
+                            year=int(year),
+                            month=int(month),
+                            root_folder_id=ROOT_DRIVE_FOLDER_ID
+                        )
+
+                        PML_folders = get_period_drive_folders(
+                            year=int(year),
+                            month=int(month),
+                            root_folder_id=ROOT_DRIVE_FOLDER_ID
+                        )
+
+                        PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
+                        # reload log terbaru setelah lock
+                        # if os.path.exists(log_path):
+                        #     log_df = pd.read_excel(log_path)
+                        # else:
+                        #     log_df = pd.DataFrame()
+
+                        pml_drive = get_or_create_folder(
                             service=service,
-                            parent_id=PML_DRIVE_ID,
+                            folder_name="Folder PML",
+                            parent_id=PERIOD_DRIVE_ID
+                        )
+
+                        PML_DRIVE_ID = pml_drive
+
+                        pml_id, seq_no, file_id = generate_pml_from_drive(
+                            service=service,
+                            period_folder_id=PML_DRIVE_ID,
+                            year=int(year),
+                            month=int(month),
+                            find_drive_file=find_drive_file,
+                            biz_type = biz_type
+                        )
+
+                        # Upload voucher (selalu CREATE)
+                        log_pml_drive_id = find_drive_file(
+                            service=service,
                             filename=get_log_pml_filename(int(year), int(month)),
-                            columns=list(log_pml.keys())
+                            # filename="log_produksi.xlsx",
+                            parent_id=PML_DRIVE_ID,
+                            mime_type="application/vnd.google-apps.spreadsheet"
                         )
 
-                    sheets_service = init_sheets_service(creds)
+                        rate_exchange = get_exchange_rate(
+                            service=service,
+                            config_folder_id=CONFIG_FOLDER_ID,
+                            currency=curr,
+                            month=month
+                        )
 
-                    append_gsheet(
-                        service=sheets_service,
-                        spreadsheet_id=log_pml_drive_id,
-                        row_dict=log_pml
+                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            log_pml = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "PML ID": pml_id,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Curr":curr,
+                                "Total Contribution": df["reins total premium"].sum(),
+                                "Commission": df["reins total comm"].sum(),
+                                "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
+                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
+                                "Tabarru": df["reins tabarru"].sum(),
+                                "Ujrah": df["reins ujrah"].sum(),
+                                "Claim": 0,
+                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON":"-"
+                            }
+
+                        elif biz_type == "Claim":
+                            log_pml = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "PML ID": pml_id,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Curr":curr,
+                                "Total Contribution": 0,
+                                "Commission": 0,
+                                "Overriding": 0,
+                                "Total Commission": 0,
+                                "Gross Premium Income": 0,
+                                "Tabarru": 0,
+                                "Ujrah": 0,
+                                "Claim": df["marein share idr"].sum(),
+                                "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON": "-"
+                            }
+
+                        # log_drive_id = find_drive_file(
+                        #     service=service,
+                        #     filename=get_log_filename(int(oby), int(obm)),
+                        #     parent_id=PERIOD_DRIVE_ID,
+                        #     mime_type="application/vnd.google-apps.spreadsheet"
+                        # )
+
+                        if not log_pml_drive_id:
+                            log_pml_drive_id = create_log_gsheet(
+                                service=service,
+                                parent_id=PML_DRIVE_ID,
+                                filename=get_log_pml_filename(int(year), int(month)),
+                                columns=list(log_pml.keys())
+                            )
+
+                        sheets_service = init_sheets_service(creds)
+
+                        append_gsheet(
+                            service=sheets_service,
+                            spreadsheet_id=log_pml_drive_id,
+                            row_dict=log_pml
+                        )
+
+                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            upload_dataframe_to_drive(
+                                service=service,
+                                df=df,
+                                template_columns=columns_template,
+                                voucher_id=pml_id,
+                                filename=f"{pml_id}.xlsx",
+                                folder_id=PML_DRIVE_ID,
+                                file_type = "PML"
+                            )
+
+                        elif biz_type == "Claim" :
+                            upload_dataframe_to_drive(
+                                service=service,
+                                df=df,
+                                template_columns=columns_template_claim,
+                                voucher_id=pml_id,
+                                filename=f"{pml_id}.xlsx",
+                                folder_id=PML_DRIVE_ID,
+                                file_type="PML"
+                            )
+
+                        end_time = time.time()
+                        duration = end_time - start_time
+
+                        st.success(f"✅ File berhasil diposting: {pml_id} ({int(duration)} seconds)")
+                        st.code(pml_id)
+
+                    except RuntimeError as e:
+                            st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                            st.stop()
+
+                    finally:
+                        release_drive_lock(service, PERIOD_DRIVE_ID)
+
+    elif reins_type == "OUTWARD":
+
+        columns_template_outward = [
+            "Out PL Detail ID",
+            "Acc With Name",
+            "Policy Category",
+            "KOB Code",
+            "Ref Offer Insured Risk ID",
+            "Main Pol No",
+            "Main Policy",
+            "Pol Holder No",
+            "Policy Holder",
+            "Certificate No",
+            "Insured Full Name",
+            "Birth Date",
+            "Gender",
+            "Issue Date",
+            "Age At",
+            "Term Year",
+            "Term Month",
+            "Expired Date",
+            "RI Period From",
+            "RI Period Until",
+            "Smoker",
+            "Medical",
+            "Ced Product Code",
+            "Ced Coverage Code",
+            "Ced Risk Code",
+            "Life Risk Detail",
+            "PA Class Category",
+            "Ccy Code",
+            "Sum Insured",
+            "Sum At Risk",
+            "Reins Sum Insured",
+            "Reins Sum At Risk",
+            "Marein Sum Insured",
+            "Marein Sum At Risk",
+            "Own Retention",
+            "Excess OR",
+            "Check_1",
+            "Retro Sum Insured",
+            "Retro Sum At Risk",
+            "Premium Ccy",
+            "Exchange Rate",
+            "Out Tty Rate",
+            "Inw Tty Rate",
+            "EM Rate",
+            "ER Rate",
+            "Retro Premium",
+            "Retro EM Premium",
+            "Retro ER Premium",
+            "Retro Oth Premium",
+            "Retro Total Premium",
+            "Retro Comm",
+            "Retro EM Comm",
+            "Retro ER Comm",
+            "Retro Oth Comm",
+            "Retro Profit Share",
+            "Retro Total Comm",
+            "Retro Tabarru",
+            "Retro Ujrah",
+            "Check_2",
+            "Retro Overriding",
+            "Retro Sliding Scale",
+            "Retro Inw Brokerage",
+            "Reins Nett Premium",
+            "Retro Nett Premium",
+            "Check_3",
+            "Is Accum Policy",
+            "Is Calculated",
+            "PL Detail ID",
+            "Inw Vouc ID",
+            "Out Vouc ID",
+            "Inw Tty Product Code",
+            "Inw Book Year",
+            "Inw Book Month",
+            "Ced Book Year",
+            "Ced Book Month",
+            "Inw Pay Period Type",
+            "Out Pay Period Type",
+            "Valuation Date",
+            "Term Condition Remark",
+            "App Date",
+            "Input Date",
+            "Input Username",
+            "Modif Date",
+            "Modif Username"
+        ]
+
+        columns_template_claim_outward = [
+            "No",
+            "Cedant Name",
+            "DLA Out Voucher ID",
+            "Main Pol No",
+            "Main Policy",
+            "Pol Holder No",
+            "Policy Holder",
+            "Certificate No",
+            "Insured Name",
+            "Birth Date",
+            "Age",
+            "Gender",
+            "Ced Product Code",
+            "Ced Coverage Code",
+            "Ced Risk Code",
+            "COB Detail",
+            "Issue Date",
+            "Term Year",
+            "Term Month",
+            "KOB Code",
+            "Smoker",
+            "Medical",
+            "Claim Date",
+            "Cause Of Claim",
+            "Inw Book Year",
+            "Inw Book Month",
+            "Ced Book Year",
+            "Ced Book Month",
+            "Curr",
+            "Reins Claim",
+            "Your Share",
+            "Reinsurer Name"
+        ]
+
+        LOG_COLUMNS = [
+            "Seq No", "Department", "Biz Type", "Voucher No",
+            "Account With", "Cedant Company", "PIC",
+            "Product", "CBY", "CBM", "OBY", "OBM",
+            "KOB", "COB", "MOP", "Curr",
+            "Total Contribution", "Commission", "Overriding",
+            "Total Commission", "Gross Premium Income",
+            "Tabarru", "Ujrah", "Claim", "Balance", "Check Balance",
+            "Rate Exchange",
+            "Kontribusi (IDR)", "Commission (IDR)", "Overiding (IDR)",
+            "Total Commission (IDR)", "Gross Premium Income (IDR)",
+            "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
+            "Balance (IDR)", "Check Balance (IDR)",
+            "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
+            "Due Date", "Subject Email", "Email Date",
+            "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
+        ]
+
+
+        if uploaded_file:
+            # ==========================
+            # READ FILE
+            # ==========================
+            df = pd.read_excel(uploaded_file)
+            original_columns = df.columns.tolist()
+            df.columns = df.columns.str.strip().str.lower()
+
+            for col in ["certificate no", "main pol no", "pol holder no"]:
+                if col in df.columns:
+                    df[col] = df[col].astype(str).str.strip()
+
+            # ==========================
+            # VALIDATION
+            # ==========================
+            errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
+
+            if errors:
+                st.error("❌ VALIDASI GAGAL")
+                for err in errors:
+                    st.write(f"- {err}")
+                st.stop()
+
+            st.success("✅ Validasi berhasil")
+
+
+            # ==========================
+            # PREVIEW + FILTER (DINAMIS)
+            # ==========================
+
+            def get_non_empty_columns(df: pd.DataFrame):
+                valid_cols = []
+                for col in df.columns:
+                    series = df[col]
+                    non_na = series.dropna()
+
+                    if non_na.empty:
+                        continue
+
+                    if series.dtype == "object":
+                        if non_na.astype(str).str.strip().ne("").any():
+                            valid_cols.append(col)
+                    else:
+                        valid_cols.append(col)
+
+                return valid_cols
+
+
+            # ==========================
+            # PREVIEW + FILTER
+            # ==========================
+            with st.expander("📊 Preview Data Voucher", expanded=True):
+                if not df.empty:
+                    # 1. Batasi jumlah baris agar aplikasi tetap cepat
+                    MAX_PREVIEW = 1000
+                    total_rows = len(df)
+                    preview_df = df.head(MAX_PREVIEW).copy()
+
+                    st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
+
+                    # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
+                    # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
+                    
+                    ACCOUNTING_COLS = [
+                        "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
+                        "reins premium", "reins em premium", "reins er premium", "reins total premium",
+                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium"
+                    ]
+
+                    # Buat dictionary formatter untuk kolom yang ada saja
+                    format_dict = {}
+                    for col in ACCOUNTING_COLS:
+                        if col in preview_df.columns:
+                            # Pastikan data adalah numerik sebelum diformat
+                            preview_df[col] = pd.to_numeric(preview_df[col], errors='coerce').fillna(0)
+                            format_dict[col] = "{:,.2f}"
+
+                    # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
+                    try:
+                        st.dataframe(
+                            preview_df.style.format(format_dict),
+                            use_container_width=True,
+                            height=450 # Memberikan scrollbar internal jika data banyak
+                        )
+                    except Exception as e:
+                        st.error(f"Gagal menampilkan preview: {e}")
+                        st.dataframe(preview_df) # Fallback ke tabel mentah jika styling gagal
+                else:
+                    st.info("Belum ada data untuk ditampilkan. Silakan upload file terlebih dahulu.")
+
+
+            # ==========================
+            # PERIOD & LOG
+            # ==========================
+            year = st.session_state["log_period"]["year"]
+            month = st.session_state["log_period"]["month"]
+
+            # ==========================
+            # DRIVE FOLDER PER PERIODE (STEP 3)
+            # ==========================
+            drive_folders = get_period_drive_folders(
+                year=year,
+                month=month,
+                root_folder_id=ROOT_DRIVE_FOLDER_ID
+            )
+
+            PERIOD_DRIVE_ID = drive_folders["period_id"]
+
+
+            # ==========================
+            # FORM INPUT
+            # ==========================
+
+            with st.expander("🧾 Informasi Voucher", expanded=True):
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+
+                    account_with = st.selectbox(
+                        "Account With",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ALLIANZ LIFE SYARIAH (Health)",
+                            "ALLIANZ LIFE SYARIAH (FlexiCare)",
+                            "ALLIANZ LIFE SYARIAH (HSCP)",
+                            "ALLIANZ LIFE SYARIAH (Individu DMTM)",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
                     )
 
-                    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-                        upload_dataframe_to_drive(
-                            service=service,
-                            df=df,
-                            template_columns=columns_template,
-                            voucher_id=pml_id,
-                            filename=f"{pml_id}.xlsx",
-                            folder_id=PML_DRIVE_ID,
-                            file_type = "PML"
+                    cedant_company = st.selectbox(
+                        "Cedant Company",
+                        [
+                            "AIA FINANCIAL SYARIAH",
+                            "AJS KITABISA (D/H AMANAH GITHA)",
+                            "ALLIANZ LIFE SYARIAH",
+                            "ASTRA AVIVA LIFE",
+                            "AVRIST ASSURANCE SYARIAH",
+                            "AXA FINANCIAL INDONESIA SYARIAH",
+                            "AXA MANDIRI FINANCIAL SERVICES SYARIAH",
+                            "BNI LIFE SYARIAH",
+                            "BRINGIN LIFE SYARIAH",
+                            "BUMIPUTERA SYARIAH",
+                            "CAPITAL LIFE SYARIAH",
+                            "CENTRAL ASIA RAYA SYARIAH",
+                            "FWD LIFE INDONESIA SYARIAH",
+                            "GENERALI INDONESIA LIFE ASSURANCE SYARIAH",
+                            "GREAT EASTERN LIFE SYARIAH",
+                            "JASA MITRA ABADI SYARIAH",
+                            "MANULIFE INDONESIA SYARIAH",
+                            "PANIN DAICHI LIFE SYARIAH",
+                            "PFI MEGA LIFE INSURANCE SYARIAH",
+                            "PRUDENTIAL LIFE SYARIAH",
+                            "PT ASURANSI JIWA SYARIAH BUMIPUTERA",
+                            "REASURANSI INTERNATIONAL INDONESIA SYARIAH",
+                            "RELIANCE SYARIAH",
+                            "SINARMAS SYARIAH",
+                            "SUN LIFE SYARIAH",
+                            "SYARIAH AL-AMIN",
+                            "TAKAFUL KELUARGA",
+                            "GENERAL REINSURANCE AG (GEN RE) PLC, SINGAPORE",
+                            "HANNOVER RETAKAFUL",
+                            "MAREIN SYARIAH",
+                            "MUNICH RE RETAKAFUL",
+                            "SCOR SE LABUAN BRANCH",
+                            "SWISS RE INTL. SE, SINGAPORE (SYARIAH)"
+                        ]
+                    )
+
+                    curr = st.selectbox(
+                        "Currency",
+                        ["IDR", "USD"]
+                    )
+
+                with col2:
+                    
+                    subject_email = st.text_area("Subject Email")
+
+                    email_date = st.date_input("Email Date",value=date.today())
+
+                    remarks = st.text_area("Remarks")
+
+
+            # ==========================
+            # FINANCIAL SUMMARY
+            # ==========================
+            st.subheader("💰 Summary Financial")
+
+            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Total Contribution",
+                        "Commission",
+                        "Tabarru",
+                        "Ujrah",
+                        "Nett Premium"
+                    ],
+                    "Nilai": [
+                        df["reins total premium"].sum(),
+                        df["reins total comm"].sum(),
+                        df["reins tabarru"].sum(),
+                        df["reins ujrah"].sum(),
+                        df["reins nett premium"].sum(),
+                    ]
+                })
+
+            elif biz_type == "Claim":
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Amount of Claim IDR",
+                        "Reins Claim IDR",
+                        "Marein Share IDR"
+                    ],
+                    "Nilai": [
+                        df["amount of claim idr"].sum(),
+                        df["reins claim idr"].sum(),
+                        df["marein share idr"].sum()
+                        ]
+                })
+                
+
+            st.dataframe(
+                summary_df.style.format({"Nilai": "{:,.2f}"}),
+                use_container_width=True
+            )
+
+
+            # ==========================
+            # POST VOUCHER (LOCKED)
+            # ==========================
+            if st.button("💾 Simpan File"):
+                start_time = time.time()
+
+                if not remarks.strip() or not subject_email.strip():
+                    st.error("Product, Subject Email, dan Remarks wajib diisi")
+                    st.stop()
+
+                #lock_path = log_path + ".lock"
+                service = get_drive_service()
+
+                with st.spinner("⏳ Menyimpan voucher, mohon tunggu..."):
+
+                    try:
+                        service = get_drive_service()                    
+
+                        drive_folders = get_period_drive_folders(
+                            year=int(year),
+                            month=int(month),
+                            root_folder_id=ROOT_DRIVE_FOLDER_ID
                         )
 
-                    elif biz_type == "Claim" :
-                        upload_dataframe_to_drive(
-                            service=service,
-                            df=df,
-                            template_columns=columns_template_claim,
-                            voucher_id=pml_id,
-                            filename=f"{pml_id}.xlsx",
-                            folder_id=PML_DRIVE_ID,
-                            file_type="PML"
+                        PML_folders = get_period_drive_folders(
+                            year=int(year),
+                            month=int(month),
+                            root_folder_id=ROOT_DRIVE_FOLDER_ID
                         )
 
-                    end_time = time.time()
-                    duration = end_time - start_time
+                        PERIOD_DRIVE_ID = drive_folders["period_id"]
 
-                    st.success(f"✅ File berhasil diposting: {pml_id} ({int(duration)} seconds)")
-                    st.code(pml_id)
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
 
-                except RuntimeError as e:
-                        st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
-                        st.stop()
+                        # reload log terbaru setelah lock
+                        # if os.path.exists(log_path):
+                        #     log_df = pd.read_excel(log_path)
+                        # else:
+                        #     log_df = pd.DataFrame()
 
-                finally:
-                    release_drive_lock(service, PERIOD_DRIVE_ID)
+                        pml_drive = get_or_create_folder(
+                            service=service,
+                            folder_name="Folder PML",
+                            parent_id=PERIOD_DRIVE_ID
+                        )
+
+                        PML_DRIVE_ID = pml_drive
+
+                        pml_id, seq_no, file_id = generate_pml_from_drive(
+                            service=service,
+                            period_folder_id=PML_DRIVE_ID,
+                            year=int(year),
+                            month=int(month),
+                            find_drive_file=find_drive_file,
+                            biz_type = biz_type
+                        )
+
+                        # Upload voucher (selalu CREATE)
+                        log_pml_drive_id = find_drive_file(
+                            service=service,
+                            filename=get_log_pml_filename(int(year), int(month)),
+                            # filename="log_produksi.xlsx",
+                            parent_id=PML_DRIVE_ID,
+                            mime_type="application/vnd.google-apps.spreadsheet"
+                        )
+
+                        rate_exchange = get_exchange_rate(
+                            service=service,
+                            config_folder_id=CONFIG_FOLDER_ID,
+                            currency=curr,
+                            month=month
+                        )
+
+                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            log_pml = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "PML ID": pml_id,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Curr":curr,
+                                "Total Contribution": df["reins total premium"].sum(),
+                                "Commission": df["reins total comm"].sum(),
+                                "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
+                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
+                                "Tabarru": df["reins tabarru"].sum(),
+                                "Ujrah": df["reins ujrah"].sum(),
+                                "Claim": 0,
+                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON":"-"
+                            }
+
+                        elif biz_type == "Claim":
+                            log_pml = {
+                                "Seq No": seq_no,
+                                "Department":department,
+                                "Biz Type": biz_type,
+                                "PML ID": pml_id,
+                                "Account With": account_with,
+                                "Cedant Company": cedant_company,
+                                "PIC": pic,
+                                "Curr":curr,
+                                "Total Contribution": 0,
+                                "Commission": 0,
+                                "Overriding": 0,
+                                "Total Commission": 0,
+                                "Gross Premium Income": 0,
+                                "Tabarru": 0,
+                                "Ujrah": 0,
+                                "Claim": df["marein share idr"].sum(),
+                                "Balance": 0 - (df["marein share idr"].sum() if "marein share idr" in df.columns else 0),
+                                "REMARKS": remarks,
+                                "STATUS": "POSTED",
+                                #"ENTRY_TYPE": entry_type,
+                                "CREATED AT": now_wib_naive(),
+                                "CREATED BY": pic,
+                                "Subject Email": subject_email,
+                                "Email Date": email_date,
+                                "CANCELED AT": "-",
+                                "CANCELED BY": "-",
+                                "CANCEL OF VOUCHER": "-",
+                                "CANCEL REASON": "-"
+                            }
+
+                        # log_drive_id = find_drive_file(
+                        #     service=service,
+                        #     filename=get_log_filename(int(oby), int(obm)),
+                        #     parent_id=PERIOD_DRIVE_ID,
+                        #     mime_type="application/vnd.google-apps.spreadsheet"
+                        # )
+
+                        if not log_pml_drive_id:
+                            log_pml_drive_id = create_log_gsheet(
+                                service=service,
+                                parent_id=PML_DRIVE_ID,
+                                filename=get_log_pml_filename(int(year), int(month)),
+                                columns=list(log_pml.keys())
+                            )
+
+                        sheets_service = init_sheets_service(creds)
+
+                        append_gsheet(
+                            service=sheets_service,
+                            spreadsheet_id=log_pml_drive_id,
+                            row_dict=log_pml
+                        )
+
+                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            upload_dataframe_to_drive(
+                                service=service,
+                                df=df,
+                                template_columns=columns_template,
+                                voucher_id=pml_id,
+                                filename=f"{pml_id}.xlsx",
+                                folder_id=PML_DRIVE_ID,
+                                file_type = "PML"
+                            )
+
+                        elif biz_type == "Claim" :
+                            upload_dataframe_to_drive(
+                                service=service,
+                                df=df,
+                                template_columns=columns_template_claim,
+                                voucher_id=pml_id,
+                                filename=f"{pml_id}.xlsx",
+                                folder_id=PML_DRIVE_ID,
+                                file_type="PML"
+                            )
+
+                        end_time = time.time()
+                        duration = end_time - start_time
+
+                        st.success(f"✅ File berhasil diposting: {pml_id} ({int(duration)} seconds)")
+                        st.code(pml_id)
+
+                    except RuntimeError as e:
+                            st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
+                            st.stop()
+
+                    finally:
+                        release_drive_lock(service, PERIOD_DRIVE_ID)
 
 
 # ==========================
@@ -743,328 +1343,664 @@ with tab_upload:
 with tab_split:
     st.subheader("🧩 Split File")
 
-    drive_service = get_drive_service()
-    sheets_service = init_sheets_service(creds)
-
-    service = get_drive_service()
-
-    year = st.session_state["log_period"]["year"]
-    month = st.session_state["log_period"]["month"]
-
-    # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
-    PERIOD_DRIVE_ID = None
-    df_posted = pd.DataFrame() # Default kosong agar tidak NameError
-    
-    # Ambil Folder ID berdasarkan Tahun/Bulan
-    drive_folders = get_period_drive_folders(
-        year=int(year),
-        month=int(month),
-        root_folder_id=ROOT_DRIVE_FOLDER_ID
+    reins_type = st.selectbox(
+        "Reinsurance Type",
+        ["INWARD", "OUTWARD"],
+        key="reins_type_upload",
+        index=0 #INWARD
+        #disabled=True
     )
-    PERIOD_DRIVE_ID = drive_folders.get("period_id")
 
-    if not PERIOD_DRIVE_ID:
-        st.error("Folder periode tidak ditemukan di Drive.")
-        st.stop()
+    if reins_type == "INWARD":
 
-    try:
-        # 2. LOCKING (Gunakan Drive Service)
-        acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
+        drive_service = get_drive_service()
+        sheets_service = init_sheets_service(creds)
 
-        # 3. MENCARI & MEMBACA DATA
-        # Cari Folder PML
-        pml_drive_id = get_or_create_folder(
-            service=drive_service,
-            folder_name="Folder PML",
-            parent_id=PERIOD_DRIVE_ID
-        )
+        service = get_drive_service()
 
-        # Cari File Log Spreadsheet
-        log_pml_drive_id = find_drive_file(
-            service=drive_service,
-            filename=get_log_pml_filename(int(year), int(month)),
-            parent_id=pml_drive_id,
-            mime_type="application/vnd.google-apps.spreadsheet"
-        )
+        year = st.session_state["log_period"]["year"]
+        month = st.session_state["log_period"]["month"]
 
-        if log_pml_drive_id:
-            # PENTING: Baca isi pakai SHEETS SERVICE
-            # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
-            df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
-            
-            if not df_log.empty and 'STATUS' in df_log.columns:
-                # Filter hanya yang POSTED
-                df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
-            else:
-                st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
-        else:
-            st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
-
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat memproses data: {e}")
-    
-    finally:
-        # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
-        if PERIOD_DRIVE_ID:
-            release_drive_lock(drive_service, PERIOD_DRIVE_ID)
-
-    # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
-    st.markdown("### 📋 Pilih Data PML untuk Di-Split")
-    st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
-
-    if not df_posted.empty:
-
-        # Tambahkan checkbox column
-        df_to_edit = df_posted.copy()
-        df_to_edit.insert(0, "Pilih", False)
-
-        # Data editor (CONSISTENT UI)
-
-        cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
-
-        for col in cols_numeric:
-
-            def clean_number(x):
-                x = str(x)
-
-                # kalau ada dua separator → anggap titik ribuan, koma desimal
-                if "." in x and "," in x:
-                    x = x.replace(".", "").replace(",", ".")
-                else:
-                    x = x.replace(",", "")
-
-                return pd.to_numeric(x, errors="coerce")
-
-            df_to_edit[col] = df_to_edit[col].apply(clean_number)
-
-        edited_df = st.data_editor(
-            df_to_edit,
-            column_config={
-                "Pilih": st.column_config.CheckboxColumn(
-                    "Pilih",
-                    help="Pilih baris ini untuk di-calculate",
-                    default=False,
-                ),
-                "PML ID": st.column_config.Column(disabled=True),
-                "STATUS": st.column_config.Column(disabled=True),
-                "Product": st.column_config.Column(disabled=True),
-
-                "Total Contribution": st.column_config.NumberColumn(
-                    "Total Contribution",
-                    format="%,.0f"
-                ),
-
-                "Commission": st.column_config.NumberColumn(
-                    "Commission",
-                    format="%,.0f"
-                ),
-
-                "Overriding": st.column_config.NumberColumn(
-                    "Overriding",
-                    format="%,.0f"
-                ),
-
-                "Total Commission": st.column_config.NumberColumn(
-                    "Total Commission",
-                    format="%,.0f"
-                ),
-
-                "Gross Premium Income": st.column_config.NumberColumn(
-                    "Gross Premium Income",
-                    format="%,.0f"
-                ),
-                "Tabarru": st.column_config.NumberColumn(
-                    "Tabarru",
-                    format="%,.0f"
-                ),
-                "Ujrah": st.column_config.NumberColumn(
-                    "Ujrah",
-                    format="%,.0f"
-                ),
-                "Claim": st.column_config.NumberColumn(
-                    "Claim",
-                    format="%,.0f"
-                ),
-                "Balance": st.column_config.NumberColumn(
-                    "Balance",
-                    format="%,.0f"
-                ),
-            },
-            disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
-            hide_index=True,
-            use_container_width=True,
-        )
-
-        # 4. Filter Baris yang Dipilih
-        selected_rows = edited_df[edited_df["Pilih"] == True]
-
-        # 5. Logika Validasi Pilihan
-        if len(selected_rows) > 1:
-            st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
+        # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
+        PERIOD_DRIVE_ID = None
+        df_posted = pd.DataFrame() # Default kosong agar tidak NameError
         
-        elif len(selected_rows) == 1:
-            selected_pml_id = selected_rows.iloc[0]["PML ID"]
-            st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
+        # Ambil Folder ID berdasarkan Tahun/Bulan
+        drive_folders = get_period_drive_folders(
+            year=int(year),
+            month=int(month),
+            root_folder_id=ROOT_DRIVE_FOLDER_ID
+        )
+        PERIOD_DRIVE_ID = drive_folders.get("period_id")
 
-            # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
-            pml_drive = get_or_create_folder(
-                service=service,
+        if not PERIOD_DRIVE_ID:
+            st.error("Folder periode tidak ditemukan di Drive.")
+            st.stop()
+
+        try:
+            # 2. LOCKING (Gunakan Drive Service)
+            acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
+
+            # 3. MENCARI & MEMBACA DATA
+            # Cari Folder PML
+            pml_drive_id = get_or_create_folder(
+                service=drive_service,
                 folder_name="Folder PML",
                 parent_id=PERIOD_DRIVE_ID
             )
 
-            PML_DRIVE_ID = pml_drive
-
-
-            pml_file_id = find_drive_file(
-                service=service,
-                filename=selected_pml_id,
-                parent_id=PML_DRIVE_ID
+            # Cari File Log Spreadsheet
+            log_pml_drive_id = find_drive_file(
+                service=drive_service,
+                filename=get_log_pml_filename(int(year), int(month)),
+                parent_id=pml_drive_id,
+                mime_type="application/vnd.google-apps.spreadsheet"
             )
 
-            service = get_drive_service()
+            if log_pml_drive_id:
+                # PENTING: Baca isi pakai SHEETS SERVICE
+                # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
+                df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
+                
+                if not df_log.empty and 'STATUS' in df_log.columns:
+                    # Filter hanya yang POSTED
+                    df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
+                else:
+                    st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
+            else:
+                st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
 
-            # Folder
-            pml_drive = get_or_create_folder(
-                service=service,
-                folder_name="Folder PML",
-                parent_id=PERIOD_DRIVE_ID
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memproses data: {e}")
+        
+        finally:
+            # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
+            if PERIOD_DRIVE_ID:
+                release_drive_lock(drive_service, PERIOD_DRIVE_ID)
+
+        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
+
+        if not df_posted.empty:
+
+            # Tambahkan checkbox column
+            df_to_edit = df_posted.copy()
+            df_to_edit.insert(0, "Pilih", False)
+
+            # Data editor (CONSISTENT UI)
+
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+
+            for col in cols_numeric:
+
+                def clean_number(x):
+                    x = str(x)
+
+                    # kalau ada dua separator → anggap titik ribuan, koma desimal
+                    if "." in x and "," in x:
+                        x = x.replace(".", "").replace(",", ".")
+                    else:
+                        x = x.replace(",", "")
+
+                    return pd.to_numeric(x, errors="coerce")
+
+                df_to_edit[col] = df_to_edit[col].apply(clean_number)
+
+            edited_df = st.data_editor(
+                df_to_edit,
+                column_config={
+                    "Pilih": st.column_config.CheckboxColumn(
+                        "Pilih",
+                        help="Pilih baris ini untuk di-calculate",
+                        default=False,
+                    ),
+                    "PML ID": st.column_config.Column(disabled=True),
+                    "STATUS": st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column(disabled=True),
+
+                    "Total Contribution": st.column_config.NumberColumn(
+                        "Total Contribution",
+                        format="%,.0f"
+                    ),
+
+                    "Commission": st.column_config.NumberColumn(
+                        "Commission",
+                        format="%,.0f"
+                    ),
+
+                    "Overriding": st.column_config.NumberColumn(
+                        "Overriding",
+                        format="%,.0f"
+                    ),
+
+                    "Total Commission": st.column_config.NumberColumn(
+                        "Total Commission",
+                        format="%,.0f"
+                    ),
+
+                    "Gross Premium Income": st.column_config.NumberColumn(
+                        "Gross Premium Income",
+                        format="%,.0f"
+                    ),
+                    "Tabarru": st.column_config.NumberColumn(
+                        "Tabarru",
+                        format="%,.0f"
+                    ),
+                    "Ujrah": st.column_config.NumberColumn(
+                        "Ujrah",
+                        format="%,.0f"
+                    ),
+                    "Claim": st.column_config.NumberColumn(
+                        "Claim",
+                        format="%,.0f"
+                    ),
+                    "Balance": st.column_config.NumberColumn(
+                        "Balance",
+                        format="%,.0f"
+                    ),
+                },
+                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                hide_index=True,
+                use_container_width=True,
             )
 
-            PML_DRIVE_ID = pml_drive
+            # 4. Filter Baris yang Dipilih
+            selected_rows = edited_df[edited_df["Pilih"] == True]
 
-            # Cari file
-            pml_file_id = find_drive_file(
-                service=service,
-                filename=selected_pml_id,
-                parent_id=PML_DRIVE_ID
-            )
+            # 5. Logika Validasi Pilihan
+            if len(selected_rows) > 1:
+                st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
+            
+            elif len(selected_rows) == 1:
+                selected_pml_id = selected_rows.iloc[0]["PML ID"]
+                st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
 
-            if not pml_file_id:
-                st.error("File PML tidak ditemukan")
-                st.stop()
+                # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                PML_DRIVE_ID = pml_drive
 
 
-            # ==========================
-            # LOAD FILE
-            # ==========================
-            file_stream = download_file_from_drive(service, pml_file_id)
-            df = pd.read_excel(file_stream)
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
 
-            # st.write("Preview Data:", df.head())
+                service = get_drive_service()
 
-            # ==========================
-            # SELECT MULTI COLUMN
-            # ==========================
-            selected_columns = st.multiselect(
-                "Pilih kolom untuk split (bisa lebih dari 1)",
-                df.columns.tolist()
-            )
+                # Folder
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
 
-            if not selected_columns:
-                st.warning("Pilih minimal 1 kolom untuk split")
-                st.stop()
+                PML_DRIVE_ID = pml_drive
 
-            # ==========================
-            # PROSES SPLIT
-            # ==========================
-            if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+                # Cari file
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
 
-                # 🔥 PREVENT DOUBLE RUN
-                if st.session_state.is_processing_split:
-                    st.warning("⏳ Proses masih berjalan...")
+                if not pml_file_id:
+                    st.error("File PML tidak ditemukan")
                     st.stop()
 
-                st.session_state.is_processing_split = True
 
-                with st.spinner(f"⏳ Split {selected_pml_id} sedang diproses..."):
+                # ==========================
+                # LOAD FILE
+                # ==========================
+                file_stream = download_file_from_drive(service, pml_file_id)
+                df = pd.read_excel(file_stream)
 
-                    progress_bar = st.progress(0)
-                    status_text = st.empty()
+                # st.write("Preview Data:", df.head())
 
-                    acquire_drive_lock(service, PERIOD_DRIVE_ID)
+                # ==========================
+                # SELECT MULTI COLUMN
+                # ==========================
+                selected_columns = st.multiselect(
+                    "Pilih kolom untuk split (bisa lebih dari 1)",
+                    df.columns.tolist()
+                )
 
-                    try:
-                        sheets_service = init_sheets_service(creds)
+                if not selected_columns:
+                    st.warning("Pilih minimal 1 kolom untuk split")
+                    st.stop()
 
-                        log_pml_drive_id = find_drive_file(
-                            service=service,
-                            filename=get_log_pml_filename(int(year), int(month)),
-                            parent_id=PML_DRIVE_ID,
-                            mime_type="application/vnd.google-apps.spreadsheet"
-                        )
+                # ==========================
+                # PROSES SPLIT
+                # ==========================
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
 
-                        base_info = {
-                            "department": selected_rows.iloc[0]["Department"],
-                            "account_with": selected_rows.iloc[0]["Account With"],
-                            "cedant_company": selected_rows.iloc[0]["Cedant Company"],
-                            "pic": selected_rows.iloc[0]["PIC"],
-                            "curr": selected_rows.iloc[0]["Curr"],
-                            "subject_email": selected_rows.iloc[0]["Subject Email"],
-                            "email_date": selected_rows.iloc[0]["Email Date"],
-                            "source_pml": selected_rows.iloc[0]["PML ID"]
-                        }
+                    # 🔥 PREVENT DOUBLE RUN
+                    if st.session_state.is_processing_split:
+                        st.warning("⏳ Proses masih berjalan...")
+                        st.stop()
 
-                        if selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-                            results = split_upload_with_log(
+                    st.session_state.is_processing_split = True
+
+                    with st.spinner(f"⏳ Split {selected_pml_id} sedang diproses..."):
+
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
+                        try:
+                            sheets_service = init_sheets_service(creds)
+
+                            log_pml_drive_id = find_drive_file(
                                 service=service,
-                                sheets_service=sheets_service,
-                                df=df,
-                                split_columns=selected_columns,
-                                period_drive_id=PERIOD_DRIVE_ID,
-                                pml_folder_id=PML_DRIVE_ID,
-                                log_pml_drive_id=log_pml_drive_id,
-                                year=int(year),
-                                month=int(month),
-                                biz_type=selected_rows.iloc[0]["Biz Type"],
-                                base_info=base_info,
-                                columns_template=columns_template,
-                                progress_bar=progress_bar,
-                                status_text=status_text
+                                filename=get_log_pml_filename(int(year), int(month)),
+                                parent_id=PML_DRIVE_ID,
+                                mime_type="application/vnd.google-apps.spreadsheet"
                             )
 
-                        elif selected_rows.iloc[0]["Biz Type"] == "Claim":
+                            base_info = {
+                                "department": selected_rows.iloc[0]["Department"],
+                                "account_with": selected_rows.iloc[0]["Account With"],
+                                "cedant_company": selected_rows.iloc[0]["Cedant Company"],
+                                "pic": selected_rows.iloc[0]["PIC"],
+                                "curr": selected_rows.iloc[0]["Curr"],
+                                "subject_email": selected_rows.iloc[0]["Subject Email"],
+                                "email_date": selected_rows.iloc[0]["Email Date"],
+                                "source_pml": selected_rows.iloc[0]["PML ID"]
+                            }
+
+                            if selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                                 results = split_upload_with_log(
-                                service=service,
-                                sheets_service=sheets_service,
-                                df=df,
-                                split_columns=selected_columns,
-                                period_drive_id=PERIOD_DRIVE_ID,
-                                pml_folder_id=PML_DRIVE_ID,
-                                log_pml_drive_id=log_pml_drive_id,
-                                year=int(year),
-                                month=int(month),
-                                biz_type=selected_rows.iloc[0]["Biz Type"],
-                                base_info=base_info,
-                                columns_template=columns_template_claim,
-                                progress_bar=progress_bar,
-                                status_text=status_text
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    base_info=base_info,
+                                    columns_template=columns_template,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
+
+                            elif selected_rows.iloc[0]["Biz Type"] == "Claim":
+                                    results = split_upload_with_log(
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    base_info=base_info,
+                                    columns_template=columns_template_claim,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
+
+                            # 🔥 UPDATE STATUS
+                            update_pml_status_to_splitted(
+                                service=sheets_service,
+                                spreadsheet_id=log_pml_drive_id,
+                                pml_id=selected_pml_id
                             )
 
-                        # 🔥 UPDATE STATUS
-                        update_pml_status_to_splitted(
-                            service=sheets_service,
-                            spreadsheet_id=log_pml_drive_id,
-                            pml_id=selected_pml_id
-                        )
+                            progress_bar.progress(1.0)
+                            status_text.text("✅ Selesai!")
 
-                        progress_bar.progress(1.0)
-                        status_text.text("✅ Selesai!")
+                            st.success("✅ Split selesai & status diupdate!")
 
-                        st.success("✅ Split selesai & status diupdate!")
+                            for r in results:
+                                st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
 
-                        for r in results:
-                            st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
+                        finally:
+                            release_drive_lock(service, PERIOD_DRIVE_ID)
+                            st.session_state.is_processing_split = False
 
-                    finally:
-                        release_drive_lock(service, PERIOD_DRIVE_ID)
-                        st.session_state.is_processing_split = False
+            else:
+                st.write("Silakan pilih baris terlebih dahulu.")
 
         else:
-            st.write("Silakan pilih baris terlebih dahulu.")
+            st.info("Tidak ada data dengan status 'POSTED'.")
 
-    else:
-        st.info("Tidak ada data dengan status 'POSTED'.")
+    elif reins_type == "OUTWARD":
+
+        drive_service = get_drive_service()
+        sheets_service = init_sheets_service(creds)
+
+        service = get_drive_service()
+
+        year = st.session_state["log_period"]["year"]
+        month = st.session_state["log_period"]["month"]
+
+        # 1. SETUP PARAMETER AWAL (Di luar try agar finally bisa mengaksesnya)
+        PERIOD_DRIVE_ID = None
+        df_posted = pd.DataFrame() # Default kosong agar tidak NameError
+        
+        # Ambil Folder ID berdasarkan Tahun/Bulan
+        drive_folders = get_period_drive_folders(
+            year=int(year),
+            month=int(month),
+            root_folder_id=ROOT_DRIVE_FOLDER_ID
+        )
+        PERIOD_DRIVE_ID = drive_folders.get("period_id")
+
+        if not PERIOD_DRIVE_ID:
+            st.error("Folder periode tidak ditemukan di Drive.")
+            st.stop()
+
+        try:
+            # 2. LOCKING (Gunakan Drive Service)
+            acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
+
+            # 3. MENCARI & MEMBACA DATA
+            # Cari Folder PML
+            pml_drive_id = get_or_create_folder(
+                service=drive_service,
+                folder_name="Folder PML",
+                parent_id=PERIOD_DRIVE_ID
+            )
+
+            # Cari File Log Spreadsheet
+            log_pml_drive_id = find_drive_file(
+                service=drive_service,
+                filename=get_log_pml_filename(int(year), int(month)),
+                parent_id=pml_drive_id,
+                mime_type="application/vnd.google-apps.spreadsheet"
+            )
+
+            if log_pml_drive_id:
+                # PENTING: Baca isi pakai SHEETS SERVICE
+                # Pastikan load_log_from_gsheet menggunakan range "'Nama Sheet'!A:Z" (dengan kutip satu)
+                df_log = load_log_from_gsheet(sheets_service, log_pml_drive_id)
+                
+                if not df_log.empty and 'STATUS' in df_log.columns:
+                    # Filter hanya yang POSTED
+                    df_posted = df_log[df_log['STATUS'] == 'POSTED'].copy()
+                else:
+                    st.warning("Data Log kosong atau kolom STATUS tidak ditemukan.")
+            else:
+                st.error("File Log Spreadsheet tidak ditemukan di Folder PML.")
+
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memproses data: {e}")
+        
+        finally:
+            # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
+            if PERIOD_DRIVE_ID:
+                release_drive_lock(drive_service, PERIOD_DRIVE_ID)
+
+        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
+
+        if not df_posted.empty:
+
+            # Tambahkan checkbox column
+            df_to_edit = df_posted.copy()
+            df_to_edit.insert(0, "Pilih", False)
+
+            # Data editor (CONSISTENT UI)
+
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+
+            for col in cols_numeric:
+
+                def clean_number(x):
+                    x = str(x)
+
+                    # kalau ada dua separator → anggap titik ribuan, koma desimal
+                    if "." in x and "," in x:
+                        x = x.replace(".", "").replace(",", ".")
+                    else:
+                        x = x.replace(",", "")
+
+                    return pd.to_numeric(x, errors="coerce")
+
+                df_to_edit[col] = df_to_edit[col].apply(clean_number)
+
+            edited_df = st.data_editor(
+                df_to_edit,
+                column_config={
+                    "Pilih": st.column_config.CheckboxColumn(
+                        "Pilih",
+                        help="Pilih baris ini untuk di-calculate",
+                        default=False,
+                    ),
+                    "PML ID": st.column_config.Column(disabled=True),
+                    "STATUS": st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column(disabled=True),
+
+                    "Total Contribution": st.column_config.NumberColumn(
+                        "Total Contribution",
+                        format="%,.0f"
+                    ),
+
+                    "Commission": st.column_config.NumberColumn(
+                        "Commission",
+                        format="%,.0f"
+                    ),
+
+                    "Overriding": st.column_config.NumberColumn(
+                        "Overriding",
+                        format="%,.0f"
+                    ),
+
+                    "Total Commission": st.column_config.NumberColumn(
+                        "Total Commission",
+                        format="%,.0f"
+                    ),
+
+                    "Gross Premium Income": st.column_config.NumberColumn(
+                        "Gross Premium Income",
+                        format="%,.0f"
+                    ),
+                    "Tabarru": st.column_config.NumberColumn(
+                        "Tabarru",
+                        format="%,.0f"
+                    ),
+                    "Ujrah": st.column_config.NumberColumn(
+                        "Ujrah",
+                        format="%,.0f"
+                    ),
+                    "Claim": st.column_config.NumberColumn(
+                        "Claim",
+                        format="%,.0f"
+                    ),
+                    "Balance": st.column_config.NumberColumn(
+                        "Balance",
+                        format="%,.0f"
+                    ),
+                },
+                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                hide_index=True,
+                use_container_width=True,
+            )
+
+            # 4. Filter Baris yang Dipilih
+            selected_rows = edited_df[edited_df["Pilih"] == True]
+
+            # 5. Logika Validasi Pilihan
+            if len(selected_rows) > 1:
+                st.warning("⚠️ Anda memilih lebih dari 1 baris. Harap pilih **satu baris saja** untuk proses split.")
+            
+            elif len(selected_rows) == 1:
+                selected_pml_id = selected_rows.iloc[0]["PML ID"]
+                st.success(f"✅ Baris terpilih: **{selected_pml_id}**")
+
+                # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                PML_DRIVE_ID = pml_drive
+
+
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
+
+                service = get_drive_service()
+
+                # Folder
+                pml_drive = get_or_create_folder(
+                    service=service,
+                    folder_name="Folder PML",
+                    parent_id=PERIOD_DRIVE_ID
+                )
+
+                PML_DRIVE_ID = pml_drive
+
+                # Cari file
+                pml_file_id = find_drive_file(
+                    service=service,
+                    filename=selected_pml_id,
+                    parent_id=PML_DRIVE_ID
+                )
+
+                if not pml_file_id:
+                    st.error("File PML tidak ditemukan")
+                    st.stop()
+
+
+                # ==========================
+                # LOAD FILE
+                # ==========================
+                file_stream = download_file_from_drive(service, pml_file_id)
+                df = pd.read_excel(file_stream)
+
+                # st.write("Preview Data:", df.head())
+
+                # ==========================
+                # SELECT MULTI COLUMN
+                # ==========================
+                selected_columns = st.multiselect(
+                    "Pilih kolom untuk split (bisa lebih dari 1)",
+                    df.columns.tolist()
+                )
+
+                if not selected_columns:
+                    st.warning("Pilih minimal 1 kolom untuk split")
+                    st.stop()
+
+                # ==========================
+                # PROSES SPLIT
+                # ==========================
+                if st.button(f"Proses Split untuk {selected_pml_id}", type="primary"):
+
+                    # 🔥 PREVENT DOUBLE RUN
+                    if st.session_state.is_processing_split:
+                        st.warning("⏳ Proses masih berjalan...")
+                        st.stop()
+
+                    st.session_state.is_processing_split = True
+
+                    with st.spinner(f"⏳ Split {selected_pml_id} sedang diproses..."):
+
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+
+                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+
+                        try:
+                            sheets_service = init_sheets_service(creds)
+
+                            log_pml_drive_id = find_drive_file(
+                                service=service,
+                                filename=get_log_pml_filename(int(year), int(month)),
+                                parent_id=PML_DRIVE_ID,
+                                mime_type="application/vnd.google-apps.spreadsheet"
+                            )
+
+                            base_info = {
+                                "department": selected_rows.iloc[0]["Department"],
+                                "account_with": selected_rows.iloc[0]["Account With"],
+                                "cedant_company": selected_rows.iloc[0]["Cedant Company"],
+                                "pic": selected_rows.iloc[0]["PIC"],
+                                "curr": selected_rows.iloc[0]["Curr"],
+                                "subject_email": selected_rows.iloc[0]["Subject Email"],
+                                "email_date": selected_rows.iloc[0]["Email Date"],
+                                "source_pml": selected_rows.iloc[0]["PML ID"]
+                            }
+
+                            if selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                                results = split_upload_with_log(
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    base_info=base_info,
+                                    columns_template=columns_template,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
+
+                            elif selected_rows.iloc[0]["Biz Type"] == "Claim":
+                                    results = split_upload_with_log(
+                                    service=service,
+                                    sheets_service=sheets_service,
+                                    df=df,
+                                    split_columns=selected_columns,
+                                    period_drive_id=PERIOD_DRIVE_ID,
+                                    pml_folder_id=PML_DRIVE_ID,
+                                    log_pml_drive_id=log_pml_drive_id,
+                                    year=int(year),
+                                    month=int(month),
+                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    base_info=base_info,
+                                    columns_template=columns_template_claim,
+                                    progress_bar=progress_bar,
+                                    status_text=status_text
+                                )
+
+                            # 🔥 UPDATE STATUS
+                            update_pml_status_to_splitted(
+                                service=sheets_service,
+                                spreadsheet_id=log_pml_drive_id,
+                                pml_id=selected_pml_id
+                            )
+
+                            progress_bar.progress(1.0)
+                            status_text.text("✅ Selesai!")
+
+                            st.success("✅ Split selesai & status diupdate!")
+
+                            for r in results:
+                                st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
+
+                        finally:
+                            release_drive_lock(service, PERIOD_DRIVE_ID)
+                            st.session_state.is_processing_split = False
+
+            else:
+                st.write("Silakan pilih baris terlebih dahulu.")
+
+        else:
+            st.info("Tidak ada data dengan status 'POSTED'.")
+
 
 
 # ==========================
