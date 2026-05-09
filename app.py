@@ -1148,8 +1148,8 @@ with tab_upload:
                         ]
                 })
                 
-                
-            st.write(df.columns.tolist())
+
+            #st.write(df.columns.tolist())
 
 
             st.dataframe(
