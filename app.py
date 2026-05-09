@@ -2057,7 +2057,7 @@ with tab_calc:
     reins_type = st.selectbox(
         "Reinsurance Type",
         ["INWARD", "OUTWARD"],
-        key="reins_type_split",
+        key="reins_type_calculate",
         index=0) #INWARD
         #disabled=True
 
