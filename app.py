@@ -349,7 +349,7 @@ with tab_upload:
                     ACCOUNTING_COLS = [
                         "sum insured", "sum at risk", "reins sum insured", "ced retention", "reins sum at risk",
                         "reins premium", "reins em premium", "reins er premium", "reins oth. premium", "reins total premium",
-                        "reins comm", "reins em comm", "reins er comm", "reins oth. comm", "reins profit share", "reins overriding", "reins broker fee" 
+                        "reins comm", "reins em comm", "reins er comm", "reins oth. comm", "reins profit share", "reins overriding", "reins broker fee", 
                         "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium",
                         "sum insured idr", "sum reinsured idr", "amount of claim idr", "reins claim idr", "marein share idr"
                     ]
