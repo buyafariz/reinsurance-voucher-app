@@ -122,8 +122,8 @@ with tab_upload:
             "Reinsurance Type",
             ["INWARD", "OUTWARD"],
             key="reins_type_upload",
-            index=0, #INWARD
-            disabled=True
+            index=0 #INWARD
+            #disabled=True
         )
 
     # row1_col2 sengaja dikosongkan
