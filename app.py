@@ -1726,14 +1726,14 @@ with tab_split:
             # Cari Folder PML
             pml_drive_id = get_or_create_folder(
                 service=drive_service,
-                folder_name="Folder PML",
+                folder_name="Folder PML (Outward)",
                 parent_id=PERIOD_DRIVE_ID
             )
 
             # Cari File Log Spreadsheet
             log_pml_drive_id = find_drive_file(
                 service=drive_service,
-                filename=get_log_pml_filename(int(year), int(month)),
+                filename=f"{get_log_pml_filename(int(year), int(month))} (Outward)",
                 parent_id=pml_drive_id,
                 mime_type="application/vnd.google-apps.spreadsheet"
             )
@@ -1860,7 +1860,7 @@ with tab_split:
                 # 1. Mengambil data asli dari file PML yang sudah di-upload sebelumnya
                 pml_drive = get_or_create_folder(
                     service=service,
-                    folder_name="Folder PML",
+                    folder_name="Folder PML (Outward)",
                     parent_id=PERIOD_DRIVE_ID
                 )
 
@@ -1878,7 +1878,7 @@ with tab_split:
                 # Folder
                 pml_drive = get_or_create_folder(
                     service=service,
-                    folder_name="Folder PML",
+                    folder_name="Folder PML (Outward)",
                     parent_id=PERIOD_DRIVE_ID
                 )
 
@@ -1940,7 +1940,7 @@ with tab_split:
 
                             log_pml_drive_id = find_drive_file(
                                 service=service,
-                                filename=get_log_pml_filename(int(year), int(month)),
+                                filename=f"{get_log_pml_filename(int(year), int(month))} (Outward)",
                                 parent_id=PML_DRIVE_ID,
                                 mime_type="application/vnd.google-apps.spreadsheet"
                             )
@@ -1969,7 +1969,7 @@ with tab_split:
                                     month=int(month),
                                     biz_type=selected_rows.iloc[0]["Biz Type"],
                                     base_info=base_info,
-                                    columns_template=columns_template,
+                                    columns_template=columns_template_outward,
                                     progress_bar=progress_bar,
                                     status_text=status_text
                                 )
@@ -1987,7 +1987,7 @@ with tab_split:
                                     month=int(month),
                                     biz_type=selected_rows.iloc[0]["Biz Type"],
                                     base_info=base_info,
-                                    columns_template=columns_template_claim,
+                                    columns_template=columns_template_claim_outward,
                                     progress_bar=progress_bar,
                                     status_text=status_text
                                 )
