@@ -1924,9 +1924,8 @@ with tab_split:
                 try:
                     st.dataframe(
                         df.style.format(format_dict),
-                        use_container_width=True,
-                        height=450 # Memberikan scrollbar internal jika data banyak
-                    )
+                        use_container_width=True
+                        )
                 except Exception as e:
                     st.error(f"Gagal menampilkan preview: {e}")
                     st.dataframe(df) # Fallback ke tabel mentah jika styling gagal
