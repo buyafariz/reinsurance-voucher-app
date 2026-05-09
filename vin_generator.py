@@ -573,3 +573,164 @@ def split_upload_with_log(
         })
 
     return results
+
+
+def split_upload_with_log_outward(
+    service,
+    sheets_service,
+    df,
+    split_columns,
+    period_drive_id,
+    pml_folder_id,
+    log_pml_drive_id,
+    year,
+    month,
+    biz_type,
+    base_info,
+    columns_template,
+    progress_bar=None,
+    status_text=None
+):
+    results = []
+
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=split_columns)
+
+    grouped = list(df.groupby(split_columns))
+    total = len(grouped)
+
+    # 🔥 ambil sequence SEKALI
+    current_seq = get_last_seq_no(sheets_service, log_pml_drive_id)
+
+    for i, (key, group) in enumerate(grouped):
+
+        if group.empty:
+            continue
+
+        formatted_key = format_split_key(split_columns, key)
+        # 🔥 UPDATE UI
+        if status_text:
+            status_text.text(f"Processing {i+1}/{total} → {formatted_key}")
+
+        if progress_bar:
+            progress_bar.progress((i + 1) / total)
+
+        # ==========================
+        # GENERATE PML (BENAR)
+        # ==========================
+        pml_id, current_seq = generate_pml_id(
+            current_seq,
+            year,
+            month,
+            biz_type
+        )
+
+        # ==========================
+        # HITUNG NILAI
+        # ==========================
+        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            total_contribution = group["Retro Total Premium"].sum()
+            commission = group["Retro Total Comm"].sum()
+            overriding = group["Retro Overriding"].sum() if "Retro Overriding" in group.columns else 0
+            total_commission = commission + overriding
+            tabarru = group["Retro Tabarru"].sum()
+            ujrah = group["Retro Ujrah"].sum()
+
+            # ==========================
+            # LOG
+            # ==========================
+            log_pml = {
+                "Seq No": current_seq,
+                "Department": base_info["department"],
+                "Biz Type": biz_type,
+                "PML ID": pml_id,
+                "Account With": base_info["account_with"],
+                "Cedant Company": base_info["cedant_company"],
+                "PIC": base_info["pic"],
+                "Curr": base_info["curr"],
+                "Total Contribution": total_contribution,
+                "Commission": commission,
+                "Overriding": overriding,
+                "Total Commission": total_commission,
+                "Gross Premium Income": total_contribution - total_commission,
+                "Tabarru": tabarru,
+                "Ujrah": ujrah,
+                "Claim": 0,
+                "Balance": total_contribution - total_commission,
+                "REMARKS": f"Split from {base_info['source_pml']}",
+                "STATUS": "POSTED",
+                "CREATED AT": now_wib_naive(),
+                "CREATED BY": base_info["pic"],
+                "Subject Email": base_info["subject_email"],
+                "Email Date": base_info["email_date"],
+                "CANCELED AT": "-",
+                "CANCELED BY": "-",
+                "CANCEL OF VOUCHER": "-",
+                "CANCEL REASON": "-"
+            }
+
+        elif biz_type == "Claim":
+            claim = group["Your Share"].sum()
+
+            # ==========================
+            # LOG
+            # ==========================
+            log_pml = {
+                "Seq No": current_seq,
+                "Department": base_info["department"],
+                "Biz Type": biz_type,
+                "PML ID": pml_id,
+                "Account With": base_info["account_with"],
+                "Cedant Company": base_info["cedant_company"],
+                "PIC": base_info["pic"],
+                "Curr": base_info["curr"],
+                "Total Contribution": 0,
+                "Commission": 0,
+                "Overriding": 0,
+                "Total Commission": 0,
+                "Gross Premium Income": 0,
+                "Tabarru": 0,
+                "Ujrah": 0,
+                "Claim": claim,
+                "Balance": claim*-1,
+                "REMARKS": f"Split from {base_info['source_pml']}",
+                "STATUS": "POSTED",
+                "CREATED AT": now_wib_naive(),
+                "CREATED BY": base_info["pic"],
+                "Subject Email": base_info["subject_email"],
+                "Email Date": base_info["email_date"],
+                "CANCELED AT": "-",
+                "CANCELED BY": "-",
+                "CANCEL OF VOUCHER": "-",
+                "CANCEL REASON": "-"
+            }
+
+        # ==========================
+        # APPEND LOG
+        # ==========================
+        append_gsheet(
+            service=sheets_service,
+            spreadsheet_id=log_pml_drive_id,
+            row_dict=log_pml
+        )
+
+        # ==========================
+        # UPLOAD FILE
+        # ==========================
+        upload_dataframe_to_drive(
+            service=service,
+            df=group,
+            template_columns=columns_template,
+            voucher_id=pml_id,
+            filename=f"{pml_id}.xlsx",
+            folder_id=pml_folder_id,
+            file_type="PML"
+        )
+
+        results.append({
+            "pml_id": pml_id,
+            "rows": len(group),
+            "split_value": formatted_key
+        })
+
+    return results
