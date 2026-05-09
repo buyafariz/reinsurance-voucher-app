@@ -1900,16 +1900,16 @@ with tab_split:
                 # LOAD FILE
                 # ==========================
                 file_stream = download_file_from_drive(service, pml_file_id)
-                df = pd.read_excel(file_stream).head().lower()
+                df = pd.read_excel(file_stream).head()
 
                 ACCOUNTING_COLS = [
-                    "sum insured", "sum at risk", "reins sum insured", "reins sum at risk",
-                    "marein sum insured", "marein sum at risk", "own retention", "excess or",
-                    "retro sum insured", "retro sum at risk",
-                    "retro premium", "retro em premium", "retro er premium", "retro oth premium", "retro total premium",
-                    "retro comm", "retro em comm", "retro er comm", "retro oth comm", "retro profit share", "retro total comm", 
-                    "retro tabarru", "retro ujrah", "retro overriding", "retro sliding scale", "retro inw brokerage", "reins nett premium", "retro nett premium",
-                    "reins claim", "your share"
+                    "Sum Insured", "Sum At Risk", "Reins Sum Insured", "Reins Sum At Risk",
+                    "Marein Sum Insured", "Marein Sum At Risk", "Own Retention", "Excess OR",
+                    "Retro Sum Insured", "Retro Sum At Risk",
+                    "Retro Premium", "Retro EM Premium", "Retro ER Premium", "Retro Oth premium", "Retro Total Premium",
+                    "Retro Comm", "Retro EM Comm", "Retro ER Comm", "Retro Oth Comm", "Retro Profit Share", "Retro Total Comm", 
+                    "Retro Tabarru", "Retro Ujrah", "Retro Overriding", "Retro Sliding Scale", "Retro Inw Brokerage", "Reins Nett Premium", "Retro Nett Premium",
+                    "Reins Claim", "Your Share"
                 ]
 
                 # Buat dictionary formatter untuk kolom yang ada saja
