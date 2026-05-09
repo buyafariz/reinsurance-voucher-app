@@ -744,6 +744,7 @@ with tab_upload:
 
         columns_template_outward = [
             "Out PL Detail ID",
+            "Retro Type",
             "Acc With Name",
             "Policy Category",
             "KOB Code",

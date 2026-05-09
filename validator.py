@@ -67,6 +67,7 @@ REQUIRED_COLUMNS_OUTWARD = [
     "retro nett premium",
     "valuation date",
     "inw vouc id"
+    "retro type"
 ]
 
 # Claim
