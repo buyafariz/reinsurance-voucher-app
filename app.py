@@ -829,6 +829,7 @@ with tab_upload:
             "Input Username",
             "Modif Date",
             "Modif Username"
+            "References No"
         ]
 
         columns_template_claim_outward = [
