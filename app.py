@@ -2899,8 +2899,27 @@ with tab_calc:
 
                         PERIOD_DRIVE_ID = drive_folders["period_id"]
 
-                        # 🔒 LOCK SEKALI SAJA
-                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
+                        
+                        outward_drive_folder = get_or_create_outward_folders(
+                            service=service,
+                            period_folder_id=PERIOD_DRIVE_ID,
+                        )
+
+                        OUTWARD_DRIVE_ID = outward_drive_folder["outward_id"]
+
+                        acquire_drive_lock(service, OUTWARD_DRIVE_ID)
+
+
+                        voucher, seq_no, _ = generate_vou_from_drive(
+                            service=service,
+                            period_folder_id=PERIOD_DRIVE_ID,
+                            year=int(year),
+                            month=int(month),
+                            find_drive_file=find_drive_file,
+                            biz_type=biz_type
+                        )
+
+                        st.success("Voucher berhasil dibuat!")
 
                         # ==========================
                         # PREPARE GLOBAL (SEKALI)
@@ -2916,7 +2935,7 @@ with tab_calc:
 
                         ceding_drive = get_or_create_ceding_folders(
                             service=service,
-                            period_folder_id=PERIOD_DRIVE_ID,
+                            period_folder_id=OUTWARD_DRIVE_ID,
                             ceding_name=ceding_folder_name
                         )
                         CEDING_DRIVE_ID = ceding_drive["ceding_id"]
@@ -2941,7 +2960,7 @@ with tab_calc:
                         log_drive_id = find_drive_file(
                             service=service,
                             filename=f"{get_log_filename(int(year), int(month))} (Outward)",
-                            parent_id=PERIOD_DRIVE_ID,
+                            parent_id=OUTWARD_DRIVE_ID,
                             mime_type="application/vnd.google-apps.spreadsheet"
                         )
 
@@ -2949,9 +2968,9 @@ with tab_calc:
                             # pakai struktur kosong dulu
                             log_drive_id = create_log_gsheet(
                                 service=service,
-                                parent_id=PERIOD_DRIVE_ID,
+                                parent_id=OUTWARD_DRIVE_ID,
                                 filename=f"{get_log_filename(int(year), int(month))} (Outward)",
-                                columns=LOG_COLUMNS
+                                columns=LOG_COLUMNS_OUTWARD
                             )
 
                         sheets_service = init_sheets_service(creds)
@@ -2987,7 +3006,7 @@ with tab_calc:
                                 # ==========================
                                 voucher, seq_no, _ = generate_vou_from_drive(
                                     service=service,
-                                    period_folder_id=PERIOD_DRIVE_ID,
+                                    period_folder_id=OUTWARD_DRIVE_ID,
                                     year=int(year),
                                     month=int(month),
                                     find_drive_file=find_drive_file,
@@ -3166,7 +3185,7 @@ with tab_calc:
                         st.stop()
 
                     finally:
-                        release_drive_lock(service, PERIOD_DRIVE_ID)
+                        release_drive_lock(service, OUTWARD_DRIVE_ID)
 
 
 
