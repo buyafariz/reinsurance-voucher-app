@@ -1148,6 +1148,9 @@ with tab_upload:
                         ]
                 })
                 
+                
+            st.write(df.columns.tolist())
+
 
             st.dataframe(
                 summary_df.style.format({"Nilai": "{:,.2f}"}),
