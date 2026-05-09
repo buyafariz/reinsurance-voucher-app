@@ -868,6 +868,7 @@ with tab_upload:
             "Your Share",
             "Reinsurer Name",
             "Voucher ID",
+            "Out Voucher ID",
             "Voucher Desc"
         ]
 
@@ -3158,14 +3159,14 @@ with tab_calc:
                                 # ==========================
                                 # UPLOAD VOUCHER FILE
                                 # ==========================
-                                upload_dataframe_to_drive(
+                                upload_dataframe_to_drive_outward(
                                     service=service,
                                     df=df,
                                     template_columns=columns_template_outward if biz_type != "Claim" else columns_template_claim_outward,
                                     voucher_id=voucher,
                                     filename=f"{voucher}.xlsx",
                                     folder_id=CEDING_DRIVE_ID,
-                                    file_type="Voucher"
+                                    biz_type=biz_type
                                 )
 
                                 success_count += 1
