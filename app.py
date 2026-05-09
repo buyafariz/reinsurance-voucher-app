@@ -1305,7 +1305,7 @@ with tab_upload:
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,
-                                template_columns=columns_template,
+                                template_columns=columns_template_outward,
                                 voucher_id=pml_id,
                                 filename=f"{pml_id}.xlsx",
                                 folder_id=PML_DRIVE_ID,
@@ -1316,7 +1316,7 @@ with tab_upload:
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,
-                                template_columns=columns_template_claim,
+                                template_columns=columns_template_claim_outward,
                                 voucher_id=pml_id,
                                 filename=f"{pml_id}.xlsx",
                                 folder_id=PML_DRIVE_ID,
