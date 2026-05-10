@@ -694,9 +694,6 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             # if not (diff_tab < 0.01).all():
             #     errors.append("tabarru + ujrah ≠ retro nett premium")
 
-            return errors
-        
-
     # =========================
     # 12. KOB Code, Pay Period Type, COB
     # =========================
@@ -883,6 +880,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             invalid_method_of_payment = set(method_of_payment_series[method_of_payment_series != ""].unique()) - allowed_method_of_payment
             if invalid_method_of_payment:
                 errors.append(f"Method of Payment tidak valid: "f"{', '.join(sorted(invalid_method_of_payment))}")
+
+    return errors
 
 
 def validate_calculate(df, biz_type: str, reins_type: str):
