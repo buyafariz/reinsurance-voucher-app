@@ -258,7 +258,6 @@ def validate_voucher(df, biz_type: str, reins_type:str):
 
     if biz_type not in allowed:
         errors.append("BUSINESS TYPE tidak valid")
-        return errors   # ⛔ stop sekali saja
 
     # =========================
     # 1. KOLOM WAJIB
@@ -268,26 +267,25 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             missing_cols = set(REQUIRED_COLUMNS_INWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
-                return errors  # stop total
 
         elif biz_type == "Claim":
             missing_cols = set(REQUIRED_COLUMNS_CLAIM_INWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
-                return errors  # stop total
+  
             
     elif reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             missing_cols = set(REQUIRED_COLUMNS_OUTWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
-                return errors  # stop total
+
 
         elif biz_type == "Claim":
             missing_cols = set(REQUIRED_COLUMNS_CLAIM_OUTWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
-                return errors  # stop total
+
 
     # =========================
     # 2. DATE VALIDATION
@@ -670,8 +668,6 @@ def validate_voucher(df, biz_type: str, reins_type:str):
 
             if not (diff_tab < 0.01).all():
                 errors.append("tabarru + ujrah ≠ reins nett premium")
-
-            return errors
         
     elif reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
