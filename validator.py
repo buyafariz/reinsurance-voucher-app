@@ -695,3 +695,10 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             #     errors.append("tabarru + ujrah ≠ retro nett premium")
 
             return errors
+        
+
+# def validate_calculate(df, biz_type: str, reins_type:str):
+#     if reins_type == "INWARD":
+#         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+#             for col in [""]    
+

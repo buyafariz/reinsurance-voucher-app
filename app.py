@@ -277,7 +277,7 @@ with tab_upload:
             "Total Commission (IDR)", "Gross Premium Income (IDR)",
             "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
             "Balance (IDR)", "Check Balance (IDR)",
-            "REMARKS", "STATUS", "CREATED AT", "CREATED BY",
+            "REMARKS", "PML ID", "STATUS", "CREATED AT", "CREATED BY",
             "Due Date", "Subject Email", "Email Date",
             "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
         ]
@@ -619,6 +619,13 @@ with tab_upload:
                         )
 
                         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            if biz_type == "Kontribusi":
+                                df["trans category"] = "PREMIUM"
+
+                            elif biz_type == "Refund":
+                                df["trans category"] = "TERMINATE"
+                                df["policy category"] = "T"
+
                             log_pml = {
                                 "Seq No": seq_no,
                                 "Department":department,
@@ -915,6 +922,7 @@ with tab_upload:
             "Balance (IDR)",
             "Check Balance (IDR)",
             "REMARKS",
+            "PML ID",
             "STATUS",
             "CREATED AT",
             "CREATED BY",
@@ -2435,6 +2443,8 @@ with tab_calc:
                                 file_stream = download_file_from_drive(service, pml_file_id)
                                 df = pd.read_excel(file_stream)
 
+                                #errors = validate_calculate(df, row["Biz Type"], reins_type)
+
                                 biz_type = row["Biz Type"]
 
                                 # ==========================
@@ -2504,6 +2514,7 @@ with tab_calc:
                                         "Check Balance (IDR)": "",
 
                                         "REMARKS": "-",
+                                        "PML ID": row["PML ID"],
                                         "STATUS": "POSTED",
                                         "CREATED AT": now_wib_naive(),
                                         "CREATED BY": row["PIC"],
@@ -2564,6 +2575,7 @@ with tab_calc:
                                         "Check Balance (IDR)": "",
 
                                         "REMARKS": "-",
+                                        "PML ID": row["PML ID"],
                                         "STATUS": "POSTED",
                                         "CREATED AT": now_wib_naive(),
                                         "CREATED BY": row["PIC"],
@@ -3006,6 +3018,8 @@ with tab_calc:
                                 file_stream = download_file_from_drive(service, pml_file_id)
                                 df = pd.read_excel(file_stream)
 
+                                #errors = validate_calculate(df, row["Biz Type"], reins_type)
+
                                 biz_type = row["Biz Type"]
 
                                 # ==========================
@@ -3077,6 +3091,7 @@ with tab_calc:
                                         "Check Balance (IDR)": "",
 
                                         "REMARKS": "-",
+                                        "PML ID": row["PML ID"],
                                         "STATUS": "POSTED",
                                         "CREATED AT": now_wib_naive(),
                                         "CREATED BY": row["PIC"],
@@ -3139,6 +3154,7 @@ with tab_calc:
                                         "Check Balance (IDR)": "",
 
                                         "REMARKS": "-",
+                                        "PML ID": row["PML ID"],
                                         "STATUS": "POSTED",
                                         "CREATED AT": now_wib_naive(),
                                         "CREATED BY": row["PIC"],
