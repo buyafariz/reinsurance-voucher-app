@@ -714,5 +714,20 @@ def validate_calculate(df, biz_type: str, reins_type: str):
                 if len(unique) > 1:
                     errors.append(col)
 
+        if biz_type == "Claim":
+            errors = []
+
+            for col in ["CedBookYear", "CedBookMonth", "ClassOfBusiness", "PayPeriodType", "KindOfBusiness", "Currency", "CBY", "CBM", "COB"]:
+
+                if col not in df.columns:
+                    errors.append(f"Kolom {col} tidak ditemukan")
+                    continue
+
+                unique = df[col].dropna().unique()
+
+                if len(unique) > 1:
+                    errors.append(col)
+
+
         return errors
 
