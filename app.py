@@ -3099,7 +3099,7 @@ with tab_calc:
                                         "Department": row["Department"],
                                         "Biz Type": row["Biz Type"],
                                         "Retro Type": df["Retro Type"].iloc[0],
-                                        "Inward VIN Ref": df["Inw Vouc ID"].iloc[0],
+                                        "Inward VIN Ref": df["Voucher ID"].iloc[0],
                                         "Voucher No": voucher,
                                         "Account With": row["Account With"],
                                         "Cedant Company": row["Cedant Company"],
