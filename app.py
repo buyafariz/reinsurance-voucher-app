@@ -1598,9 +1598,9 @@ with tab_split:
                 df = pd.read_excel(file_stream)
 
                 ACCOUNTING_COLS = [
-                    "Sum Insured", "Sum At Risk", "Reins Sum Insured", "Reins Sum At Risk",
-                    "Reins Premium", "Reins EM Premium", "Reins ER Premium", "Reins Oth premium", "Reins Total Premium",
-                    "Reins Comm", "Reins EM Comm", "Reins ER Comm", "Reins Oth Comm", "Reins Profit Share", "Reins Total Comm", 
+                    "Sum Insured", "Sum At Risk", "Reins Sum Insured", "Reins Sum At Risk", "Ced Retention",
+                    "Reins Premium", "Reins EM Premium", "Reins ER Premium", "Reins Oth. premium", "Reins Total Premium",
+                    "Reins Comm", "Reins EM Comm", "Reins ER Comm", "Reins Oth. Comm", "Reins Profit Share", "Reins Total Comm", 
                     "Reins Tabarru", "Reins Ujrah", "Reins Overriding", "Reins Sliding Scale", "Reins Inw Brokerage", "Reins Nett Premium",
                     "Reins Claim", "Your Share"
                 ]
