@@ -3369,137 +3369,138 @@ with tab_calc:
             # POST VOUCHER (MULTI - LOCKED)
             # ==========================
             if ceding_clicked:
-                start_time = time.time()
+                with st.spinner("🔍 Validating PML..."):
+                    start_time = time.time()
 
-                # ==========================
-                # INIT
-                # ==========================
-                validation_errors = []
-                validated_data = []
+                    # ==========================
+                    # INIT
+                    # ==========================
+                    validation_errors = []
+                    validated_data = []
 
-                service = get_drive_service()
+                    service = get_drive_service()
 
-                drive_folders = get_period_drive_folders(
-                    year=int(year),
-                    month=int(month),
-                    root_folder_id=ROOT_DRIVE_FOLDER_ID
-                )
-
-                PERIOD_DRIVE_ID = drive_folders["period_id"]
-
-                # ==========================
-                # PREPARE GLOBAL
-                # ==========================
-                outward_drive_folder = get_or_create_outward_folders(
-                    service=service,
-                    period_folder_id=PERIOD_DRIVE_ID,
-                )
-
-                OUTWARD_DRIVE_ID = outward_drive_folder["outward_id"]
-
-                pml_drive = get_or_create_folder(
-                    service=service,
-                    folder_name="Folder PML (Outward)",
-                    parent_id=PERIOD_DRIVE_ID
-                )
-
-                PML_DRIVE_ID = pml_drive
-
-                ceding_folder_name = normalize_folder_name(selected_account)
-
-                ceding_drive = get_or_create_ceding_folders(
-                    service=service,
-                    period_folder_id=OUTWARD_DRIVE_ID,
-                    ceding_name=ceding_folder_name
-                )
-
-                CEDING_DRIVE_ID = ceding_drive["ceding_id"]
-
-                rate_exchange = get_exchange_rate(
-                    service=service,
-                    config_folder_id=CONFIG_FOLDER_ID,
-                    currency=selected_rows.iloc[0]["Curr"],
-                    month=month
-                )
-
-                due_date = calculate_due_date(
-                    account_with=selected_account,
-                    year=year,
-                    month=month,
-                    service=service
-                )
-
-                # ==========================
-                # LOAD / CREATE LOG
-                # ==========================
-                log_drive_id = find_drive_file(
-                    service=service,
-                    filename=f"{get_log_filename(int(year), int(month))} (Outward)",
-                    parent_id=OUTWARD_DRIVE_ID,
-                    mime_type="application/vnd.google-apps.spreadsheet"
-                )
-
-                if not log_drive_id:
-
-                    log_drive_id = create_log_gsheet(
-                        service=service,
-                        parent_id=OUTWARD_DRIVE_ID,
-                        filename=f"{get_log_filename(int(year), int(month))} (Outward)",
-                        columns=LOG_COLUMNS_OUTWARD
+                    drive_folders = get_period_drive_folders(
+                        year=int(year),
+                        month=int(month),
+                        root_folder_id=ROOT_DRIVE_FOLDER_ID
                     )
 
-                # ==========================
-                # VALIDATION STAGE
-                # ==========================
-                for _, row in selected_rows.iterrows():
+                    PERIOD_DRIVE_ID = drive_folders["period_id"]
 
-                    try:
+                    # ==========================
+                    # PREPARE GLOBAL
+                    # ==========================
+                    outward_drive_folder = get_or_create_outward_folders(
+                        service=service,
+                        period_folder_id=PERIOD_DRIVE_ID,
+                    )
 
-                        pml_file_id = find_drive_file(
+                    OUTWARD_DRIVE_ID = outward_drive_folder["outward_id"]
+
+                    pml_drive = get_or_create_folder(
+                        service=service,
+                        folder_name="Folder PML (Outward)",
+                        parent_id=PERIOD_DRIVE_ID
+                    )
+
+                    PML_DRIVE_ID = pml_drive
+
+                    ceding_folder_name = normalize_folder_name(selected_account)
+
+                    ceding_drive = get_or_create_ceding_folders(
+                        service=service,
+                        period_folder_id=OUTWARD_DRIVE_ID,
+                        ceding_name=ceding_folder_name
+                    )
+
+                    CEDING_DRIVE_ID = ceding_drive["ceding_id"]
+
+                    rate_exchange = get_exchange_rate(
+                        service=service,
+                        config_folder_id=CONFIG_FOLDER_ID,
+                        currency=selected_rows.iloc[0]["Curr"],
+                        month=month
+                    )
+
+                    due_date = calculate_due_date(
+                        account_with=selected_account,
+                        year=year,
+                        month=month,
+                        service=service
+                    )
+
+                    # ==========================
+                    # LOAD / CREATE LOG
+                    # ==========================
+                    log_drive_id = find_drive_file(
+                        service=service,
+                        filename=f"{get_log_filename(int(year), int(month))} (Outward)",
+                        parent_id=OUTWARD_DRIVE_ID,
+                        mime_type="application/vnd.google-apps.spreadsheet"
+                    )
+
+                    if not log_drive_id:
+
+                        log_drive_id = create_log_gsheet(
                             service=service,
-                            filename=str(row["PML ID"]).strip(),
-                            parent_id=PML_DRIVE_ID
+                            parent_id=OUTWARD_DRIVE_ID,
+                            filename=f"{get_log_filename(int(year), int(month))} (Outward)",
+                            columns=LOG_COLUMNS_OUTWARD
                         )
 
-                        if not pml_file_id:
+                    # ==========================
+                    # VALIDATION STAGE
+                    # ==========================
+                    for _, row in selected_rows.iterrows():
 
-                            validation_errors.append(
-                                f"{row['PML ID']} → file tidak ditemukan"
+                        try:
+
+                            pml_file_id = find_drive_file(
+                                service=service,
+                                filename=str(row["PML ID"]).strip(),
+                                parent_id=PML_DRIVE_ID
                             )
 
-                            continue
+                            if not pml_file_id:
 
-                        file_stream = download_file_from_drive(
-                            service,
-                            pml_file_id
-                        )
+                                validation_errors.append(
+                                    f"{row['PML ID']} → file tidak ditemukan"
+                                )
 
-                        df = pd.read_excel(file_stream)
+                                continue
 
-                        errors = validate_calculate(
-                            df,
-                            row["Biz Type"],
-                            reins_type
-                        )
-
-                        if errors:
-
-                            validation_errors.append(
-                                f"{row['PML ID']} → {', '.join(errors)} (Kolom Tidak Unik)"
+                            file_stream = download_file_from_drive(
+                                service,
+                                pml_file_id
                             )
 
-                            continue
+                            df = pd.read_excel(file_stream)
 
-                        validated_data.append({
-                            "row": row,
-                            "df": df
-                        })
+                            errors = validate_calculate(
+                                df,
+                                row["Biz Type"],
+                                reins_type
+                            )
 
-                    except Exception as e:
+                            if errors:
 
-                        validation_errors.append(
-                            f"{row['PML ID']} → {e}"
-                        )
+                                validation_errors.append(
+                                    f"{row['PML ID']} → {', '.join(errors)} (Kolom Tidak Unik)"
+                                )
+
+                                continue
+
+                            validated_data.append({
+                                "row": row,
+                                "df": df
+                            })
+
+                        except Exception as e:
+
+                            validation_errors.append(
+                                f"{row['PML ID']} → {e}"
+                            )
 
                 # ==========================
                 # STOP IF VALIDATION FAILED
