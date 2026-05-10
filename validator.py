@@ -703,7 +703,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "INWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             # KOB Code
-            kob_series = (df["K.O.B Code"].fillna("").astype(str).str.strip())
+            kob_series = (df["k.o.b Code"].fillna("").astype(str).str.strip())
             if (kob_series == "").any():
                 errors.append("K.O.B Code tidak boleh kosong")
             allowed_kob = {"TTY", "FAC"}
@@ -712,7 +712,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"K.O.B Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
 
             # Pay Period Type
-            pay_period_series = (df["Pay Period Type"].fillna("").astype(str).str.strip())
+            pay_period_series = (df["pay period type"].fillna("").astype(str).str.strip())
             if (pay_period_series == "").any():
                 errors.append("Pay Period Type tidak boleh kosong")
             allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
@@ -721,7 +721,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_pay_period))}")
 
             # COB
-            cob_series = (df["COB"].fillna("").astype(str).str.strip())
+            cob_series = (df["cob"].fillna("").astype(str).str.strip())
             if (cob_series == "").any():
                 errors.append("COB tidak boleh kosong")
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
@@ -730,19 +730,19 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"COB tidak valid: "f"{', '.join(sorted(invalid_cob))}")
 
             # CBY
-            cby_series = (df["CBY"].fillna("").astype(str).str.strip())
+            cby_series = (df["cby"].fillna("").astype(str).str.strip())
             if (cby_series == "").any():
                 errors.append("CBY tidak boleh kosong")
 
             # CBM
-            cbm_series = (df["CBM"].fillna("").astype(str).str.strip())
+            cbm_series = (df["cbm"].fillna("").astype(str).str.strip())
             if (cbm_series == "").any():
                 errors.append("CBM tidak boleh kosong")
 
 
         elif biz_type == "Claim":
             # COB
-            cob_series = (df["ClassOfBusiness"].fillna("").astype(str).str.strip())
+            cob_series = (df["classofbusiness"].fillna("").astype(str).str.strip())
             if (cob_series == "").any():
                 errors.append("ClassOfBusiness tidak boleh kosong")
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
@@ -751,7 +751,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"ClassOfBusiness tidak valid: "f"{', '.join(sorted(invalid_cob))}")
 
             # Pay Period Type
-            pay_period_series = (df["PayPeriodType"].fillna("").astype(str).str.strip())
+            pay_period_series = (df["payperiodtype"].fillna("").astype(str).str.strip())
             if (pay_period_series == "").any():
                 errors.append("PayPeriodType tidak boleh kosong")
             allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
@@ -760,7 +760,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"PayPeriodType tidak valid: "f"{', '.join(sorted(invalid_pay_period))}")
 
             # KOB Code
-            kob_series = (df["KindOfBusiness"].fillna("").astype(str).str.strip())
+            kob_series = (df["kindofbusiness"].fillna("").astype(str).str.strip())
             if (kob_series == "").any():
                 errors.append("KindOfBusiness tidak boleh kosong")
             allowed_kob = {"TTY", "FAC"}
@@ -769,12 +769,12 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"KindOfBusiness tidak valid: "f"{', '.join(sorted(invalid_kob))}")
 
             # CedBookYear
-            cby_series = (df["CedBookYear"].fillna("").astype(str).str.strip())
+            cby_series = (df["cedbookyear"].fillna("").astype(str).str.strip())
             if (cby_series == "").any():
                 errors.append("CedBookYear tidak boleh kosong")
 
             # CedBookMonth
-            cbm_series = (df["CedBookMonth"].fillna("").astype(str).str.strip())
+            cbm_series = (df["cedbookmonth"].fillna("").astype(str).str.strip())
             if (cbm_series == "").any():
                 errors.append("CedBookMonth tidak boleh kosong")
 
@@ -782,7 +782,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             # Retro Type
-            retro_type_series = (df["Retro Type"].fillna("").astype(str).str.strip())
+            retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
             if (retro_type_series == "").any():
                 errors.append("Retro Type tidak boleh kosong")
             allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
@@ -791,7 +791,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Retro Type tidak valid: "f"{', '.join(sorted(invalid_retro))}")
 
             # KOB Code
-            kob_series = (df["KOB Code"].fillna("").astype(str).str.strip())
+            kob_series = (df["kob code"].fillna("").astype(str).str.strip())
             if (kob_series == "").any():
                 errors.append("KOB Code tidak boleh kosong")
             allowed_kob = {"TTY", "FAC"}
@@ -800,17 +800,17 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"KOB Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
 
             # Ced Book Year
-            cby_series = (df["Ced Book Year"].fillna("").astype(str).str.strip())
+            cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
             if (cby_series == "").any():
                 errors.append("Ced Book Year tidak boleh kosong")
 
             # Ced Book Month
-            cbm_series = (df["Ced Book Month"].fillna("").astype(str).str.strip())
+            cbm_series = (df["ced book month"].fillna("").astype(str).str.strip())
             if (cbm_series == "").any():
                 errors.append("Ced Book Month tidak boleh kosong")
 
             # Inw Pay Period Type
-            inw_pay_period_series = (df["Inw Pay Period Type"].fillna("").astype(str).str.strip())
+            inw_pay_period_series = (df["inw pay period type"].fillna("").astype(str).str.strip())
             if (inw_pay_period_series == "").any():
                 errors.append("Inw Pay Period Type tidak boleh kosong")
             allowed_inw_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
@@ -819,7 +819,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Inw Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_inw_pay_period))}")
             
             # Out Pay Period Type
-            out_pay_period_series = (df["Out Pay Period Type"].fillna("").astype(str).str.strip())
+            out_pay_period_series = (df["out pay period type"].fillna("").astype(str).str.strip())
             if (out_pay_period_series == "").any():
                 errors.append("Out Pay Period Type tidak boleh kosong")
             allowed_out_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly"}
@@ -828,7 +828,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Out Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_out_pay_period))}")
 
             # COB
-            cob_series = (df["COB"].fillna("").astype(str).str.strip())
+            cob_series = (df["cob"].fillna("").astype(str).str.strip())
             if (cob_series == "").any():
                 errors.append("COB tidak boleh kosong")
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
@@ -839,7 +839,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                          
         elif biz_type == "Claim":
             # Retro Type
-            retro_type_series = (df["Retro Type"].fillna("").astype(str).str.strip())
+            retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
             if (retro_type_series == "").any():
                 errors.append("Retro Type tidak boleh kosong")
             allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
@@ -848,7 +848,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Retro Type tidak valid: "f"{', '.join(sorted(invalid_retro))}")
 
             # COB
-            cob_series = (df["COB Detail"].fillna("").astype(str).str.strip())
+            cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
             if (cob_series == "").any():
                 errors.append("COB Detail tidak boleh kosong")
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
@@ -857,7 +857,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"COB Detail tidak valid: "f"{', '.join(sorted(invalid_cob))}")
 
             # KOB Code
-            kob_series = (df["KOB Code"].fillna("").astype(str).str.strip())
+            kob_series = (df["kob code"].fillna("").astype(str).str.strip())
             if (kob_series == "").any():
                 errors.append("KOB Code tidak boleh kosong")
             allowed_kob = {"TTY", "FAC"}
@@ -866,17 +866,17 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"KOB Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
 
             # Ced Book Year
-            cby_series = (df["Ced Book Year"].fillna("").astype(str).str.strip())
+            cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
             if (cby_series == "").any():
                 errors.append("Ced Book Year tidak boleh kosong")
 
             # Ced Book Month
-            cbm_series = (df["Ced Book Month"].fillna("").astype(str).str.strip())
+            cbm_series = (df["ced book month"].fillna("").astype(str).str.strip())
             if (cbm_series == "").any():
                 errors.append("Ced Book Month tidak boleh kosong")
 
             # Method of Payment
-            method_of_payment_series = (df["Method of Payment"].fillna("").astype(str).str.strip())
+            method_of_payment_series = (df["method of payment"].fillna("").astype(str).str.strip())
             if (method_of_payment_series == "").any():
                 errors.append("Method of Payment tidak boleh kosong")
             allowed_method_of_payment = {"Monthly", "Quarterly", "Half Yearly", "Yearly"}
