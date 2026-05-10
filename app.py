@@ -3070,7 +3070,23 @@ with tab_calc:
                                 file_stream = download_file_from_drive(service, pml_file_id)
                                 df = pd.read_excel(file_stream)
 
-                                #errors = validate_calculate(df, row["Biz Type"], reins_type)
+                                errors = validate_calculate(df, row["Biz Type"], reins_type)
+
+                                if errors:
+
+                                    error_text = ", ".join(errors)
+
+                                    st.error(
+                                        f"""
+                                        ❌ Calculate gagal untuk {row['PML ID']}
+
+                                        Kolom berikut harus bernilai unik:
+                                        {error_text}
+                                        """
+                                    )
+
+                                    has_error = True
+                                    break
 
                                 biz_type = row["Biz Type"]
 
@@ -3255,7 +3271,8 @@ with tab_calc:
                         end_time = time.time()
                         duration = int(end_time - start_time)
 
-                        st.success(f"✅ {success_count} voucher berhasil diposting ({duration} detik)")
+                        if success_count > 0:
+                            st.success(f"✅ {success_count} voucher berhasil diposting ({duration} detik)")
 
                     except RuntimeError:
                         st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
@@ -3264,7 +3281,8 @@ with tab_calc:
                     finally:
                         release_drive_lock(service, OUTWARD_DRIVE_ID)
 
-
+                if has_error:
+                    st.stop()
 
 
 # # ==========================
