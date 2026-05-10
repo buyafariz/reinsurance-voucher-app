@@ -3166,7 +3166,9 @@ with tab_calc:
                                     voucher_id=voucher,
                                     filename=f"{voucher}.xlsx",
                                     folder_id=CEDING_DRIVE_ID,
-                                    biz_type=biz_type
+                                    biz_type=biz_type,
+                                    pic=row["PIC"],
+                                    date=now_wib_naive
                                 )
 
                                 success_count += 1

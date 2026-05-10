@@ -433,11 +433,15 @@ def upload_dataframe_to_drive(service, df, template_columns, voucher_id, filenam
 
     return file.get("id")
 
-def upload_dataframe_to_drive_outward(service, df, template_columns, voucher_id, filename, folder_id, biz_type):
+def upload_dataframe_to_drive_outward(service, df, template_columns, voucher_id, filename, folder_id, biz_type, pic, date):
     buffer = BytesIO()
 
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         df["Out Vouc ID"] = voucher_id
+        df["Input Date"] = date
+        df["Input Username"] = pic
+        df["Modif Date"] = date
+        df["Modif Username"] = pic
     
     elif biz_type == "Claim":
         df["Out Voucher ID"] = voucher_id
