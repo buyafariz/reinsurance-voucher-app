@@ -1597,7 +1597,31 @@ with tab_split:
                 file_stream = download_file_from_drive(service, pml_file_id)
                 df = pd.read_excel(file_stream)
 
-                # st.write("Preview Data:", df.head())
+                ACCOUNTING_COLS = [
+                    "Sum Insured", "Sum At Risk", "Reins Sum Insured", "Reins Sum At Risk",
+                    "Reins Premium", "Reins EM Premium", "Reins ER Premium", "Reins Oth premium", "Reins Total Premium",
+                    "Reins Comm", "Reins EM Comm", "Reins ER Comm", "Reins Oth Comm", "Reins Profit Share", "Reins Total Comm", 
+                    "Reins Tabarru", "Reins Ujrah", "Reins Overriding", "Reins Sliding Scale", "Reins Inw Brokerage", "Reins Nett Premium",
+                    "Reins Claim", "Your Share"
+                ]
+
+                # Buat dictionary formatter untuk kolom yang ada saja
+                format_dict = {}
+                for col in ACCOUNTING_COLS:
+                    if col in df.columns:
+                        # Pastikan data adalah numerik sebelum diformat
+                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                        format_dict[col] = "{:,.2f}"
+
+                # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
+                try:
+                    st.dataframe(
+                        df.style.format(format_dict),
+                        use_container_width=True
+                        )
+                except Exception as e:
+                    st.error(f"Gagal menampilkan preview: {e}")
+                    st.dataframe(df) # Fallback ke tabel mentah jika styling gagal
 
                 # ==========================
                 # SELECT MULTI COLUMN
