@@ -2663,7 +2663,8 @@ with tab_calc:
                         end_time = time.time()
                         duration = int(end_time - start_time)
 
-                        st.success(f"✅ {success_count} voucher berhasil diposting ({duration} detik)")
+                        if success_count > 0:
+                            st.success(f"✅ {success_count} voucher berhasil diposting ({duration} detik)")
 
                     except RuntimeError:
                         st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
