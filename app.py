@@ -2367,15 +2367,6 @@ with tab_calc:
                 with st.spinner("⏳ Calculation sedang berjalan, mohon tunggu..."):
 
                     try:
-                        sheets_service = init_sheets_service(creds)
-
-                        # 🔥 UPDATE STATUS
-                        update_pml_status_to_calculated(
-                            service=sheets_service,
-                            spreadsheet_id=log_pml_drive_id,
-                            pml_id=selected_rows["PML ID"].astype(str).tolist()
-                        )
-
                         service = get_drive_service()
 
 
@@ -2485,6 +2476,15 @@ with tab_calc:
 
                                     has_error = True
                                     break
+
+                                sheets_service = init_sheets_service(creds)
+
+                                # 🔥 UPDATE STATUS
+                                update_pml_status_to_calculated(
+                                    service=sheets_service,
+                                    spreadsheet_id=log_pml_drive_id,
+                                    pml_id=row["PML ID"].astype(str).tolist()
+                                )
 
                                 biz_type = row["Biz Type"]
 
