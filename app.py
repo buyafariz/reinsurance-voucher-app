@@ -2744,7 +2744,7 @@ with tab_calc:
 
             # Data editor (CONSISTENT UI)
 
-            cols_numeric = ["Total Contribution", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission",  "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
 
@@ -2775,6 +2775,14 @@ with tab_calc:
 
                     "Total Contribution": st.column_config.NumberColumn(
                         "Total Contribution",
+                        format="%,.0f"
+                    ),
+                    "Commission": st.column_config.NumberColumn(
+                        "Commission",
+                        format="%,.0f"
+                    ),
+                    "Overriding": st.column_config.NumberColumn(
+                        "Overriding",
                         format="%,.0f"
                     ),
                     "Total Commission": st.column_config.NumberColumn(
