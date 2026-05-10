@@ -698,10 +698,10 @@ def validate_voucher(df, biz_type: str, reins_type:str):
         
 
 def validate_calculate(df, biz_type: str, reins_type: str):
-    errors = []
 
     if reins_type == "INWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            errors = []
 
             for col in ["K.O.B Code", "Ccy Code", "Pay Period Type", "CBY", "CBM", "COB"]:
 
@@ -714,5 +714,5 @@ def validate_calculate(df, biz_type: str, reins_type: str):
                 if len(unique) > 1:
                     errors.append(col)
 
-    return errors
+        return errors
 

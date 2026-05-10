@@ -2362,6 +2362,7 @@ with tab_calc:
             # ==========================
             if ceding_clicked:
                 start_time = time.time()
+                has_error = False
 
                 with st.spinner("⏳ Calculation sedang berjalan, mohon tunggu..."):
 
@@ -2470,10 +2471,20 @@ with tab_calc:
                                 errors = validate_calculate(df, row["Biz Type"], reins_type)
 
                                 if errors:
-                                    st.error(f"❌ Calculate gagal untuk {row['PML ID']}")
+
                                     error_text = ", ".join(errors)
-                                    st.write(f"Kolom berikut harus bernilai unik: {error_text}")
-                                    st.stop()
+
+                                    st.error(
+                                        f"""
+                                        ❌ Calculate gagal untuk {row['PML ID']}
+
+                                        Kolom berikut harus bernilai unik:
+                                        {error_text}
+                                        """
+                                    )
+
+                                    has_error = True
+                                    break
 
                                 biz_type = row["Biz Type"]
 
@@ -2661,6 +2672,8 @@ with tab_calc:
                     finally:
                         release_drive_lock(service, PERIOD_DRIVE_ID)
 
+                if has_error:
+                    st.stop()
 
     elif reins_type == "OUTWARD":
 
