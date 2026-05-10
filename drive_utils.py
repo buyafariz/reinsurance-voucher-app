@@ -438,6 +438,8 @@ def upload_dataframe_to_drive_outward(service, df, template_columns, voucher_id,
 
     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         df["Out Vouc ID"] = voucher_id
+        df["Is Calculated"] = "True"
+        df["App Date"] = date
         df["Input Date"] = date
         df["Input Username"] = pic
         df["Modif Date"] = date
