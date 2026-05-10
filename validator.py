@@ -703,7 +703,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "INWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             # KOB Code
-            kob_series = (df["k.o.b Code"].fillna("").astype(str).str.strip())
+            kob_series = (df["k.o.b code"].fillna("").astype(str).str.strip())
             if (kob_series == "").any():
                 errors.append("K.O.B Code tidak boleh kosong")
             allowed_kob = {"TTY", "FAC"}
