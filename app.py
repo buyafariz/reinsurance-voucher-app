@@ -1602,7 +1602,7 @@ with tab_split:
                     "Reins Premium", "Reins EM Premium", "Reins ER Premium", "Reins Oth. premium", "Reins Total Premium",
                     "Reins Comm", "Reins EM Comm", "Reins ER Comm", "Reins Oth. Comm", "Reins Profit Share", "Reins Total Comm", 
                     "Reins Tabarru", "Reins Ujrah", "Reins Overriding", "Reins Sliding Scale", "Reins Inw Brokerage", "Reins Nett Premium",
-                    "Reins Claim", "Your Share"
+                    "Sum Insured IDR", "Sum Reinsured IDR", "Amount of Claim IDR", "Reins Claim IDR", "Marein Share IDR"
                 ]
 
                 # Buat dictionary formatter untuk kolom yang ada saja
