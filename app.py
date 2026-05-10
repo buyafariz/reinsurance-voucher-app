@@ -1341,6 +1341,7 @@ with tab_upload:
                             )
 
                         elif biz_type == "Claim" :
+                            df["dla out voucher id"] = pml_id
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,

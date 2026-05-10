@@ -447,6 +447,7 @@ def upload_dataframe_to_drive_outward(service, df, template_columns, voucher_id,
     
     elif biz_type == "Claim":
         df["Out Voucher ID"] = voucher_id
+        
  
     df.columns = template_columns
 
