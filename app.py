@@ -2922,8 +2922,6 @@ with tab_calc:
                             biz_type=biz_type
                         )
 
-                        st.success("Voucher berhasil dibuat!")
-
                         # ==========================
                         # PREPARE GLOBAL (SEKALI)
                         # ==========================
