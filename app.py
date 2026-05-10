@@ -3168,7 +3168,7 @@ with tab_calc:
                                     folder_id=CEDING_DRIVE_ID,
                                     biz_type=biz_type,
                                     pic=row["PIC"],
-                                    date=now_wib_naive
+                                    date=now_wib_naive()
                                 )
 
                                 success_count += 1
