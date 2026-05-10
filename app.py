@@ -1170,6 +1170,11 @@ with tab_upload:
             if st.button("💾 Simpan File"):
                 start_time = time.time()
 
+                if biz_type == "Claim":
+                    df["cedant name"] = cedant_company
+                    df["reinsurer name"] = account_with
+
+
                 if not remarks.strip():
                     st.error("Remarks wajib diisi")
                     st.stop()
