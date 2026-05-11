@@ -2652,7 +2652,7 @@ with tab_calc:
             # INFO RATE
             # ==========================
             if selected_account is None:
-                st.info("ℹ️ Pilih data terlebih dahulu (dan pastikan Account With sama)")
+                st.info("ℹ️ Pilih data terlebih dahulu (pastikan Account With sama)")
 
             elif not has_rate:
                 st.info("ℹ️ Rate belum tersedia → Our Calculation dinonaktifkan")
@@ -3356,7 +3356,7 @@ with tab_calc:
             # INFO RATE
             # ==========================
             if selected_account is None:
-                st.info("ℹ️ Pilih data terlebih dahulu (dan pastikan Account With sama)")
+                st.info("ℹ️ Pilih data terlebih dahulu (pastikan Account With sama)")
 
             elif not has_rate:
                 st.info("ℹ️ Rate belum tersedia → Our Calculation dinonaktifkan")
