@@ -2645,7 +2645,7 @@ with tab_calc:
                     "🧮 Our Calculation",
                     use_container_width=True,
                     disabled=(selected_account is None or not has_rate),
-                    help="Rate belum tersedia"
+                    help="Rate belum tersedia" if not has_rate else ""
                 )
 
             # ==========================
@@ -3349,7 +3349,7 @@ with tab_calc:
                     "🧮 Our Calculation",
                     use_container_width=True,
                     disabled=(selected_account is None or not has_rate),
-                    help="Rate belum tersedia"
+                    help="Rate belum tersedia" if not has_rate else ""
                 )
 
             # ==========================
