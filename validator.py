@@ -618,13 +618,13 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
 
         elif biz_type == "Claim":
-            if not (df["sum insured idr"] <= df["sum reinsured idr"]).all():
+            if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
                 errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
 
-            if not (df["amount of claim idr"] <= df["reins claim idr"]).all():
+            if not (df["amount of claim idr"] >= df["reins claim idr"]).all():
                 errors.append("reins claim idr tidak boleh lebih besar dari amount of claim idr")
 
-            if not (df["amount of claim idr"] <= df["marein share idr"]).all():
+            if not (df["amount of claim idr"] >= df["marein share idr"]).all():
                 errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
 
     if reins_type == "OUTWARD":
@@ -642,8 +642,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append("retro sum at risk tidak boleh lebih besar dari reins sum at risk")
 
         elif biz_type == "Claim":
-            if not (df["reins claim"] <= df["your share"]).all():
-                errors.append("reins claim tidak boleh lebih besar dari your share")
+            if not (df["reins claim"] >= df["your share"]).all():
+                errors.append("your share tidak boleh lebih besar dari reins claim")
 
 
     # =========================
