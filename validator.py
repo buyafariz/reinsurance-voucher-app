@@ -257,7 +257,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     allowed = ["Kontribusi", "Claim", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]
 
     if biz_type not in allowed:
-        errors.append("BUSINESS TYPE tidak valid")
+        errors.append("BUSINESS TYPE harus bernilai salah satu dari")
 
     # =========================
     # 1. KOLOM WAJIB
@@ -702,7 +702,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_kob = {"TTY", "FAC"}
             invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
             if invalid_kob:
-                errors.append(f"K.O.B Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
+                errors.append(f"K.O.B Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Pay Period Type
             pay_period_series = (df["pay period type"].fillna("").astype(str).str.strip())
@@ -711,7 +711,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
             invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
             if invalid_pay_period:
-                errors.append(f"Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_pay_period))}")
+                errors.append(f"Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
 
             # COB
             cob_series = (df["cob"].fillna("").astype(str).str.strip())
@@ -720,7 +720,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
             invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
             if invalid_cob:
-                errors.append(f"COB tidak valid: "f"{', '.join(sorted(invalid_cob))}")
+                errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # CBY
             cby_series = (df["cby"].fillna("").astype(str).str.strip())
@@ -741,7 +741,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
             invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
             if invalid_cob:
-                errors.append(f"ClassOfBusiness tidak valid: "f"{', '.join(sorted(invalid_cob))}")
+                errors.append(f"ClassOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # Pay Period Type
             pay_period_series = (df["payperiodtype"].fillna("").astype(str).str.strip())
@@ -750,7 +750,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
             invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
             if invalid_pay_period:
-                errors.append(f"PayPeriodType tidak valid: "f"{', '.join(sorted(invalid_pay_period))}")
+                errors.append(f"PayPeriodType harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
 
             # KOB Code
             kob_series = (df["kindofbusiness"].fillna("").astype(str).str.strip())
@@ -759,7 +759,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_kob = {"TTY", "FAC"}
             invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
             if invalid_kob:
-                errors.append(f"KindOfBusiness tidak valid: "f"{', '.join(sorted(invalid_kob))}")
+                errors.append(f"KindOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # CedBookYear
             cby_series = (df["cedbookyear"].fillna("").astype(str).str.strip())
@@ -781,7 +781,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
             invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
             if invalid_retro:
-                errors.append(f"Retro Type tidak valid: "f"{', '.join(sorted(invalid_retro))}")
+                errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # KOB Code
             kob_series = (df["kob code"].fillna("").astype(str).str.strip())
@@ -790,7 +790,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_kob = {"TTY", "FAC"}
             invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
             if invalid_kob:
-                errors.append(f"KOB Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
+                errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Ced Book Year
             cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
@@ -809,7 +809,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_inw_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
             invalid_inw_pay_period = set(inw_pay_period_series[inw_pay_period_series != ""].unique()) - allowed_inw_pay_period
             if invalid_inw_pay_period:
-                errors.append(f"Inw Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_inw_pay_period))}")
+                errors.append(f"Inw Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_inw_pay_period))}")
             
             # Out Pay Period Type
             out_pay_period_series = (df["out pay period type"].fillna("").astype(str).str.strip())
@@ -818,7 +818,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_out_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly"}
             invalid_out_pay_period = set(out_pay_period_series[out_pay_period_series != ""].unique()) - allowed_out_pay_period
             if invalid_out_pay_period:
-                errors.append(f"Out Pay Period Type tidak valid: "f"{', '.join(sorted(invalid_out_pay_period))}")
+                errors.append(f"Out Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_out_pay_period))}")
 
             # COB
             cob_series = (df["cob"].fillna("").astype(str).str.strip())
@@ -827,7 +827,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
             invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
             if invalid_cob:
-                errors.append(f"COB tidak valid: "f"{', '.join(sorted(invalid_cob))}")
+                errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
                          
         elif biz_type == "Claim":
@@ -838,7 +838,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
             invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
             if invalid_retro:
-                errors.append(f"Retro Type tidak valid: "f"{', '.join(sorted(invalid_retro))}")
+                errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # COB
             cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
@@ -847,7 +847,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
             invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
             if invalid_cob:
-                errors.append(f"COB Detail tidak valid: "f"{', '.join(sorted(invalid_cob))}")
+                errors.append(f"COB Detail harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # KOB Code
             kob_series = (df["kob code"].fillna("").astype(str).str.strip())
@@ -856,7 +856,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_kob = {"TTY", "FAC"}
             invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
             if invalid_kob:
-                errors.append(f"KOB Code tidak valid: "f"{', '.join(sorted(invalid_kob))}")
+                errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Ced Book Year
             cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
@@ -875,7 +875,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             allowed_method_of_payment = {"Monthly", "Quarterly", "Half Yearly", "Yearly"}
             invalid_method_of_payment = set(method_of_payment_series[method_of_payment_series != ""].unique()) - allowed_method_of_payment
             if invalid_method_of_payment:
-                errors.append(f"Method of Payment tidak valid: "f"{', '.join(sorted(invalid_method_of_payment))}")
+                errors.append(f"Method of Payment harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_method_of_payment))}")
 
     return errors
 
