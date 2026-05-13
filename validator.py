@@ -787,13 +787,16 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                     errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # KOB Code
-            kob_series = (df["kob code"].fillna("").astype(str).str.strip())
-            if (kob_series == "").any():
-                errors.append("KOB Code tidak boleh kosong")
-            allowed_kob = {"TTY", "FAC"}
-            invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
-            if invalid_kob:
-                errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
+            if "kob code" not in df.columns:
+                errors.append("Tambahkan kolom KOB Code")
+            else:
+                kob_series = (df["kob code"].fillna("").astype(str).str.strip())
+                if (kob_series == "").any():
+                    errors.append("KOB Code tidak boleh kosong")
+                allowed_kob = {"TTY", "FAC"}
+                invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
+                if invalid_kob:
+                    errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Ced Book Year
             cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
@@ -847,22 +850,28 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                     errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # COB
-            cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
-            if (cob_series == "").any():
-                errors.append("COB Detail tidak boleh kosong")
-            allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
-            invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
-            if invalid_cob:
-                errors.append(f"COB Detail harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
+            if "cob" not in df.columns:
+                errors.append("Tambahkan kolom COB")
+            else:
+                cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
+                if (cob_series == "").any():
+                    errors.append("COB Detail tidak boleh kosong")
+                allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
+                invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
+                if invalid_cob:
+                    errors.append(f"COB Detail harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # KOB Code
-            kob_series = (df["kob code"].fillna("").astype(str).str.strip())
-            if (kob_series == "").any():
-                errors.append("KOB Code tidak boleh kosong")
-            allowed_kob = {"TTY", "FAC"}
-            invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
-            if invalid_kob:
-                errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
+            if "kob code" not in df.columns:
+                errors.append("Tambahkan kolom KOB Code")
+            else:
+                kob_series = (df["kob code"].fillna("").astype(str).str.strip())
+                if (kob_series == "").any():
+                    errors.append("KOB Code tidak boleh kosong")
+                allowed_kob = {"TTY", "FAC"}
+                invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
+                if invalid_kob:
+                    errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Ced Book Year
             cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
