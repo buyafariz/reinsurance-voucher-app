@@ -775,6 +775,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             # Retro Type
+            if df["retro type"] not in df.columns():
+                errors.append("Tambahkan kolom Retro Type")
             retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
             if (retro_type_series == "").any():
                 errors.append("Retro Type tidak boleh kosong")
@@ -832,6 +834,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                          
         elif biz_type == "Claim":
             # Retro Type
+            if df["retro type"] not in df.columns():
+                errors.append("Tambahkan kolom Retro Type")
             retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
             if (retro_type_series == "").any():
                 errors.append("Retro Type tidak boleh kosong")
