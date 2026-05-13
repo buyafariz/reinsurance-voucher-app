@@ -827,13 +827,16 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Out Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_out_pay_period))}")
 
             # COB
-            cob_series = (df["cob"].fillna("").astype(str).str.strip())
-            if (cob_series == "").any():
-                errors.append("COB tidak boleh kosong")
-            allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
-            invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
-            if invalid_cob:
-                errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
+            if "cob" not in df.columns:
+                errors.append("Tambahkan kolom COB")
+            else:
+                cob_series = (df["cob"].fillna("").astype(str).str.strip())
+                if (cob_series == "").any():
+                    errors.append("COB tidak boleh kosong")
+                allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
+                invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
+                if invalid_cob:
+                    errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
                          
         elif biz_type == "Claim":
