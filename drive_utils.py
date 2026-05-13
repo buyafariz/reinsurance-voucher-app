@@ -898,3 +898,180 @@ def get_exchange_rate(service, config_folder_id, currency, month):
 
     return float(row.iloc[0][month_col])
 
+
+def create_review_spreadsheet(
+    service,
+    review_df,
+    pml_id,
+    parent_folder_id
+):
+
+    import io
+    import pandas as pd
+
+    from googleapiclient.http import MediaIoBaseUpload
+    from google.oauth2.credentials import Credentials
+    import gspread
+
+    # ==========================
+    # FILE NAME
+    # ==========================
+    filename = f"{pml_id} - Review Calculation"
+
+    # ==========================
+    # CREATE EMPTY SPREADSHEET
+    # ==========================
+    file_metadata = {
+        "name": filename,
+        "mimeType": "application/vnd.google-apps.spreadsheet",
+        "parents": [parent_folder_id]
+    }
+
+    spreadsheet_file = service.files().create(
+        body=file_metadata,
+        fields="id"
+    ).execute()
+
+    spreadsheet_id = spreadsheet_file["id"]
+
+    # ==========================
+    # AUTHORIZE GSPREAD
+    # ==========================
+    creds = Credentials.from_authorized_user_info(
+        st.secrets["google_credentials"],
+        scopes=[
+            "https://www.googleapis.com/auth/drive",
+            "https://www.googleapis.com/auth/spreadsheets"
+        ]
+    )
+
+    gc = gspread.authorize(creds)
+
+    spreadsheet = gc.open_by_key(
+        spreadsheet_id
+    )
+
+    # ==========================
+    # MAIN SHEET
+    # ==========================
+    worksheet = spreadsheet.sheet1
+
+    worksheet.update_title(
+        "REVIEW"
+    )
+
+    # ==========================
+    # CLEAN DATAFRAME
+    # ==========================
+    export_df = review_df.copy()
+
+    export_df = export_df.fillna("")
+
+    # ==========================
+    # UPLOAD DATAFRAME
+    # ==========================
+    worksheet.update(
+        [
+            export_df.columns.tolist()
+        ] +
+        export_df.values.tolist()
+    )
+
+    # ==========================
+    # FREEZE HEADER
+    # ==========================
+    worksheet.freeze(
+        rows=1
+    )
+
+    # ==========================
+    # AUTO FILTER
+    # ==========================
+    worksheet.set_basic_filter()
+
+    # ==========================
+    # AUTO RESIZE
+    # ==========================
+    worksheet.columns_auto_resize(
+        0,
+        len(export_df.columns)
+    )
+
+    # ==========================
+    # SUMMARY SHEET
+    # ==========================
+    summary_ws = spreadsheet.add_worksheet(
+        title="SUMMARY",
+        rows=20,
+        cols=5
+    )
+
+    # ==========================
+    # SUMMARY VALUES
+    # ==========================
+    total_original = (
+        pd.to_numeric(
+            export_df["Reins Premium"],
+            errors="coerce"
+        )
+        .fillna(0)
+        .sum()
+    )
+
+    total_calc = (
+        pd.to_numeric(
+            export_df["Reins Premium (Calc)"],
+            errors="coerce"
+        )
+        .fillna(0)
+        .sum()
+    )
+
+    total_diff = (
+        total_calc - total_original
+    )
+
+    missing_rate = len(
+        export_df[
+            export_df[
+                "Calculation Status"
+            ] == "RATE NOT FOUND"
+        ]
+    )
+
+    summary_data = [
+
+        ["PML ID", pml_id],
+
+        ["Total Rows", len(export_df)],
+
+        ["Missing Rate", missing_rate],
+
+        ["Original Premium", total_original],
+
+        ["Calculated Premium", total_calc],
+
+        ["Difference", total_diff]
+    ]
+
+    summary_ws.update(
+        "A1:B6",
+        summary_data
+    )
+
+    # ==========================
+    # FREEZE HEADER
+    # ==========================
+    summary_ws.freeze(
+        rows=1
+    )
+
+    # ==========================
+    # GET URL
+    # ==========================
+    spreadsheet_url = (
+        f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}"
+    )
+
+    return spreadsheet_url
+

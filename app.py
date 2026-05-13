@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher, validate_calculate
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vou_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive, split_upload_with_log, split_upload_with_log_outward, get_last_seq_no, generate_pml_id
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -3253,7 +3253,6 @@ with tab_calc:
 
                     try:
                         
-                        # Mapping rate dari 
                         # ==========================
                         # LOAD RATE FILE
                         # ==========================
@@ -3268,6 +3267,10 @@ with tab_calc:
                         rate_df["Age At"] = (pd.to_numeric(rate_df["Age At"],errors="coerce").fillna(0).astype(int))
                         rate_df["Rate"] = (pd.to_numeric(rate_df["Rate"],errors="coerce"))
 
+                        # ==========================
+                        # CREATE RATE MAP
+                        # ==========================
+
                         rate_map = {}
 
                         for _, rate_row in rate_df.iterrows():
@@ -3280,6 +3283,15 @@ with tab_calc:
 
                             rate_map[key] = rate_row["Rate"]
 
+                        # ==========================
+                        # REVIEW RESULTS
+                        # ==========================
+                        review_results = []
+
+                        # ==========================
+                        # LOOP EACH PML
+                        # ==========================
+
                         for validated in validated_data:
 
                             row = validated["row"]
@@ -3287,6 +3299,10 @@ with tab_calc:
                             df = validated["df"]
 
                             review_df = df.copy()
+
+                            # ==========================
+                            # INSERT CALC COLUMNS
+                            # ==========================
 
                             calc_pairs = [
                                 "Reins Premium",
@@ -3298,6 +3314,10 @@ with tab_calc:
                                 "Reins Ujrah",
                                 "Reins Nett Premium"
                             ]
+
+                            # ==========================
+                            # INSERT RATE COLUMN
+                            # ==========================
 
                             premium_idx = review_df.columns.get_loc(
                                 "Reins Premium"
@@ -3311,13 +3331,32 @@ with tab_calc:
                                     None
                                 )
 
+                            # ==========================
+                            # INSERT CALC RESULT COLUMNS
+                            # ==========================
+
                             for col in calc_pairs:
 
                                 idx = review_df.columns.get_loc(col)
 
                                 review_df.insert(idx + 1, f"{col} (Calc)", 0.0)
 
+                            # ==========================
+                            # OPTIONAL STATUS
+                            # ==========================
+                            if "Calculation Status" not in review_df.columns:
+
+                                review_df["Calculation Status"] = ""
+
+                            # ==========================
+                            # LOOP EACH ROW
+                            # ==========================
+
                             for idx, data in review_df.iterrows():
+
+                                # ==========================
+                                # BUILD KEY
+                                # ==========================
 
                                 gender = (str(data["Gender"]).strip().upper())
 
@@ -3326,6 +3365,10 @@ with tab_calc:
                                 age = int(pd.to_numeric(data["Age At"],errors="coerce") or 0)
 
                                 key = (gender, product_code, age)
+
+                                # ==========================
+                                # GET RATE
+                                # ==========================
 
                                 rate = rate_map.get(key)
 
@@ -3339,18 +3382,30 @@ with tab_calc:
 
                                 review_df.at[idx, "Rate (Calc)"] = rate
 
+                                # ==========================
+                                # NUMERIC CONVERSION
+                                # ==========================
 
                                 sum_at_risk = (pd.to_numeric(data["Reins Sum At Risk"],errors="coerce"))
                                 em_rate = (pd.to_numeric(data["Ced EM Rate"],errors="coerce"))
                                 er_rate = (pd.to_numeric(data["Ced ER Rate"],errors="coerce"))
                                 commission = (pd.to_numeric(data["Reins Total Comm"],errors="coerce"))
                                 nett_premium = pd.to_numeric(data["Reins Nett Premium"],errors="coerce")
+
+                                # ==========================
+                                # TABARRU & UJRAH %
+                                # ==========================
+
                                 if nett_premium and nett_premium != 0:
                                     tabarru_percentage = data["Reins Tabarru"]/nett_premium
                                     ujrah_percentage = data["Reins Ujrah"]/nett_premium
                                 else:
                                     tabarru_percentage = 0
                                     ujrah_percentage = 0
+
+                                # ==========================
+                                # CALCULATION
+                                # ==========================
 
                                 premium = (sum_at_risk * rate) / 1000
                                 em_premium = (premium * em_rate) / 100
@@ -3360,6 +3415,10 @@ with tab_calc:
                                 tabarru = nett_premium * tabarru_percentage
                                 ujrah = nett_premium * ujrah_percentage
 
+                                # ==========================
+                                # SAVE RESULT
+                                # ==========================
+
                                 review_df.at[idx, "Reins Premium (Calc)"] = premium
                                 review_df.at[idx, "Reins EM Premium (Calc)"] = em_premium
                                 review_df.at[idx, "Reins ER Premium (Calc)"] = er_premium
@@ -3368,6 +3427,66 @@ with tab_calc:
                                 review_df.at[idx, "Reins Tabarru (Calc)"] = tabarru
                                 review_df.at[idx, "Reins Ujrah (Calc)"] = ujrah
 
+                                # ==========================
+                                # SUMMARY
+                                # ==========================
+                                total_original = (pd.to_numeric(review_df["Reins Nett Premium"], errors="coerce").fillna(0).sum())
+
+                                total_calc = (pd.to_numeric(review_df["Reins Nett Premium (Calc)"],errors="coerce").fillna(0).sum())
+
+                                total_diff = (total_calc - total_original)
+
+                                missing_rate = len(review_df[review_df["Calculation Status"] == "RATE NOT FOUND"])
+
+                                # ==========================
+                                # CREATE REVIEW SPREADSHEET
+                                # ==========================
+                                review_spreadsheet_url = (create_review_spreadsheet(service=service, review_df=review_df, pml_id=row["PML ID"], parent_folder_id=PML_DRIVE_ID))
+
+                                # ==========================
+                                # SAVE RESULT
+                                # ==========================
+                                review_results.append({
+
+                                    "pml_id": row["PML ID"],
+
+                                    "review_df": review_df,
+
+                                    "spreadsheet_url":
+                                        review_spreadsheet_url,
+
+                                    "total_rows":
+                                        len(review_df),
+
+                                    "missing_rate":
+                                        missing_rate,
+
+                                    "total_original":
+                                        total_original,
+
+                                    "total_calc":
+                                        total_calc,
+
+                                    "total_diff":
+                                        total_diff,
+
+                                    "approved":
+                                        False
+                                })
+
+                            # ==========================
+                            # SAVE SESSION
+                            # ==========================
+                            st.session_state[
+                                "review_results"
+                            ] = review_results
+
+                            # ==========================
+                            # SUCCESS
+                            # ==========================
+                            st.success(
+                                "✅ Calculation selesai"
+                            )
 
 
                     #     # 🔒 LOCK SEKALI SAJA
