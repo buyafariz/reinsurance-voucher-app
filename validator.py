@@ -777,13 +777,14 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             # Retro Type
             if "retro type" not in df.columns:
                 errors.append("Tambahkan kolom Retro Type")
-            retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
-            if (retro_type_series == "").any():
-                errors.append("Retro Type tidak boleh kosong")
-            allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
-            invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
-            if invalid_retro:
-                errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
+            else:
+                retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
+                if (retro_type_series == "").any():
+                    errors.append("Retro Type tidak boleh kosong")
+                allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
+                invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
+                if invalid_retro:
+                    errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # KOB Code
             kob_series = (df["kob code"].fillna("").astype(str).str.strip())
@@ -836,13 +837,14 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             # Retro Type
             if "retro type" not in df.columns:
                 errors.append("Tambahkan kolom Retro Type")
-            retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
-            if (retro_type_series == "").any():
-                errors.append("Retro Type tidak boleh kosong")
-            allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
-            invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
-            if invalid_retro:
-                errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
+            else:
+                retro_type_series = (df["retro type"].fillna("").astype(str).str.strip())
+                if (retro_type_series == "").any():
+                    errors.append("Retro Type tidak boleh kosong")
+                allowed_retro = {"Sp Program", "Sp Arrangement", "Panel"}
+                invalid_retro = set(retro_type_series[retro_type_series != ""].unique()) - allowed_retro
+                if invalid_retro:
+                    errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # COB
             cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
