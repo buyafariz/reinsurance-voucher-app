@@ -3831,6 +3831,28 @@ with tab_calc:
                         ] = review_results
 
                         # ==========================
+                        # CUSTOM CSS
+                        # ==========================
+                        st.markdown("""
+                        <style>
+
+                        div[data-testid="stMetricValue"] {
+                            font-size: 2rem;
+                        }
+
+                        div[data-testid="stMetricLabel"] {
+                            font-size: 0.9rem;
+                        }
+
+                        .small-status {
+                            font-size: 0.95rem !important;
+                            padding: 0.3rem 0.6rem !important;
+                        }
+
+                        </style>
+                        """, unsafe_allow_html=True)
+
+                        # ==========================
                         # REVIEW RESULT SECTION
                         # ==========================
                         if "review_results" in st.session_state:
@@ -3910,33 +3932,48 @@ with tab_calc:
                                     # HEADER
                                     # ==========================
                                     col1, col2 = st.columns(
-                                        [4,1]
+                                        [5,1]
                                     )
 
                                     with col1:
 
                                         st.markdown(
-                                            f"### 📄 {pml_id}"
+                                            f"## 📄 {pml_id}"
                                         )
 
                                     with col2:
 
                                         if status_type == "success":
 
-                                            st.success(
-                                                status
+                                            st.markdown(
+                                                f"""
+                                                <div class="small-status">
+                                                    ✅ Ready
+                                                </div>
+                                                """,
+                                                unsafe_allow_html=True
                                             )
 
                                         elif status_type == "warning":
 
-                                            st.warning(
-                                                status
+                                            st.markdown(
+                                                f"""
+                                                <div class="small-status">
+                                                    ⚠️ Missing Rate
+                                                </div>
+                                                """,
+                                                unsafe_allow_html=True
                                             )
 
                                         else:
 
-                                            st.error(
-                                                status
+                                            st.markdown(
+                                                f"""
+                                                <div class="small-status">
+                                                    ❌ Difference
+                                                </div>
+                                                """,
+                                                unsafe_allow_html=True
                                             )
 
                                     # ==========================
@@ -4046,7 +4083,7 @@ with tab_calc:
                                             "Review lolos validasi."
                                         )
 
-                                    st.write("")
+                                    st.write("") 
 
                         # ==========================
                         # SUCCESS
