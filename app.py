@@ -1964,6 +1964,11 @@ with tab_split:
                         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                         format_dict[col] = "{:,.2f}"
 
+                # Mengubah int format menjadi string
+                for col in ["certificate no", "main pol no", "pol holder no"]:
+                    if col in df.columns:
+                        df[col] = df[col].astype(str).str.strip()
+
                 # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
                 try:
                     st.dataframe(
