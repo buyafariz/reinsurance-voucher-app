@@ -3831,6 +3831,155 @@ with tab_calc:
                         ] = review_results
 
                         # ==========================
+                        # SHOW REVIEW RESULTS
+                        # ==========================
+                        if "review_results" in st.session_state:
+
+                            review_results = (
+                                st.session_state["review_results"]
+                            )
+
+                            st.divider()
+
+                            st.subheader(
+                                "📋 Review Calculation Result"
+                            )
+
+                            # ==========================
+                            # VALIDATION STATUS
+                            # ==========================
+                            can_approve = True
+
+                            # ==========================
+                            # LOOP RESULTS
+                            # ==========================
+                            for result in review_results:
+
+                                pml_id = result["pml_id"]
+
+                                total_original = (
+                                    result["total_original"]
+                                )
+
+                                total_calc = (
+                                    result["total_calc"]
+                                )
+
+                                total_diff = (
+                                    result["total_diff"]
+                                )
+
+                                missing_rate = (
+                                    result["missing_rate"]
+                                )
+
+                                spreadsheet_url = (
+                                    result["spreadsheet_url"]
+                                )
+
+                                # ==========================
+                                # CARD HEADER
+                                # ==========================
+                                st.markdown(
+                                    f"### 📄 {pml_id}"
+                                )
+
+                                # ==========================
+                                # METRICS
+                                # ==========================
+                                col1, col2, col3, col4 = (
+                                    st.columns(4)
+                                )
+
+                                col1.metric(
+                                    "Original",
+                                    f"{total_original:,.2f}"
+                                )
+
+                                col2.metric(
+                                    "Calculated",
+                                    f"{total_calc:,.2f}"
+                                )
+
+                                col3.metric(
+                                    "Difference",
+                                    f"{total_diff:,.2f}"
+                                )
+
+                                col4.metric(
+                                    "Missing Rate",
+                                    missing_rate
+                                )
+
+                                # ==========================
+                                # VALIDATION
+                                # ==========================
+                                if missing_rate > 0:
+
+                                    st.warning(
+                                        "⚠️ Masih ada RATE NOT FOUND"
+                                    )
+
+                                    can_approve = False
+
+                                if abs(total_diff) > 1:
+
+                                    st.error(
+                                        "❌ Difference terlalu besar"
+                                    )
+
+                                    can_approve = False
+
+                                # ==========================
+                                # OPEN SPREADSHEET
+                                # ==========================
+                                st.link_button(
+                                    "📂 Open Review Spreadsheet",
+                                    spreadsheet_url,
+                                    use_container_width=True
+                                )
+
+                                st.divider()
+
+                            # ==========================
+                            # APPROVAL SECTION
+                            # ==========================
+                            st.subheader(
+                                "✅ Approval"
+                            )
+
+                            if can_approve:
+
+                                st.success(
+                                    "Semua review lolos validasi"
+                                )
+
+                                approve_clicked = st.button(
+                                    "✅ Approve Calculation",
+                                    type="primary",
+                                    use_container_width=True
+                                )
+
+                                if approve_clicked:
+
+                                    # ==========================
+                                    # UPDATE STATUS
+                                    # ==========================
+                                    for result in review_results:
+
+                                        result["approved"] = True
+
+                                    st.success(
+                                        "✅ Calculation approved"
+                                    )
+
+                            else:
+
+                                st.error(
+                                    "❌ Approval tidak dapat dilakukan"
+                                )
+
+                        # ==========================
                         # SUCCESS
                         # ==========================
                         st.success(
