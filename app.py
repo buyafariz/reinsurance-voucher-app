@@ -3922,13 +3922,13 @@ with tab_calc:
 
                                     can_approve = False
 
-                                if abs(total_diff) > 1:
+                                # if abs(total_diff) > 1:
 
-                                    st.error(
-                                        "❌ Difference terlalu besar"
-                                    )
+                                #     st.error(
+                                #         "❌ Difference terlalu besar"
+                                #     )
 
-                                    can_approve = False
+                                #     can_approve = False
 
                                 # ==========================
                                 # OPEN SPREADSHEET
