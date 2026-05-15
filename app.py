@@ -1977,6 +1977,19 @@ with tab_split:
                         )
                 except Exception as e:
                     st.error(f"Gagal menampilkan preview: {e}")
+                    # Hindari error Arrow / integer terlalu besar
+                    for col in df.columns:
+                        try:
+                            if df[col].dtype == "object":
+                                df[col] = df[col].astype(str)
+
+                            # convert integer besar menjadi string
+                            if "no" in col.lower() or "id" in col.lower():
+                                df[col] = df[col].astype(str)
+
+                        except:
+                            pass
+
                     st.dataframe(df) # Fallback ke tabel mentah jika styling gagal
 
 
