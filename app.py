@@ -3833,112 +3833,22 @@ with tab_calc:
                         # ==========================
                         # REVIEW RESULT SECTION
                         # ==========================
-
                         if "review_results" in st.session_state:
 
                             review_results = (
                                 st.session_state["review_results"]
                             )
 
-                            # ==========================
-                            # CUSTOM CSS
-                            # ==========================
-                            st.markdown("""
-                            <style>
+                            st.subheader(
+                                "📋 Review Calculation Result"
+                            )
 
-                            .review-card {
-                                padding: 24px;
-                                border-radius: 20px;
-                                background: linear-gradient(
-                                    145deg,
-                                    #111827,
-                                    #0F172A
-                                );
-                                border: 1px solid rgba(255,255,255,0.08);
-                                margin-bottom: 24px;
-                            }
-
-                            .card-header {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                margin-bottom: 20px;
-                            }
-
-                            .card-title {
-                                font-size: 28px;
-                                font-weight: 700;
-                                color: white;
-                            }
-
-                            .card-subtitle {
-                                font-size: 14px;
-                                color: #9CA3AF;
-                                margin-top: 4px;
-                            }
-
-                            .metric-card {
-                                background-color: rgba(255,255,255,0.03);
-                                padding: 18px;
-                                border-radius: 16px;
-                                text-align: center;
-                                border: 1px solid rgba(255,255,255,0.05);
-                            }
-
-                            .metric-title {
-                                font-size: 13px;
-                                color: #9CA3AF;
-                                margin-bottom: 10px;
-                            }
-
-                            .metric-value {
-                                font-size: 28px;
-                                font-weight: 700;
-                                color: white;
-                            }
-
-                            .success-badge {
-                                display: inline-block;
-                                padding: 8px 14px;
-                                border-radius: 999px;
-                                background-color: rgba(34,197,94,0.15);
-                                color: #4ADE80;
-                                font-size: 13px;
-                                font-weight: 600;
-                            }
-
-                            .warning-badge {
-                                display: inline-block;
-                                padding: 8px 14px;
-                                border-radius: 999px;
-                                background-color: rgba(250,204,21,0.15);
-                                color: #FACC15;
-                                font-size: 13px;
-                                font-weight: 600;
-                            }
-
-                            .danger-badge {
-                                display: inline-block;
-                                padding: 8px 14px;
-                                border-radius: 999px;
-                                background-color: rgba(239,68,68,0.15);
-                                color: #F87171;
-                                font-size: 13px;
-                                font-weight: 600;
-                            }
-
-                            </style>
-                            """, unsafe_allow_html=True)
+                            st.caption(
+                                "Review hasil calculation sebelum proses approval dan posting."
+                            )
 
                             # ==========================
-                            # HEADER
-                            # ==========================
-                            st.markdown("""
-                            # 📋 Review Calculation Result
-                            """)
-
-                            # ==========================
-                            # LOOP REVIEW RESULT
+                            # LOOP RESULT
                             # ==========================
                             for result in review_results:
 
@@ -3964,243 +3874,180 @@ with tab_calc:
                                     result["spreadsheet_url"]
                                 )
 
+                                review_df = (
+                                    result["review_df"]
+                                )
+
                                 # ==========================
-                                # STATUS BADGE
+                                # STATUS
                                 # ==========================
                                 if missing_rate > 0:
 
-                                    badge = f"""
-                                    <span class="warning-badge">
-                                        ⚠️ {missing_rate} Missing Rate
-                                    </span>
-                                    """
+                                    status = "⚠️ Missing Rate"
+
+                                    status_type = "warning"
 
                                 elif abs(total_diff) > 1:
 
-                                    badge = """
-                                    <span class="danger-badge">
-                                        ❌ Difference Detected
-                                    </span>
-                                    """
+                                    status = "❌ Difference Detected"
+
+                                    status_type = "error"
 
                                 else:
 
-                                    badge = """
-                                    <span class="success-badge">
-                                        ✅ VALID
-                                    </span>
-                                    """
+                                    status = "✅ Ready for Approval"
+
+                                    status_type = "success"
 
                                 # ==========================
-                                # CARD
+                                # CONTAINER
                                 # ==========================
-                                st.markdown(f"""
-                                <div class="review-card">
-
-                                    <div class="card-header">
-
-                                        <div>
-
-                                            <div class="card-title">
-                                                📄 {pml_id}
-                                            </div>
-
-                                            <div class="card-subtitle">
-                                                Review calculation summary
-                                            </div>
-
-                                        </div>
-
-                                        <div>
-                                            {badge}
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                                """, unsafe_allow_html=True)
-
-                                # ==========================
-                                # METRICS
-                                # ==========================
-                                col1, col2, col3, col4 = (
-                                    st.columns(4)
-                                )
-
-                                # ==========================
-                                # ORIGINAL
-                                # ==========================
-                                with col1:
-
-                                    st.markdown(f"""
-                                    <div class="metric-card">
-
-                                        <div class="metric-title">
-                                            Original
-                                        </div>
-
-                                        <div class="metric-value">
-                                            {total_original:,.0f}
-                                        </div>
-
-                                    </div>
-                                    """, unsafe_allow_html=True)
-
-                                # ==========================
-                                # CALCULATED
-                                # ==========================
-                                with col2:
-
-                                    st.markdown(f"""
-                                    <div class="metric-card">
-
-                                        <div class="metric-title">
-                                            Calculated
-                                        </div>
-
-                                        <div class="metric-value">
-                                            {total_calc:,.0f}
-                                        </div>
-
-                                    </div>
-                                    """, unsafe_allow_html=True)
-
-                                # ==========================
-                                # DIFFERENCE
-                                # ==========================
-                                with col3:
-
-                                    st.markdown(f"""
-                                    <div class="metric-card">
-
-                                        <div class="metric-title">
-                                            Difference
-                                        </div>
-
-                                        <div class="metric-value">
-                                            {total_diff:,.0f}
-                                        </div>
-
-                                    </div>
-                                    """, unsafe_allow_html=True)
-
-                                # ==========================
-                                # MISSING RATE
-                                # ==========================
-                                with col4:
-
-                                    st.markdown(f"""
-                                    <div class="metric-card">
-
-                                        <div class="metric-title">
-                                            Missing Rate
-                                        </div>
-
-                                        <div class="metric-value">
-                                            {missing_rate}
-                                        </div>
-
-                                    </div>
-                                    """, unsafe_allow_html=True)
-
-                                st.write("")
-
-                                # ==========================
-                                # ACTION SECTION
-                                # ==========================
-                                col_a, col_b = st.columns([2,1])
-
-                                # ==========================
-                                # OPEN SPREADSHEET
-                                # ==========================
-                                with col_a:
-
-                                    st.link_button(
-                                        "📂 Open Review Spreadsheet",
-                                        spreadsheet_url,
-                                        use_container_width=True
-                                    )
-
-                                # ==========================
-                                # APPROVE BUTTON
-                                # ==========================
-                                with col_b:
-
-                                    approve_clicked = st.button(
-                                        f"✅ Approve",
-                                        key=f"approve_{pml_id}",
-                                        type="primary",
-                                        use_container_width=True,
-                                        disabled=(
-                                            missing_rate > 0
-                                            or
-                                            abs(total_diff) > 1
-                                        )
-                                    )
-
-                                    if approve_clicked:
-
-                                        result["approved"] = True
-
-                                        st.success(
-                                            f"{pml_id} approved successfully"
-                                        )
-
-                                # ==========================
-                                # EXPAND REVIEW DATAFRAME
-                                # ==========================
-                                with st.expander(
-                                    f"🔍 Preview Review Data - {pml_id}"
+                                with st.container(
+                                    border=True
                                 ):
 
-                                    preview_df = (
-                                        result["review_df"]
+                                    # ==========================
+                                    # HEADER
+                                    # ==========================
+                                    col1, col2 = st.columns(
+                                        [4,1]
                                     )
 
-                                    st.dataframe(
-                                        preview_df,
-                                        use_container_width=True
-                                    )
+                                    with col1:
 
-                                st.divider()
-                            # ==========================
-                            # APPROVAL SECTION
-                            # ==========================
-                            st.subheader(
-                                "✅ Approval"
-                            )
+                                        st.markdown(
+                                            f"### 📄 {pml_id}"
+                                        )
 
-                            if can_approve:
+                                    with col2:
 
-                                st.success(
-                                    "Semua review lolos validasi"
-                                )
+                                        if status_type == "success":
 
-                                approve_clicked = st.button(
-                                    "✅ Approve Calculation",
-                                    type="primary",
-                                    use_container_width=True
-                                )
+                                            st.success(
+                                                status
+                                            )
 
-                                if approve_clicked:
+                                        elif status_type == "warning":
+
+                                            st.warning(
+                                                status
+                                            )
+
+                                        else:
+
+                                            st.error(
+                                                status
+                                            )
 
                                     # ==========================
-                                    # UPDATE STATUS
+                                    # METRICS
                                     # ==========================
-                                    for result in review_results:
-
-                                        result["approved"] = True
-
-                                    st.success(
-                                        "✅ Calculation approved"
+                                    metric1, metric2, metric3, metric4 = (
+                                        st.columns(4)
                                     )
 
-                            else:
+                                    metric1.metric(
+                                        "Original",
+                                        f"{total_original:,.2f}"
+                                    )
 
-                                st.error(
-                                    "❌ Approval tidak dapat dilakukan"
-                                )
+                                    metric2.metric(
+                                        "Calculated",
+                                        f"{total_calc:,.2f}"
+                                    )
 
+                                    metric3.metric(
+                                        "Difference",
+                                        f"{total_diff:,.2f}"
+                                    )
+
+                                    metric4.metric(
+                                        "Missing Rate",
+                                        missing_rate
+                                    )
+
+                                    st.write("")
+
+                                    # ==========================
+                                    # ACTION BUTTONS
+                                    # ==========================
+                                    btn1, btn2 = st.columns(
+                                        [2,1]
+                                    )
+
+                                    # ==========================
+                                    # OPEN SPREADSHEET
+                                    # ==========================
+                                    with btn1:
+
+                                        st.link_button(
+                                            "📂 Open Review Spreadsheet",
+                                            spreadsheet_url,
+                                            use_container_width=True
+                                        )
+
+                                    # ==========================
+                                    # APPROVE
+                                    # ==========================
+                                    with btn2:
+
+                                        approve_clicked = (
+                                            st.button(
+                                                "✅ Approve",
+                                                key=f"approve_{pml_id}",
+                                                type="primary",
+                                                use_container_width=True,
+                                                disabled=(
+                                                    missing_rate > 0
+                                                    or
+                                                    abs(total_diff) > 1
+                                                )
+                                            )
+                                        )
+
+                                        if approve_clicked:
+
+                                            result["approved"] = True
+
+                                            st.success(
+                                                f"{pml_id} approved"
+                                            )
+
+                                    # ==========================
+                                    # PREVIEW DATA
+                                    # ==========================
+                                    with st.expander(
+                                        "🔍 Preview Review Data"
+                                    ):
+
+                                        st.dataframe(
+                                            review_df,
+                                            use_container_width=True
+                                        )
+
+                                    # ==========================
+                                    # APPROVAL INFO
+                                    # ==========================
+                                    if missing_rate > 0:
+
+                                        st.warning(
+                                            "Masih terdapat RATE NOT FOUND."
+                                        )
+
+                                    elif abs(total_diff) > 1:
+
+                                        st.error(
+                                            "Difference terlalu besar."
+                                        )
+
+                                    else:
+
+                                        st.success(
+                                            "Review lolos validasi."
+                                        )
+
+                                    st.write("")
+                                    
                         # ==========================
                         # SUCCESS
                         # ==========================
