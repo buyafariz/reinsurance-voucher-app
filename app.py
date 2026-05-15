@@ -1958,13 +1958,14 @@ with tab_split:
 
                 # Buat dictionary formatter untuk kolom yang ada saja
                 format_dict = {}
+
                 for col in ACCOUNTING_COLS:
                     if col in df.columns:
-                        # Pastikan data adalah numerik sebelum diformat
+                        # Pastikan data numerik
                         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                         format_dict[col] = "{:,.2f}"
 
-                # Mengubah int format menjadi string
+                # Kolom identifier dijadikan string
                 for col in ["certificate no", "main pol no", "pol holder no"]:
                     if col in df.columns:
                         df[col] = df[col].astype(str).str.strip()
@@ -1977,8 +1978,13 @@ with tab_split:
                     )
 
                 except Exception:
-                    # fallback aman tanpa menampilkan error merah
-                    safe_df = df.astype(str)
+                    # fallback aman
+                    safe_df = df.copy()
+
+                    # hanya convert kolom identifier
+                    for col in ["certificate no", "main pol no", "pol holder no"]:
+                        if col in safe_df.columns:
+                            safe_df[col] = safe_df[col].astype(str)
 
                     st.dataframe(
                         safe_df,
