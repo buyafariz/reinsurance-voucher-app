@@ -4036,8 +4036,8 @@ with tab_calc:
                                                 use_container_width=True,
                                                 disabled=(
                                                     missing_rate > 0
-                                                    or
-                                                    abs(total_diff) > 1
+                                                    # or
+                                                    # abs(total_diff) > 1
                                                 )
                                             )
                                         )
