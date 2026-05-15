@@ -1969,28 +1969,21 @@ with tab_split:
                     if col in df.columns:
                         df[col] = df[col].astype(str).str.strip()
 
-                # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
+                # 3. RENDER MENGGUNAKAN ST.DATAFRAME
                 try:
                     st.dataframe(
                         df.style.format(format_dict),
                         use_container_width=True
-                        )
-                except Exception as e:
-                    st.error(f"Gagal menampilkan preview: {e}")
-                    # Hindari error Arrow / integer terlalu besar
-                    for col in df.columns:
-                        try:
-                            if df[col].dtype == "object":
-                                df[col] = df[col].astype(str)
+                    )
 
-                            # convert integer besar menjadi string
-                            if "no" in col.lower() or "id" in col.lower():
-                                df[col] = df[col].astype(str)
+                except Exception:
+                    # fallback aman tanpa menampilkan error merah
+                    safe_df = df.astype(str)
 
-                        except:
-                            pass
-
-                    st.dataframe(df) # Fallback ke tabel mentah jika styling gagal
+                    st.dataframe(
+                        safe_df,
+                        use_container_width=True
+                    )
 
 
                 # ==========================
