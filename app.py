@@ -1961,33 +1961,36 @@ with tab_split:
 
                 for col in ACCOUNTING_COLS:
                     if col in df.columns:
-                        # Pastikan data numerik
                         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                         format_dict[col] = "{:,.2f}"
 
-                # Kolom identifier dijadikan string
-                for col in ["certificate no", "main pol no", "pol holder no"]:
-                    if col in df.columns:
-                        df[col] = df[col].astype(str).str.strip()
+                # =========================
+                # SAFE DATAFRAME
+                # =========================
+                safe_df = df.copy()
 
-                # 3. RENDER MENGGUNAKAN ST.DATAFRAME
+                for col in safe_df.columns:
+
+                    # Kolom accounting tetap numerik
+                    if col in ACCOUNTING_COLS:
+                        continue
+
+                    # Selain accounting -> string
+                    safe_df[col] = safe_df[col].astype(str).replace("nan", "")
+
+                # =========================
+                # RENDER
+                # =========================
                 try:
                     st.dataframe(
-                        df.style.format(format_dict),
+                        safe_df.style.format(format_dict),
                         use_container_width=True
                     )
 
                 except Exception:
-                    # fallback aman
-                    safe_df = df.copy()
-
-                    # hanya convert kolom identifier
-                    for col in ["certificate no", "main pol no", "pol holder no"]:
-                        if col in safe_df.columns:
-                            safe_df[col] = safe_df[col].astype(str)
-
+                    # fallback final
                     st.dataframe(
-                        safe_df,
+                        safe_df.astype(str),
                         use_container_width=True
                     )
 
