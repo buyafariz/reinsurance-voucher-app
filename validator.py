@@ -696,80 +696,110 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "INWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             # KOB Code
-            kob_series = (df["k.o.b code"].fillna("").astype(str).str.strip())
-            if (kob_series == "").any():
-                errors.append("K.O.B Code tidak boleh kosong")
-            allowed_kob = {"TTY", "FAC"}
-            invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
-            if invalid_kob:
-                errors.append(f"K.O.B Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
+            if "k.o.b code" not in df.columns:
+                errors.append("Tambahkan kolom K.O.B Code")
+            else:
+                kob_series = (df["k.o.b code"].fillna("").astype(str).str.strip())
+                if (kob_series == "").any():
+                    errors.append("K.O.B Code tidak boleh kosong")
+                allowed_kob = {"TTY", "FAC"}
+                invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
+                if invalid_kob:
+                    errors.append(f"K.O.B Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Pay Period Type
-            pay_period_series = (df["pay period type"].fillna("").astype(str).str.strip())
-            if (pay_period_series == "").any():
-                errors.append("Pay Period Type tidak boleh kosong")
-            allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
-            invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
-            if invalid_pay_period:
-                errors.append(f"Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
+            if "pay period type" not in df.columns:
+                errors.append("Tambahkan kolom Pay Period Type")
+            else:
+                pay_period_series = (df["pay period type"].fillna("").astype(str).str.strip())
+                if (pay_period_series == "").any():
+                    errors.append("Pay Period Type tidak boleh kosong")
+                allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
+                invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
+                if invalid_pay_period:
+                    errors.append(f"Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
 
             # COB
-            cob_series = (df["cob"].fillna("").astype(str).str.strip())
-            if (cob_series == "").any():
-                errors.append("COB tidak boleh kosong")
-            allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
-            invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
-            if invalid_cob:
-                errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
+            if "cob" not in df.columns:
+                errors.append("Tambahkan kolom COB")
+            else:
+                cob_series = (df["cob"].fillna("").astype(str).str.strip())
+                if (cob_series == "").any():
+                    errors.append("COB tidak boleh kosong")
+                allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
+                invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
+                if invalid_cob:
+                    errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # CBY
-            cby_series = (df["cby"].fillna("").astype(str).str.strip())
-            if (cby_series == "").any():
-                errors.append("CBY tidak boleh kosong")
+            if "cby" not in df.columns:
+                errors.append("Tambahkan kolom CBY")
+            else:
+                cby_series = (df["cby"].fillna("").astype(str).str.strip())
+                if (cby_series == "").any():
+                    errors.append("CBY tidak boleh kosong")
 
             # CBM
-            cbm_series = (df["cbm"].fillna("").astype(str).str.strip())
-            if (cbm_series == "").any():
-                errors.append("CBM tidak boleh kosong")
+            if "cbm" not in df.columns:
+                errors.append("Tambahkan kolom CBM")
+            else:
+                cbm_series = (df["cbm"].fillna("").astype(str).str.strip())
+                if (cbm_series == "").any():
+                    errors.append("CBM tidak boleh kosong")
 
 
         elif biz_type == "Claim":
             # COB
-            cob_series = (df["classofbusiness"].fillna("").astype(str).str.strip())
-            if (cob_series == "").any():
-                errors.append("ClassOfBusiness tidak boleh kosong")
-            allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
-            invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
-            if invalid_cob:
-                errors.append(f"ClassOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
+            if "classofbusiness" not in df.columns:
+                errors.append("Tambahkan kolom ClassofBusiness")
+            else:
+                cob_series = (df["classofbusiness"].fillna("").astype(str).str.strip())
+                if (cob_series == "").any():
+                    errors.append("ClassOfBusiness tidak boleh kosong")
+                allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
+                invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
+                if invalid_cob:
+                    errors.append(f"ClassOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
             # Pay Period Type
-            pay_period_series = (df["payperiodtype"].fillna("").astype(str).str.strip())
-            if (pay_period_series == "").any():
-                errors.append("PayPeriodType tidak boleh kosong")
-            allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
-            invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
-            if invalid_pay_period:
-                errors.append(f"PayPeriodType harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
+            if "payperiodtype" not in df.columns:
+                errors.append("Tambahkan kolom PayPeriodType")
+            else:
+                pay_period_series = (df["payperiodtype"].fillna("").astype(str).str.strip())
+                if (pay_period_series == "").any():
+                    errors.append("PayPeriodType tidak boleh kosong")
+                allowed_pay_period = {"Monthly", "Quarterly", "Half Yearly", "Yearly", "Single Premium"}
+                invalid_pay_period = set(pay_period_series[pay_period_series != ""].unique()) - allowed_pay_period
+                if invalid_pay_period:
+                    errors.append(f"PayPeriodType harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_pay_period))}")
 
             # KOB Code
-            kob_series = (df["kindofbusiness"].fillna("").astype(str).str.strip())
-            if (kob_series == "").any():
-                errors.append("KindOfBusiness tidak boleh kosong")
-            allowed_kob = {"TTY", "FAC"}
-            invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
-            if invalid_kob:
-                errors.append(f"KindOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
+            if "kindofbusiness" not in df.columns:
+                errors.append("Tambahkan kolom KindOfBusiness")
+            else:
+                kob_series = (df["kindofbusiness"].fillna("").astype(str).str.strip())
+                if (kob_series == "").any():
+                    errors.append("KindOfBusiness tidak boleh kosong")
+                allowed_kob = {"TTY", "FAC"}
+                invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
+                if invalid_kob:
+                    errors.append(f"KindOfBusiness harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # CedBookYear
-            cby_series = (df["cedbookyear"].fillna("").astype(str).str.strip())
-            if (cby_series == "").any():
-                errors.append("CedBookYear tidak boleh kosong")
+            if "cedbookyear" not in df.columns:
+                errors.append("Tambahkan kolom CedBookYear")
+            else:
+                cby_series = (df["cedbookyear"].fillna("").astype(str).str.strip())
+                if (cby_series == "").any():
+                    errors.append("CedBookYear tidak boleh kosong")
 
             # CedBookMonth
-            cbm_series = (df["cedbookmonth"].fillna("").astype(str).str.strip())
-            if (cbm_series == "").any():
-                errors.append("CedBookMonth tidak boleh kosong")
+            if "cedbookmonth" not in df.columns:
+                errors.append("Tambahkan kolom CedBookMonth")
+            else:
+                cbm_series = (df["cedbookmonth"].fillna("").astype(str).str.strip())
+                if (cbm_series == "").any():
+                    errors.append("CedBookMonth tidak boleh kosong")
 
 
     if reins_type == "OUTWARD":
