@@ -910,7 +910,8 @@ def create_review_spreadsheet(
     import pandas as pd
 
     from googleapiclient.http import MediaIoBaseUpload
-    from google.oauth2.credentials import Credentials, service_account
+    from google.oauth2.credentials import Credentials
+    from google.oauth2 import service_account
     import gspread
 
     # ==========================
