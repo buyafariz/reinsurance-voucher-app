@@ -3968,11 +3968,11 @@ with tab_calc:
                                         else:
 
                                             st.markdown(
-                                                f"""
-                                                <div class="small-status">
-                                                    ❌ Difference
-                                                </div>
-                                                """,
+                                                # f"""
+                                                # <div class="small-status">
+                                                #     ❌ Difference
+                                                # </div>
+                                                # """,
                                                 unsafe_allow_html=True
                                             )
 
