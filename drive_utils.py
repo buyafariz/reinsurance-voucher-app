@@ -930,7 +930,8 @@ def create_review_spreadsheet(
     try:
         spreadsheet_file = service.files().create(
             body=file_metadata,
-            fields="id"
+            fields="id",
+            supportsAllDrives=True
         ).execute()
     except HttpError as e:
         st.error(f"Google API Error: {e}")
