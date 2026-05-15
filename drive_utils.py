@@ -970,16 +970,49 @@ def create_review_spreadsheet(
     # ==========================
     export_df = review_df.copy()
 
+    # replace NaN
     export_df = export_df.fillna("")
+
+    # convert semua value menjadi native python
+    for col in export_df.columns:
+
+        # datetime
+        if pd.api.types.is_datetime64_any_dtype(export_df[col]):
+
+            export_df[col] = (
+                export_df[col]
+                .astype(str)
+            )
+
+        # integer besar / numpy object
+        elif export_df[col].dtype == "object":
+
+            export_df[col] = (
+                export_df[col]
+                .astype(str)
+            )
+
+        # float/int numpy
+        else:
+
+            export_df[col] = (
+                export_df[col]
+                .apply(
+                    lambda x:
+                    float(x)
+                    if pd.notna(x)
+                    else ""
+                )
+            )
 
     # ==========================
     # UPLOAD DATAFRAME
     # ==========================
     worksheet.update(
-        [
+        range_name="A1",
+        values=[
             export_df.columns.tolist()
-        ] +
-        export_df.values.tolist()
+        ] + export_df.values.tolist()
     )
 
     # ==========================
