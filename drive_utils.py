@@ -943,7 +943,7 @@ def create_review_spreadsheet(
     # AUTHORIZE GSPREAD
     # ==========================
     creds = Credentials.from_authorized_user_info(
-        st.secrets["google_credentials"],
+        st.secrets["gcp_service_account"],
         scopes=[
             "https://www.googleapis.com/auth/drive",
             "https://www.googleapis.com/auth/spreadsheets"
