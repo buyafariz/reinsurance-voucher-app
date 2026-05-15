@@ -199,6 +199,65 @@ def download_file_from_drive(service, file_id):
     file_stream.seek(0)
     return file_stream
 
+def download_file_csv_from_drive(service, file_id):
+
+    import io
+
+    from googleapiclient.http import (
+        MediaIoBaseDownload
+    )
+
+    # ==========================
+    # GET FILE METADATA
+    # ==========================
+    file_meta = service.files().get(
+        fileId=file_id,
+        fields="mimeType",
+        supportsAllDrives=True
+    ).execute()
+
+    mime_type = file_meta["mimeType"]
+
+    # ==========================
+    # GOOGLE SHEETS
+    # ==========================
+    if mime_type == "application/vnd.google-apps.spreadsheet":
+
+        # Export Google Sheets menjadi CSV
+        request = service.files().export_media(
+            fileId=file_id,
+            mimeType="text/csv"
+        )
+
+    # ==========================
+    # NORMAL FILE
+    # ==========================
+    else:
+
+        request = service.files().get_media(
+            fileId=file_id
+        )
+
+    # ==========================
+    # DOWNLOAD
+    # ==========================
+    file_stream = io.BytesIO()
+
+    downloader = MediaIoBaseDownload(
+        file_stream,
+        request
+    )
+
+    done = False
+
+    while not done:
+
+        _, done = downloader.next_chunk()
+
+    file_stream.seek(0)
+
+    return file_stream
+
 
 def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
     result = service.spreadsheets().values().get(
