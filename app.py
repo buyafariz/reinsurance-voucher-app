@@ -3097,7 +3097,7 @@ with tab_calc:
                             # ==========================
                             pml_file_id = find_drive_file(
                                 service=service,
-                                filename=f"{row['PML ID']}.xlsx",
+                                filename=str(row['PML ID']).strip(),
                                 parent_id=PML_DRIVE_ID,
                                 mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
@@ -4047,7 +4047,7 @@ with tab_calc:
                                         )
 
                                     st.write("")
-                                    
+
                         # ==========================
                         # SUCCESS
                         # ==========================
