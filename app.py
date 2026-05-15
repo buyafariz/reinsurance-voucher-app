@@ -2964,7 +2964,7 @@ with tab_calc:
             if selected_account:
                 rate_file_id = find_drive_file(
                     service=service,
-                    filename=f"{selected_account}.csv",
+                    filename=f"{selected_account}.xlsx",
                     parent_id=RATE_FOLDER_ID
                 )
 
