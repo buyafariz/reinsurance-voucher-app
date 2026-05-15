@@ -9,3 +9,5 @@ google-auth-oauthlib
 portalocker
 streamlit-aggrid
 xlsxwriter
+gspread
+gspread-dataframe
