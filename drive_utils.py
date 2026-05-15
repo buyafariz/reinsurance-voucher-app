@@ -1030,39 +1030,45 @@ def create_review_spreadsheet(
     # ==========================
     export_df = review_df.copy()
 
-    # replace NaN
     export_df = export_df.fillna("")
 
-    # convert semua value menjadi native python
     for col in export_df.columns:
 
-        # datetime
-        if pd.api.types.is_datetime64_any_dtype(export_df[col]):
+        # ==========================
+        # DATETIME
+        # ==========================
+        if pd.api.types.is_datetime64_any_dtype(
+            export_df[col]
+        ):
 
             export_df[col] = (
                 export_df[col]
                 .astype(str)
             )
 
-        # integer besar / numpy object
-        elif export_df[col].dtype == "object":
+        # ==========================
+        # NUMERIC
+        # ==========================
+        elif pd.api.types.is_numeric_dtype(
+            export_df[col]
+        ):
 
             export_df[col] = (
-                export_df[col]
-                .astype(str)
+                pd.to_numeric(
+                    export_df[col],
+                    errors="coerce"
+                )
+                .fillna(0)
             )
 
-        # float/int numpy
+        # ==========================
+        # OTHER TYPES
+        # ==========================
         else:
 
             export_df[col] = (
                 export_df[col]
-                .apply(
-                    lambda x:
-                    float(x)
-                    if pd.notna(x)
-                    else ""
-                )
+                .astype(str)
             )
 
     # ==========================
