@@ -3599,7 +3599,7 @@ with tab_calc:
                         # ==========================
                         # LOAD RATE FILE
                         # ==========================
-                        rate_stream = download_file_csv_from_drive(service, rate_file_id)
+                        rate_stream = download_file_from_drive(service, rate_file_id)
 
                         rate_df = pd.read_csv(rate_stream)
 
