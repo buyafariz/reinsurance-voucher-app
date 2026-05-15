@@ -1683,8 +1683,9 @@ with tab_split:
 
                 pml_file_id = find_drive_file(
                     service=service,
-                    filename=selected_pml_id,
-                    parent_id=PML_DRIVE_ID
+                    filename=f"{selected_pml_id}.xlsx",
+                    parent_id=PML_DRIVE_ID,
+                    mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
                 service = get_drive_service()
@@ -1701,8 +1702,9 @@ with tab_split:
                 # Cari file
                 pml_file_id = find_drive_file(
                     service=service,
-                    filename=selected_pml_id,
-                    parent_id=PML_DRIVE_ID
+                    filename=f"{selected_pml_id}.xlsx",
+                    parent_id=PML_DRIVE_ID,
+                    mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
                 if not pml_file_id:
@@ -2236,8 +2238,9 @@ with tab_split:
 
                 pml_file_id = find_drive_file(
                     service=service,
-                    filename=selected_pml_id,
-                    parent_id=PML_DRIVE_ID
+                    filename=f"{selected_pml_id}.xlsx",
+                    parent_id=PML_DRIVE_ID,
+                    mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
                 service = get_drive_service()
@@ -2254,8 +2257,9 @@ with tab_split:
                 # Cari file
                 pml_file_id = find_drive_file(
                     service=service,
-                    filename=selected_pml_id,
-                    parent_id=PML_DRIVE_ID
+                    filename=f"{selected_pml_id}.xlsx",
+                    parent_id=PML_DRIVE_ID,
+                    mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
                 if not pml_file_id:
@@ -3093,8 +3097,9 @@ with tab_calc:
                             # ==========================
                             pml_file_id = find_drive_file(
                                 service=service,
-                                filename=str(row["PML ID"]).strip(),
-                                parent_id=PML_DRIVE_ID
+                                filename=f"{row['PML ID']}.xlsx",
+                                parent_id=PML_DRIVE_ID,
+                                mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
 
                             if not pml_file_id:
@@ -3527,8 +3532,9 @@ with tab_calc:
                             # ==========================
                             pml_file_id = find_drive_file(
                                 service=service,
-                                filename=str(row["PML ID"]).strip(),
-                                parent_id=PML_DRIVE_ID
+                                filename=f"{row['PML ID']}.xlsx",
+                                parent_id=PML_DRIVE_ID,
+                                mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
 
                             if not pml_file_id:
