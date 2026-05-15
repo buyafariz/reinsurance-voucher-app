@@ -3607,7 +3607,7 @@ with tab_calc:
                         # ==========================
                         rate_stream = download_file_from_drive(service, rate_file_id)
 
-                        rate_df = pd.read_csv(rate_stream)
+                        rate_df = pd.read_excel(rate_stream)
 
                         rate_df.columns = (rate_df.columns.str.strip())
 
