@@ -3770,66 +3770,66 @@ with tab_calc:
                                 review_df.at[idx, "Reins Tabarru (Calc)"] = tabarru
                                 review_df.at[idx, "Reins Ujrah (Calc)"] = ujrah
 
-                                # ==========================
-                                # SUMMARY
-                                # ==========================
-                                total_original = (pd.to_numeric(review_df["Reins Nett Premium"], errors="coerce").fillna(0).sum())
+                            # ==========================
+                            # SUMMARY
+                            # ==========================
+                            total_original = (pd.to_numeric(review_df["Reins Nett Premium"], errors="coerce").fillna(0).sum())
 
-                                total_calc = (pd.to_numeric(review_df["Reins Nett Premium (Calc)"],errors="coerce").fillna(0).sum())
+                            total_calc = (pd.to_numeric(review_df["Reins Nett Premium (Calc)"],errors="coerce").fillna(0).sum())
 
-                                total_diff = (total_calc - total_original)
+                            total_diff = (total_calc - total_original)
 
-                                missing_rate = len(review_df[review_df["Calculation Status"] == "RATE NOT FOUND"])
-
-                                # ==========================
-                                # CREATE REVIEW SPREADSHEET
-                                # ==========================
-                                review_spreadsheet_url = (create_review_spreadsheet(service=service, review_df=review_df, pml_id=row["PML ID"], parent_folder_id=PML_DRIVE_ID))
-
-                                # ==========================
-                                # SAVE RESULT
-                                # ==========================
-                                review_results.append({
-
-                                    "pml_id": row["PML ID"],
-
-                                    "review_df": review_df,
-
-                                    "spreadsheet_url":
-                                        review_spreadsheet_url,
-
-                                    "total_rows":
-                                        len(review_df),
-
-                                    "missing_rate":
-                                        missing_rate,
-
-                                    "total_original":
-                                        total_original,
-
-                                    "total_calc":
-                                        total_calc,
-
-                                    "total_diff":
-                                        total_diff,
-
-                                    "approved":
-                                        False
-                                })
+                            missing_rate = len(review_df[review_df["Calculation Status"] == "RATE NOT FOUND"])
 
                             # ==========================
-                            # SAVE SESSION
+                            # CREATE REVIEW SPREADSHEET
                             # ==========================
-                            st.session_state[
-                                "review_results"
-                            ] = review_results
+                            review_spreadsheet_url = (create_review_spreadsheet(service=service, review_df=review_df, pml_id=row["PML ID"], parent_folder_id=PML_DRIVE_ID))
 
                             # ==========================
-                            # SUCCESS
+                            # SAVE RESULT
                             # ==========================
-                            st.success(
-                                "✅ Calculation selesai"
-                            )
+                            review_results.append({
+
+                                "pml_id": row["PML ID"],
+
+                                "review_df": review_df,
+
+                                "spreadsheet_url":
+                                    review_spreadsheet_url,
+
+                                "total_rows":
+                                    len(review_df),
+
+                                "missing_rate":
+                                    missing_rate,
+
+                                "total_original":
+                                    total_original,
+
+                                "total_calc":
+                                    total_calc,
+
+                                "total_diff":
+                                    total_diff,
+
+                                "approved":
+                                    False
+                            })
+
+                        # ==========================
+                        # SAVE SESSION
+                        # ==========================
+                        st.session_state[
+                            "review_results"
+                        ] = review_results
+
+                        # ==========================
+                        # SUCCESS
+                        # ==========================
+                        st.success(
+                            "✅ Calculation selesai"
+                        )
 
 
                     #     # 🔒 LOCK SEKALI SAJA
