@@ -927,10 +927,14 @@ def create_review_spreadsheet(
         "parents": [parent_folder_id]
     }
 
-    spreadsheet_file = service.files().create(
-        body=file_metadata,
-        fields="id"
-    ).execute()
+    try:
+        spreadsheet_file = service.files().create(
+            body=file_metadata,
+            fields="id"
+        ).execute()
+    except HttpError as e:
+        st.error(f"Google API Error: {e}")
+        raise
 
     spreadsheet_id = spreadsheet_file["id"]
 
