@@ -4696,7 +4696,7 @@ with tab_calc:
 
                             pml_file_id = find_drive_file(
                                 service=service,
-                                filename=str(row["PML ID"]).strip(),
+                                filename=f"{row["PML ID"]}.xlsx",
                                 parent_id=PML_DRIVE_ID
                             )
 
