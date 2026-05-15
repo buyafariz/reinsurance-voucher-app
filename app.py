@@ -3932,7 +3932,7 @@ with tab_calc:
                                     # HEADER
                                     # ==========================
                                     col1, col2 = st.columns(
-                                        [5,1]
+                                        [4,2]
                                     )
 
                                     with col1:
