@@ -910,7 +910,7 @@ def create_review_spreadsheet(
     import pandas as pd
 
     from googleapiclient.http import MediaIoBaseUpload
-    from google.oauth2.credentials import Credentials
+    from google.oauth2.credentials import Credentials, service_account
     import gspread
 
     # ==========================
@@ -942,7 +942,7 @@ def create_review_spreadsheet(
     # ==========================
     # AUTHORIZE GSPREAD
     # ==========================
-    creds = Credentials.from_authorized_user_info(
+    creds = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=[
             "https://www.googleapis.com/auth/drive",
