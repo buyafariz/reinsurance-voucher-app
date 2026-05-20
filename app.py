@@ -3615,6 +3615,7 @@ with tab_calc:
                         rate_df.columns = (rate_df.columns.str.strip())
 
                         rate_df["Gender"] = (rate_df["Gender"].astype(str).str.strip().str.upper())
+                        rate_df["Smoker"] = (rate_df["Smoker"].astype(str).str.strip().str.upper())
                         rate_df["Ced Product Code"] = (rate_df["Ced Product Code"].astype(str).str.strip().str.upper())
                         rate_df["Age At"] = (pd.to_numeric(rate_df["Age At"],errors="coerce").fillna(0).astype(int))
                         rate_df["Rate"] = (pd.to_numeric(rate_df["Rate"],errors="coerce"))
@@ -3629,6 +3630,7 @@ with tab_calc:
 
                             key = (
                                 rate_row["Gender"],
+                                rate_row["Smoker"],
                                 rate_row["Ced Product Code"],
                                 rate_row["Age At"]
                             )
@@ -3712,11 +3714,13 @@ with tab_calc:
 
                                 gender = (str(data["Gender"]).strip().upper())
 
+                                smoker = (str(data["Smoker"]).strip().upper())
+
                                 product_code = (str(data["Ced Product Code"]).strip().upper())
 
                                 age = int(pd.to_numeric(data["Age At"],errors="coerce") or 0)
 
-                                key = (gender, product_code, age)
+                                key = (gender, smoker, product_code, age)
 
                                 # ==========================
                                 # GET RATE
