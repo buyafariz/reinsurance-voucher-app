@@ -16,6 +16,7 @@ REQUIRED_COLUMNS_INWARD = [
     "term month",
     "expired date",
     "medical",
+    "smoker",
     "ced product code",
     "ced coverage code",
     "ccy code",
@@ -562,6 +563,36 @@ def validate_voucher(df, biz_type: str, reins_type:str):
 
             if not df["medical"].isin(["M", "N"]).all():
                 errors.append("Kolom medical hanya boleh bernilai M atau N")
+
+    # =========================
+    # 7. SMOKER (S / N)
+    # =========================
+    if reins_type == "INWARD":
+        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            df["smoker"] = df["smoker"].astype(str).str.strip().str.upper()
+
+            if not df["medical"].isin(["S", "N"]).all():
+                errors.append("Kolom medical hanya boleh bernilai S atau N")
+
+        # elif biz_type == "Claim":
+        #     df["medicalcategory"] = df["medicalcategory"].astype(str).str.strip().str.upper()
+
+        #     if not df["medicalcategory"].isin(["M", "N"]).all():
+        #         errors.append("Kolom medical hanya boleh bernilai M atau N")
+
+    # elif reins_type == "OUTWARD":
+    #     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    #         df["medical"] = df["medical"].astype(str).str.strip().str.upper()
+
+    #         if not df["medical"].isin(["M", "N"]).all():
+    #             errors.append("Kolom medical hanya boleh bernilai M atau N")
+
+    #     elif biz_type == "Claim":
+    #         df["medical"] = df["medical"].astype(str).str.strip().str.upper()
+
+    #         if not df["medical"].isin(["M", "N"]).all():
+    #             errors.append("Kolom medical hanya boleh bernilai M atau N")
+
 
     # =========================
     # 8. CCY CODE (3 HURUF)
