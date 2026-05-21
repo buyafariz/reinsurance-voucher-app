@@ -571,8 +571,8 @@ def validate_voucher(df, biz_type: str, reins_type:str):
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             df["smoker"] = df["smoker"].astype(str).str.strip().str.upper()
 
-            if not df["medical"].isin(["S", "N"]).all():
-                errors.append("Kolom medical hanya boleh bernilai S atau N")
+            if not df["smoker"].isin(["S", "N"]).all():
+                errors.append("Kolom smoker hanya boleh bernilai S atau N")
 
         # elif biz_type == "Claim":
         #     df["medicalcategory"] = df["medicalcategory"].astype(str).str.strip().str.upper()
