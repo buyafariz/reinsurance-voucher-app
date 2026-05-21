@@ -2344,7 +2344,7 @@ with tab_split:
                     # 🔥 PREVENT DOUBLE RUN
                     if st.session_state.is_processing_split:
                         st.warning("⏳ Proses masih berjalan...")
-                        st.stop()
+                        # st.stop()
 
                     st.session_state.is_processing_split = True
 
