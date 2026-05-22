@@ -4902,7 +4902,7 @@ with tab_calc:
 
                                         "Kontribusi (IDR)": total_contribution * rate_exchange,
                                         "Commission (IDR)": commission * rate_exchange,
-                                        "Overiding (IDR)": overriding * rate_exchange,
+                                        "Overriding (IDR)": overriding * rate_exchange,
                                         "Total Commission (IDR)": total_commission * rate_exchange,
                                         "Gross Premium Income (IDR)": (
                                             total_contribution - total_commission
