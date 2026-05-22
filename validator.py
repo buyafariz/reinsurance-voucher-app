@@ -69,7 +69,8 @@ REQUIRED_COLUMNS_OUTWARD = [
     "valuation date",
     "inw vouc id",
     "retro type",
-    "cob"
+    "cob",
+    "references no"
 ]
 
 # Claim
@@ -968,13 +969,25 @@ def validate_calculate(df, biz_type: str, reins_type: str):
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             errors = []
 
-            for col in ["K.O.B Code", "Ccy Code", "Pay Period Type", "CBY", "CBM", "COB"]:
+            for col in ["K.O.B Code", "Ccy Code", "Pay Period Type", "CBY", "CBM", "COB", "References No"]:
 
                 if col not in df.columns:
                     errors.append(f"Kolom {col} tidak ditemukan")
                     continue
 
-                unique = df[col].dropna().unique()
+                series = (
+                    df[col]
+                    .fillna("")
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # cek kosong
+                if (series == "").any():
+                    errors.append(f"Kolom {col} terdapat data kosong")
+                    continue
+
+                unique = series.unique()
 
                 if len(unique) > 1:
                     errors.append(col)
@@ -982,13 +995,25 @@ def validate_calculate(df, biz_type: str, reins_type: str):
         if biz_type == "Claim":
             errors = []
 
-            for col in ["CedBookYear", "CedBookMonth", "ClassOfBusiness", "PayPeriodType", "KindOfBusiness", "Currency"]:
+            for col in ["CedBookYear", "CedBookMonth", "ClassOfBusiness", "PayPeriodType", "KindOfBusiness", "Currency", "References No"]:
 
                 if col not in df.columns:
                     errors.append(f"Kolom {col} tidak ditemukan")
                     continue
 
-                unique = df[col].dropna().unique()
+                series = (
+                    df[col]
+                    .fillna("")
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # cek kosong
+                if (series == "").any():
+                    errors.append(f"Kolom {col} terdapat data kosong")
+                    continue
+
+                unique = series.unique()
 
                 if len(unique) > 1:
                     errors.append(col)
@@ -997,13 +1022,25 @@ def validate_calculate(df, biz_type: str, reins_type: str):
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             errors = []
 
-            for col in ["Retro Type", "Acc With Name", "KOB Code", "Ccy Code", "Premium Ccy", "Ced Book Year", "Ced Book Month", "Out Pay Period Type", "COB"]:
+            for col in ["Retro Type", "Acc With Name", "KOB Code", "Ccy Code", "Premium Ccy", "Ced Book Year", "Ced Book Month", "Out Pay Period Type", "COB", "References No"]:
 
                 if col not in df.columns:
                     errors.append(f"Kolom {col} tidak ditemukan")
                     continue
 
-                unique = df[col].dropna().unique()
+                series = (
+                    df[col]
+                    .fillna("")
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # cek kosong
+                if (series == "").any():
+                    errors.append(f"Kolom {col} terdapat data kosong")
+                    continue
+
+                unique = series.unique()
 
                 if len(unique) > 1:
                     errors.append(col)
@@ -1011,13 +1048,25 @@ def validate_calculate(df, biz_type: str, reins_type: str):
         if biz_type == "Claim":
             errors = []
 
-            for col in ["Retro Type", "Cedant Name", "COB Detail", "KOB Code", "Ced Book Year", "Ced Book Month", "Method of Payment", "Curr", "Reinsurer Name"]:
+            for col in ["Retro Type", "Cedant Name", "COB Detail", "KOB Code", "Ced Book Year", "Ced Book Month", "Method of Payment", "Curr", "Reinsurer Name", "Voucher Desc"]:
 
                 if col not in df.columns:
                     errors.append(f"Kolom {col} tidak ditemukan")
                     continue
 
-                unique = df[col].dropna().unique()
+                series = (
+                    df[col]
+                    .fillna("")
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # cek kosong
+                if (series == "").any():
+                    errors.append(f"Kolom {col} terdapat data kosong")
+                    continue
+
+                unique = series.unique()
 
                 if len(unique) > 1:
                     errors.append(col)
