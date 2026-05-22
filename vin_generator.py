@@ -245,6 +245,58 @@ def generate_pml_from_drive(
     return voucher, next_seq, file_id
 
 
+def generate_pml_outward_from_drive(
+    service,
+    period_folder_id,
+    year,
+    month,
+    find_drive_file,
+    biz_type
+):
+    filename = f"{get_log_pml_filename(year,month)} (Outward)"
+
+    file_id = find_drive_file(
+        service=service,
+        filename=filename,
+        parent_id=period_folder_id,
+        mime_type="application/vnd.google-apps.spreadsheet"
+    )
+
+    # ==========================
+    # Jika belum ada log
+    # ==========================
+    if not file_id:
+        next_seq = 1
+
+    else:
+        log_df = load_log_from_gsheet(
+            service=service,
+            spreadsheet_id=file_id
+        )
+
+        if log_df.empty or "Seq No" not in log_df.columns:
+            next_seq = 1
+        else:
+            seq_series = pd.to_numeric(log_df["Seq No"], errors="coerce")
+            seq_series = seq_series.dropna()
+
+            if seq_series.empty:
+                next_seq = 1
+            else:
+                next_seq = int(seq_series.max()) + 1
+
+    # ==========================
+    # Format Voucher
+    # ==========================
+    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        voucher = f"PML{year}{month:02d}LIS{next_seq:04d}"
+
+    elif biz_type == "Claim":
+        voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
+
+    return voucher, next_seq, file_id
+
+
 
 def generate_vin_from_drive_log(log_df, year, month, biz_type):
     if log_df.empty:
