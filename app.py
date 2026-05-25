@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher, validate_calculate
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vou_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive, generate_pml_outward_from_drive, split_upload_with_log, split_upload_with_log_outward, get_last_seq_no, generate_pml_id
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_references_no_from_pml
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_pml_metadata
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -2843,34 +2843,42 @@ with tab_calc:
             st.stop()
 
         # ==========================
-        # ENRICH DENGAN KOLOM PRODUCT DARI FILE PML
+        # ENRICH DENGAN PRODUCT, CBY, CBM DARI FILE PML
         # ==========================
         if not df_posted.empty:
 
-            with st.spinner("🔄 Memuat data Product dari file PML..."):
+            with st.spinner("🔄 Memuat data Product, CBY, CBM dari file PML..."):
 
-                product_map = {}
+                meta_map = {}
 
                 for pml_id in df_posted["PML ID"].unique():
-                    ref_val = get_references_no_from_pml(
+                    meta_map[pml_id] = get_pml_metadata(
                         _service=service,
                         pml_id=str(pml_id),
                         pml_drive_id=PML_DRIVE_ID
                     )
-                    product_map[pml_id] = ref_val if ref_val else "-"
 
-                df_posted["Product"] = df_posted["PML ID"].map(product_map)
+                df_posted["Product"] = df_posted["PML ID"].map(lambda x: meta_map[x]["product"])
+                df_posted["CBY"]     = df_posted["PML ID"].map(lambda x: meta_map[x]["cby"])
+                df_posted["CBM"]     = df_posted["PML ID"].map(lambda x: meta_map[x]["cbm"])
 
-            # Susun ulang kolom: sisipkan Product setelah Cedant Company, sebelum PIC
+            # ==========================
+            # SUSUN ULANG KOLOM
+            # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
+            # ==========================
             cols = list(df_posted.columns)
 
-            if "Cedant Company" in cols and "PIC" in cols and "Product" in cols:
-                # Hapus Product dari posisi sekarang
-                cols.remove("Product")
-                # Sisipkan setelah Cedant Company
+            for col in ["Product", "CBY", "CBM"]:
+                if col in cols:
+                    cols.remove(col)
+
+            if "Cedant Company" in cols:
                 insert_pos = cols.index("Cedant Company") + 1
                 cols.insert(insert_pos, "Product")
-                df_posted = df_posted[cols]
+                cols.insert(insert_pos + 1, "CBY")
+                cols.insert(insert_pos + 2, "CBM")
+
+            df_posted = df_posted[cols]
 
         # ==========================
         # SEARCH (OPSIONAL)
@@ -2915,6 +2923,7 @@ with tab_calc:
 
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
 
+
             edited_df = st.data_editor(
                 df_to_edit,
                 column_config={
@@ -2923,14 +2932,24 @@ with tab_calc:
                         help="Pilih baris ini untuk di-calculate",
                         default=False,
                     ),
-                    "PML ID": st.column_config.Column(disabled=True),
-                    "STATUS": st.column_config.Column(disabled=True),
-                    
-                    # ✅ TAMBAHAN: Kolom Product
+                    "PML ID":  st.column_config.Column(disabled=True),
+                    "STATUS":  st.column_config.Column(disabled=True),
+
+                    # ✅ Kolom dari file PML
                     "Product": st.column_config.Column(
                         "Product",
                         disabled=True,
-                        help="Diambil dari baris pertama kolom References No pada file PML"
+                        help="Baris pertama kolom References No pada file PML"
+                    ),
+                    "CBY": st.column_config.Column(
+                        "CBY",
+                        disabled=True,
+                        help="Baris pertama kolom CBY pada file PML"
+                    ),
+                    "CBM": st.column_config.Column(
+                        "CBM",
+                        disabled=True,
+                        help="Baris pertama kolom CBM pada file PML"
                     ),
 
                     "Total Contribution": st.column_config.NumberColumn(

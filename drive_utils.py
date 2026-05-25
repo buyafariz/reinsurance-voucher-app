@@ -1184,13 +1184,12 @@ def create_review_spreadsheet(
 # FUNGSI BACA REFERENCES NO DARI FILE PML
 # ==========================
 @st.cache_data(ttl=300)
-def get_references_no_from_pml(_service, pml_id, pml_drive_id):
+def get_pml_metadata(_service, pml_id, pml_drive_id):
     """
     Cari file PML berdasarkan PML ID di folder Drive,
-    lalu ambil baris pertama kolom 'References No'.
+    lalu ambil baris pertama kolom 'References No', 'CBY', dan 'CBM'.
     """
     try:
-        # Cari file dengan nama mengandung PML ID
         file_id = find_drive_file(
             service=_service,
             filename=f"{pml_id}.xlsx",
@@ -1199,9 +1198,8 @@ def get_references_no_from_pml(_service, pml_id, pml_drive_id):
         )
 
         if not file_id:
-            return None
+            return {"product": "-", "cby": "-", "cbm": "-"}
 
-        # Download file sebagai bytes
         from googleapiclient.http import MediaIoBaseDownload
         import io
 
@@ -1213,21 +1211,25 @@ def get_references_no_from_pml(_service, pml_id, pml_drive_id):
             _, done = downloader.next_chunk()
 
         buffer.seek(0)
-        df_pml = pd.read_excel(buffer, nrows=2)  # Baca 2 baris saja (header + baris 1)
-
-        # Normalisasi nama kolom
+        df_pml = pd.read_excel(buffer, nrows=2)  # header + baris pertama saja
         df_pml.columns = df_pml.columns.str.strip()
 
-        # Cari kolom References No (case-insensitive)
-        ref_col = next(
-            (c for c in df_pml.columns if c.lower().replace(" ", "") == "referencesno"),
-            None
-        )
+        def get_first_val(df, col_name):
+            """Ambil nilai baris pertama dari kolom, case-insensitive."""
+            match = next(
+                (c for c in df.columns if c.strip().lower() == col_name.strip().lower()),
+                None
+            )
+            if match and not df.empty:
+                val = df[match].iloc[0]
+                return str(val) if pd.notna(val) else "-"
+            return "-"
 
-        if ref_col and not df_pml.empty:
-            return str(df_pml[ref_col].iloc[0]) if pd.notna(df_pml[ref_col].iloc[0]) else None
+        return {
+            "product": get_first_val(df_pml, "References No"),
+            "cby":     get_first_val(df_pml, "CBY"),
+            "cbm":     get_first_val(df_pml, "CBM"),
+        }
 
-        return None
-
-    except Exception as e:
-        return None
+    except Exception:
+        return {"product": "-", "cby": "-", "cbm": "-"}
