@@ -1179,3 +1179,55 @@ def create_review_spreadsheet(
 
     return spreadsheet_url
 
+
+# ==========================
+# FUNGSI BACA REFERENCES NO DARI FILE PML
+# ==========================
+@st.cache_data(ttl=300)
+def get_references_no_from_pml(_service, pml_id, pml_drive_id):
+    """
+    Cari file PML berdasarkan PML ID di folder Drive,
+    lalu ambil baris pertama kolom 'References No'.
+    """
+    try:
+        # Cari file dengan nama mengandung PML ID
+        file_id = find_drive_file(
+            service=_service,
+            filename=f"{pml_id}.xlsx",
+            parent_id=pml_drive_id,
+            mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        if not file_id:
+            return None
+
+        # Download file sebagai bytes
+        from googleapiclient.http import MediaIoBaseDownload
+        import io
+
+        request = _service.files().get_media(fileId=file_id)
+        buffer = io.BytesIO()
+        downloader = MediaIoBaseDownload(buffer, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+        buffer.seek(0)
+        df_pml = pd.read_excel(buffer, nrows=2)  # Baca 2 baris saja (header + baris 1)
+
+        # Normalisasi nama kolom
+        df_pml.columns = df_pml.columns.str.strip()
+
+        # Cari kolom References No (case-insensitive)
+        ref_col = next(
+            (c for c in df_pml.columns if c.lower().replace(" ", "") == "referencesno"),
+            None
+        )
+
+        if ref_col and not df_pml.empty:
+            return str(df_pml[ref_col].iloc[0]) if pd.notna(df_pml[ref_col].iloc[0]) else None
+
+        return None
+
+    except Exception as e:
+        return None

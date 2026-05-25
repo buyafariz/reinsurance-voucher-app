@@ -8,7 +8,7 @@ import st_aggrid
 from datetime import datetime
 from validator import validate_voucher, validate_calculate
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vou_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive, generate_pml_outward_from_drive, split_upload_with_log, split_upload_with_log_outward, get_last_seq_no, generate_pml_id
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet
+from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_references_no_from_pml
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -2843,6 +2843,36 @@ with tab_calc:
             st.stop()
 
         # ==========================
+        # ENRICH DENGAN KOLOM PRODUCT DARI FILE PML
+        # ==========================
+        if not df_posted.empty:
+
+            with st.spinner("🔄 Memuat data Product dari file PML..."):
+
+                product_map = {}
+
+                for pml_id in df_posted["PML ID"].unique():
+                    ref_val = get_references_no_from_pml(
+                        _service=service,
+                        pml_id=str(pml_id),
+                        pml_drive_id=PML_DRIVE_ID
+                    )
+                    product_map[pml_id] = ref_val if ref_val else "-"
+
+                df_posted["Product"] = df_posted["PML ID"].map(product_map)
+
+            # Susun ulang kolom: sisipkan Product setelah Cedant Company, sebelum PIC
+            cols = list(df_posted.columns)
+
+            if "Cedant Company" in cols and "PIC" in cols and "Product" in cols:
+                # Hapus Product dari posisi sekarang
+                cols.remove("Product")
+                # Sisipkan setelah Cedant Company
+                insert_pos = cols.index("Cedant Company") + 1
+                cols.insert(insert_pos, "Product")
+                df_posted = df_posted[cols]
+
+        # ==========================
         # SEARCH (OPSIONAL)
         # ==========================
         search = st.text_input("🔍 Cari PML ID")
@@ -2895,7 +2925,13 @@ with tab_calc:
                     ),
                     "PML ID": st.column_config.Column(disabled=True),
                     "STATUS": st.column_config.Column(disabled=True),
-                    "Product": st.column_config.Column(disabled=True),
+                    
+                    # ✅ TAMBAHAN: Kolom Product
+                    "Product": st.column_config.Column(
+                        "Product",
+                        disabled=True,
+                        help="Diambil dari baris pertama kolom References No pada file PML"
+                    ),
 
                     "Total Contribution": st.column_config.NumberColumn(
                         "Total Contribution",
