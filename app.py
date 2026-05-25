@@ -2977,7 +2977,7 @@ with tab_calc:
                         format="%,.0f"
                     ),
                 },
-                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                disabled=["No", "PML ID", "STATUS", "Product", "CBY", "CBM", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
                 hide_index=True,
                 use_container_width=True,
             )
