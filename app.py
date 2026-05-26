@@ -2932,7 +2932,7 @@ with tab_calc:
             with col_f2:
                 # ✅ Ganti selectbox → text_input untuk pencarian bebas
                 filter_product = st.text_input(
-                    "🔍 Product (ketik untuk cari)",
+                    "🔍 Product",
                     key="filter_product"
                 )
 
