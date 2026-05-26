@@ -2952,8 +2952,11 @@ with tab_calc:
         if filter_cedant != "(Semua)":
             df_filtered = df_filtered[df_filtered["Cedant Company"] == filter_cedant]
 
-        if filter_product != "(Semua)":
-            df_filtered = df_filtered[df_filtered["Product"] == filter_product]
+        # ✅ Hanya filter jika ada keyword yang diketik (kosong = tampil semua)
+        if filter_product.strip():  # <-- ini yang perlu diperbaiki
+            df_filtered = df_filtered[
+                df_filtered["Product"].astype(str).str.contains(filter_product.strip(), case=False, na=False)
+            ]
 
         if filter_cby != "(Semua)":
             df_filtered = df_filtered[df_filtered["CBY"] == filter_cby]
