@@ -2893,37 +2893,105 @@ with tab_calc:
         st.write(f"Total PML POSTED: {len(df_posted)}")
 
         # ==========================
-        # UI SELECT (SAMA DENGAN SPLIT)
+        # FILTER
         # ==========================
-        # st.markdown("### 📋 Pilih Data PML untuk Di-Calculate")
+        with st.expander("🔽 Filter Data", expanded=False):
+
+            col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+
+            with col_f1:
+                # Filter Cedant Company
+                cedant_options = ["(Semua)"] + sorted(df_posted["Cedant Company"].dropna().unique().tolist())
+                filter_cedant = st.selectbox("Cedant Company", cedant_options, key="filter_cedant")
+
+            with col_f2:
+                # Filter Product
+                product_options = ["(Semua)"] + sorted(df_posted["Product"].dropna().unique().tolist())
+                filter_product = st.selectbox("Product", product_options, key="filter_product")
+
+            with col_f3:
+                # Filter CBY
+                cby_options = ["(Semua)"] + sorted(df_posted["CBY"].dropna().unique().tolist())
+                filter_cby = st.selectbox("CBY", cby_options, key="filter_cby")
+
+            with col_f4:
+                # Filter CBM
+                cbm_options = ["(Semua)"] + sorted(df_posted["CBM"].dropna().unique().tolist())
+                filter_cbm = st.selectbox("CBM", cbm_options, key="filter_cbm")
+
+        # Terapkan filter
+        df_filtered = df_posted.copy()
+
+        if filter_cedant != "(Semua)":
+            df_filtered = df_filtered[df_filtered["Cedant Company"] == filter_cedant]
+
+        if filter_product != "(Semua)":
+            df_filtered = df_filtered[df_filtered["Product"] == filter_product]
+
+        if filter_cby != "(Semua)":
+            df_filtered = df_filtered[df_filtered["CBY"] == filter_cby]
+
+        if filter_cbm != "(Semua)":
+            df_filtered = df_filtered[df_filtered["CBM"] == filter_cbm]
+
+        st.write(f"Total PML POSTED: {len(df_filtered)} {'(difilter)' if len(df_filtered) != len(df_posted) else ''}")
+
+        # ==========================
+        # UI SELECT
+        # ==========================
         st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
-        if not df_posted.empty:
+        if not df_filtered.empty:
 
-            # Tambahkan checkbox column
-            df_to_edit = df_posted.copy()
-            df_to_edit.insert(0, "Pilih", False)
+            # ==========================
+            # SELECT ALL BUTTON
+            # ==========================
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 6])
 
-            # Data editor (CONSISTENT UI)
+            with col_btn1:
+                select_all = st.button("✅ Select All", key="btn_select_all")
 
+            with col_btn2:
+                deselect_all = st.button("⬜ Deselect All", key="btn_deselect_all")
+
+            # State untuk select all
+            if "pilih_state" not in st.session_state:
+                st.session_state["pilih_state"] = {}
+
+            if select_all:
+                for idx in df_filtered.index:
+                    st.session_state["pilih_state"][idx] = True
+
+            if deselect_all:
+                for idx in df_filtered.index:
+                    st.session_state["pilih_state"][idx] = False
+
+            # Tambahkan checkbox column berdasarkan state
+            df_to_edit = df_filtered.copy()
+            df_to_edit.insert(
+                0, "Pilih",
+                df_to_edit.index.map(lambda i: st.session_state["pilih_state"].get(i, False))
+            )
+
+            # ==========================
+            # CLEAN NUMERIC
+            # ==========================
             cols_numeric = ["Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
-
                 def clean_number(x):
                     x = str(x)
-
-                    # kalau ada dua separator → anggap titik ribuan, koma desimal
                     if "." in x and "," in x:
                         x = x.replace(".", "").replace(",", ".")
                     else:
                         x = x.replace(",", "")
-
                     return pd.to_numeric(x, errors="coerce")
 
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
 
-
+            # ==========================
+            # DATA EDITOR
+            # ==========================
             edited_df = st.data_editor(
                 df_to_edit,
                 column_config={
@@ -2934,72 +3002,63 @@ with tab_calc:
                     ),
                     "PML ID":  st.column_config.Column(disabled=True),
                     "STATUS":  st.column_config.Column(disabled=True),
-
-                    # ✅ Kolom dari file PML
                     "Product": st.column_config.Column(
-                        "Product",
-                        disabled=True,
+                        "Product", disabled=True,
                         help="Baris pertama kolom References No pada file PML"
                     ),
                     "CBY": st.column_config.Column(
-                        "CBY",
-                        disabled=True,
+                        "CBY", disabled=True,
                         help="Baris pertama kolom CBY pada file PML"
                     ),
                     "CBM": st.column_config.Column(
-                        "CBM",
-                        disabled=True,
+                        "CBM", disabled=True,
                         help="Baris pertama kolom CBM pada file PML"
                     ),
-
                     "Total Contribution": st.column_config.NumberColumn(
-                        "Total Contribution",
-                        format="%,.0f"
+                        "Total Contribution", format="%,.0f"
                     ),
                     "Gross Premium Income": st.column_config.NumberColumn(
-                        "Gross Premium Income",
-                        format="%,.0f"
+                        "Gross Premium Income", format="%,.0f"
                     ),
                     "Tabarru": st.column_config.NumberColumn(
-                        "Tabarru",
-                        format="%,.0f"
+                        "Tabarru", format="%,.0f"
                     ),
                     "Ujrah": st.column_config.NumberColumn(
-                        "Ujrah",
-                        format="%,.0f"
+                        "Ujrah", format="%,.0f"
                     ),
                     "Claim": st.column_config.NumberColumn(
-                        "Claim",
-                        format="%,.0f"
+                        "Claim", format="%,.0f"
                     ),
                     "Balance": st.column_config.NumberColumn(
-                        "Balance",
-                        format="%,.0f"
+                        "Balance", format="%,.0f"
                     ),
                 },
-                disabled=["No", "PML ID", "STATUS", "Product", "CBY", "CBM", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                disabled=[
+                    "No", "PML ID", "STATUS", "Product", "CBY", "CBM",
+                    "Total Contribution", "Gross Premium Income",
+                    "Tabarru", "Ujrah", "Claim", "Balance"
+                ],
                 hide_index=True,
                 use_container_width=True,
+                key="data_editor_calculate"
             )
+
+            # ==========================
+            # SYNC STATE DARI EDITED DF
+            # ==========================
+            for idx, row in edited_df.iterrows():
+                st.session_state["pilih_state"][idx] = row["Pilih"]
 
             # ==========================
             # AMBIL YANG DIPILIH
             # ==========================
             selected_rows = edited_df[edited_df["Pilih"] == True]
 
-            # ==========================
-            # VALIDASI
-            # ==========================
             if selected_rows.empty:
                 st.info("Silakan pilih minimal satu baris untuk melanjutkan.")
                 selected_rows = None
-
             else:
                 st.success(f"✅ {len(selected_rows)} baris terpilih")
-
-                # tampilkan list PML biar user yakin
-                # st.write("PML terpilih:")
-                # st.write(selected_rows["PML ID"].tolist())
 
         
             # ==========================
