@@ -2863,16 +2863,6 @@ with tab_calc:
                 df_posted["CBM"]     = df_posted["PML ID"].map(lambda x: meta_map[x]["cbm"])
 
             # ==========================
-            # DEBUG SEMENTARA — hapus setelah konfirmasi
-            # ==========================
-            sample_pml_id = df_posted["PML ID"].iloc[0]
-            st.write(f"**Sample PML ID:** `{sample_pml_id}`")
-            st.write(f"**meta_map result:** `{meta_map.get(sample_pml_id)}`")
-            st.write(f"**CBY values:** `{df_posted['CBY'].head(3).tolist()}`")
-            st.write(f"**CBM values:** `{df_posted['CBM'].head(3).tolist()}`")
-            st.write(f"**Kolom df_posted:** `{list(df_posted.columns)}`")
-
-            # ==========================
             # SUSUN ULANG KOLOM
             # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
             # ==========================
