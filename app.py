@@ -2930,9 +2930,11 @@ with tab_calc:
                 filter_cedant = st.selectbox("Cedant Company", cedant_options, key="filter_cedant")
 
             with col_f2:
-                # Filter Product
-                product_options = ["(Semua)"] + sorted(df_posted["Product"].dropna().unique().tolist())
-                filter_product = st.selectbox("Product", product_options, key="filter_product")
+                # ✅ Ganti selectbox → text_input untuk pencarian bebas
+                filter_product = st.text_input(
+                    "🔍 Product (ketik untuk cari)",
+                    key="filter_product"
+                )
 
             with col_f3:
                 # Filter CBY
