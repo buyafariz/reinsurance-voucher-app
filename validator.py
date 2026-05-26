@@ -652,6 +652,12 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             if not (df["reins sum at risk"] <= df["sum at risk"]).all():
                 errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
 
+            if not (df["sum at risk"] <= df["sum insured"]).all():
+                errors.append("sum at risk tidak boleh lebih besar dari sum insured")
+
+            if not (df["reins sum at risk"] <= df["reins sum insured"]).all():
+                errors.append("reins sum at risk tidak boleh lebih besar dari reins sum insured")
+
         elif biz_type == "Claim":
             if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
                 errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
