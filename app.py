@@ -5033,7 +5033,7 @@ with tab_calc:
 
                                         "Total Contribution": total_contribution,
                                         "Commission": commission,
-                                        "Overriding": overriding,
+                                        "Overriding": (df["Retro Overriding"].sum() if "Retro Overriding" in df.columns else 0),
                                         "Total Commission": total_commission,
                                         "Gross Premium Income": total_contribution - total_commission,
                                         "Tabarru": df["Retro Tabarru"].sum(),
@@ -5046,7 +5046,7 @@ with tab_calc:
 
                                         "Kontribusi (IDR)": total_contribution * rate_exchange,
                                         "Commission (IDR)": commission * rate_exchange,
-                                        "Overriding (IDR)": overriding * rate_exchange,
+                                        "Overriding (IDR)": (df["Retro Overriding"].sum() if "Retro Overriding" in df.columns else 0) * rate_exchange,
                                         "Total Commission (IDR)": total_commission * rate_exchange,
                                         "Gross Premium Income (IDR)": (
                                             total_contribution - total_commission
