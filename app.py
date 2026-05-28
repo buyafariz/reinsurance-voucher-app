@@ -637,9 +637,9 @@ with tab_upload:
                                 "PIC": pic,
                                 "Curr":curr,
                                 "Total Contribution": df["reins total premium"].sum(),
-                                "Commission": df["reins total comm"].sum(),
+                                "Commission": df["reins comm"].sum(),
                                 "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
-                                "Total Commission": (df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Total Commission": (df["reins comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
                                 "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
                                 "Tabarru": df["reins tabarru"].sum(),
                                 "Ujrah": df["reins ujrah"].sum(),
@@ -3360,7 +3360,7 @@ with tab_calc:
 
                                     total_contribution = df["Reins Total Premium"].sum()
 
-                                    commission = df["Reins Total Comm"].sum()
+                                    commission = df["Reins Comm"].sum()
 
                                     overriding = (
                                         df["Reins Overriding"].sum()
