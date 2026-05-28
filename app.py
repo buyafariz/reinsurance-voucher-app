@@ -644,7 +644,7 @@ with tab_upload:
                                 "Tabarru": df["reins tabarru"].sum(),
                                 "Ujrah": df["reins ujrah"].sum(),
                                 "Claim": 0,
-                                "Balance": df["reins total premium"].sum() - df["reins total comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "Balance": df["reins total premium"].sum() - df["reins comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
                                 "REMARKS": remarks,
                                 "STATUS": "POSTED",
                                 #"ENTRY_TYPE": entry_type,
