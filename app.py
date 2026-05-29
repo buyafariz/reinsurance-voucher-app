@@ -2860,39 +2860,6 @@ with tab_calc:
         if not df_posted.empty:
 
             # ==========================
-            # ENRICH DENGAN PRODUCT, CBY, CBM DARI FILE PML
-            # Gunakan session_state agar tidak reload setiap interaksi
-            # ==========================
-
-            # Buat cache key unik per periode
-            cache_key = f"pml_meta_{year}_{month}"
-
-            if cache_key not in st.session_state:
-
-                with st.spinner("🔄 Memuat data Product, CBY, CBM dari file PML..."):
-
-                    meta_map = {}
-
-                    for pml_id in df_posted["PML ID"].unique():
-                        meta_map[pml_id] = get_pml_metadata(
-                            _service=service,
-                            pml_id=str(pml_id),
-                            pml_drive_id=PML_DRIVE_ID
-                        )
-
-                    st.session_state[cache_key] = meta_map
-
-            else:
-                # Sudah ada di session, langsung pakai
-                meta_map = st.session_state[cache_key]
-
-            # Assign ke df_posted
-            df_posted["Product"] = df_posted["PML ID"].map(lambda x: meta_map.get(x, {}).get("product", "-"))
-            df_posted["CBY"]     = df_posted["PML ID"].map(lambda x: meta_map.get(x, {}).get("cby", "-"))
-            df_posted["CBM"]     = df_posted["PML ID"].map(lambda x: meta_map.get(x, {}).get("cbm", "-"))
-
-
-            # ==========================
             # SUSUN ULANG KOLOM
             # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
             # ==========================
@@ -2910,11 +2877,12 @@ with tab_calc:
 
             df_posted = df_posted[cols]
 
-        # ✅ TAMBAHKAN TOMBOL REFRESH DI SINI
-        # Letakkan setelah blok enrich, sebelum search
-        if st.button("🔄 Refresh Data PML", key="btn_refresh_pml"):
-            if cache_key in st.session_state:
-                del st.session_state[cache_key]
+        # ==========================
+        # REFRESH LOG PML
+        # Reload log dari Google Sheet (bukan dari file PML)
+        # ==========================
+        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
+            st.cache_data.clear()
             st.rerun()
 
         # ==========================
@@ -2926,8 +2894,6 @@ with tab_calc:
             df_posted = df_posted[
                 df_posted["PML ID"].astype(str).str.contains(search, case=False, na=False)
             ]
-
-        st.write(f"Total PML POSTED: {len(df_posted)}")
 
         # ==========================
         # FILTER
