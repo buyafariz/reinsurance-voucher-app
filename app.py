@@ -2855,25 +2855,6 @@ with tab_calc:
             st.stop()
 
         # ==========================
-        # SUSUN ULANG KOLOM
-        # Product, CBY, CBM langsung dari log — tidak perlu mapping
-        # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
-        # ==========================
-        cols = list(df_posted.columns)
-
-        for col in ["Product", "CBY", "CBM"]:
-            if col in cols:
-                cols.remove(col)
-
-        if "Cedant Company" in cols:
-            insert_pos = cols.index("Cedant Company") + 1
-            cols.insert(insert_pos,     "Product")
-            cols.insert(insert_pos + 1, "CBY")
-            cols.insert(insert_pos + 2, "CBM")
-
-        df_posted = df_posted[cols]
-
-        # ==========================
         # REFRESH LOG PML
         # Reload log dari Google Sheet (bukan dari file PML)
         # ==========================
