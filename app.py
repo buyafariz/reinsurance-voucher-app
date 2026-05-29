@@ -2960,7 +2960,7 @@ with tab_calc:
             # ==========================
             # SELECT ALL BUTTON
             # ==========================
-            col_btn1, col_btn2, col_btn3 = st.columns([2.5, 2.5, 8])
+            col_btn1, col_btn2, col_btn3 = st.columns([2.5, 2.5, 10])
 
             with col_btn1:
                 select_all = st.button("✅ Select All", key="btn_select_all")
