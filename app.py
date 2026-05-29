@@ -3741,59 +3741,48 @@ with tab_calc:
 
                     try:
                         
-                        # ==========================
+# ==========================
                         # LOAD RATE FILE
                         # ==========================
                         rate_stream = download_file_from_drive(service, rate_file_id)
 
                         rate_df = pd.read_excel(rate_stream)
 
-                        rate_df.columns = (rate_df.columns.str.strip())
-
-                        rate_df["Gender"] = (rate_df["Gender"].astype(str).str.strip().str.upper())
-                        rate_df["Smoker"] = (rate_df["Smoker"].astype(str).str.strip().str.upper())
-                        rate_df["Ced Product Code"] = (rate_df["Ced Product Code"].astype(str).str.strip().str.upper())
-                        rate_df["Age At"] = (pd.to_numeric(rate_df["Age At"],errors="coerce").fillna(0).astype(int))
-                        rate_df["Rate"] = (pd.to_numeric(rate_df["Rate"],errors="coerce"))
+                        rate_df.columns = rate_df.columns.str.strip()
 
                         # ==========================
-                        # CREATE RATE MAP
+                        # NORMALIZE RATE COLUMNS
                         # ==========================
-
-                        rate_map = {}
-
-                        for _, rate_row in rate_df.iterrows():
-
-                            key = (
-                                rate_row["Gender"],
-                                rate_row["Smoker"],
-                                rate_row["Ced Product Code"],
-                                rate_row["Age At"]
-                            )
-
-                            rate_map[key] = rate_row["Rate"]
-
-                        # ==========================
-                        # REVIEW RESULTS
-                        # ==========================
-                        review_results = []
+                        rate_df["Gender"]           = rate_df["Gender"].astype(str).str.strip().str.upper()
+                        rate_df["Smoker"]           = rate_df["Smoker"].astype(str).str.strip().str.upper()
+                        rate_df["Ced Product Code"] = rate_df["Ced Product Code"].astype(str).str.strip().str.upper()
+                        rate_df["Age At"]           = pd.to_numeric(rate_df["Age At"], errors="coerce").fillna(0).astype(int)
+                        rate_df["Rate"]             = pd.to_numeric(rate_df["Rate"], errors="coerce")
+                        rate_df["Effective Start"]  = pd.to_datetime(rate_df["Effective Start"], errors="coerce", dayfirst=True)
+                        rate_df["Effective End"]    = pd.to_datetime(rate_df["Effective End"], errors="coerce", dayfirst=True)
 
                         # ==========================
                         # LOOP EACH PML
                         # ==========================
-
                         for validated in validated_data:
 
                             row = validated["row"]
-
-                            df = validated["df"]
+                            df  = validated["df"]
 
                             review_df = df.copy()
 
                             # ==========================
+                            # NORMALIZE PML COLUMNS
+                            # ==========================
+                            review_df["Gender"]           = review_df["Gender"].astype(str).str.strip().str.upper()
+                            review_df["Smoker"]           = review_df["Smoker"].astype(str).str.strip().str.upper()
+                            review_df["Ced Product Code"] = review_df["Ced Product Code"].astype(str).str.strip().str.upper()
+                            review_df["Age At"]           = pd.to_numeric(review_df["Age At"], errors="coerce").fillna(0).astype(int)
+                            review_df["Issue Date"]       = pd.to_datetime(review_df["Issue Date"], errors="coerce", dayfirst=True)
+
+                            # ==========================
                             # INSERT CALC COLUMNS
                             # ==========================
-
                             calc_pairs = [
                                 "Reins Premium",
                                 "Reins EM Premium",
@@ -3805,119 +3794,91 @@ with tab_calc:
                                 "Reins Nett Premium"
                             ]
 
-                            # ==========================
-                            # INSERT RATE COLUMN
-                            # ==========================
-
-                            premium_idx = review_df.columns.get_loc(
-                                "Reins Premium"
-                            )
+                            premium_idx = review_df.columns.get_loc("Reins Premium")
 
                             if "Rate (Calc)" not in review_df.columns:
-
-                                review_df.insert(
-                                    premium_idx,
-                                    "Rate (Calc)",
-                                    None
-                                )
-
-                            # ==========================
-                            # INSERT CALC RESULT COLUMNS
-                            # ==========================
+                                review_df.insert(premium_idx, "Rate (Calc)", None)
 
                             for col in calc_pairs:
-
                                 idx = review_df.columns.get_loc(col)
-
                                 review_df.insert(idx + 1, f"{col} (Calc)", 0.0)
 
-                            # ==========================
-                            # OPTIONAL STATUS
-                            # ==========================
                             if "Calculation Status" not in review_df.columns:
-
                                 review_df["Calculation Status"] = ""
 
                             # ==========================
                             # LOOP EACH ROW
                             # ==========================
-
                             for idx, data in review_df.iterrows():
 
-                                # ==========================
-                                # BUILD KEY
-                                # ==========================
-
-                                gender = (str(data["Gender"]).strip().upper())
-
-                                smoker = (str(data["Smoker"]).strip().upper())
-
-                                product_code = (str(data["Ced Product Code"]).strip().upper())
-
-                                age = int(pd.to_numeric(data["Age At"],errors="coerce") or 0)
-
-                                key = (gender, smoker, product_code, age)
+                                gender       = str(data["Gender"]).strip().upper()
+                                smoker       = str(data["Smoker"]).strip().upper()
+                                product_code = str(data["Ced Product Code"]).strip().upper()
+                                age          = int(pd.to_numeric(data["Age At"], errors="coerce") or 0)
+                                issue_date   = data["Issue Date"]
 
                                 # ==========================
-                                # GET RATE
+                                # CARI RATE BERDASARKAN
+                                # Gender, Smoker, Product Code, Age,
+                                # dan Issue Date di antara Effective Start & End
                                 # ==========================
+                                matched_rate = rate_df[
+                                    (rate_df["Gender"]           == gender) &
+                                    (rate_df["Smoker"]           == smoker) &
+                                    (rate_df["Ced Product Code"] == product_code) &
+                                    (rate_df["Age At"]           == age) &
+                                    (rate_df["Effective Start"]  <= issue_date) &
+                                    (rate_df["Effective End"]    >= issue_date)
+                                ]
 
-                                rate = rate_map.get(key)
-
-                                if rate is None:
-
-                                    review_df.at[idx, "Calculation Status"] = (
-                                        "RATE NOT FOUND"
-                                    )
-
+                                if matched_rate.empty:
+                                    review_df.at[idx, "Calculation Status"] = "RATE NOT FOUND"
                                     continue
+
+                                rate = matched_rate.iloc[0]["Rate"]
 
                                 review_df.at[idx, "Rate (Calc)"] = rate
 
                                 # ==========================
                                 # NUMERIC CONVERSION
                                 # ==========================
-
-                                sum_at_risk = (pd.to_numeric(data["Reins Sum At Risk"],errors="coerce"))
-                                em_rate = (pd.to_numeric(data["Ced EM Rate"],errors="coerce"))
-                                er_rate = (pd.to_numeric(data["Ced ER Rate"],errors="coerce"))
-                                commission = (pd.to_numeric(data["Reins Total Comm"],errors="coerce"))
-                                nett_premium = pd.to_numeric(data["Reins Nett Premium"],errors="coerce")
+                                sum_at_risk  = pd.to_numeric(data["Reins Sum At Risk"], errors="coerce")
+                                em_rate      = pd.to_numeric(data["Ced EM Rate"],       errors="coerce")
+                                er_rate      = pd.to_numeric(data["Ced ER Rate"],       errors="coerce")
+                                commission   = pd.to_numeric(data["Reins Total Comm"],  errors="coerce")
+                                nett_premium = pd.to_numeric(data["Reins Nett Premium"], errors="coerce")
 
                                 # ==========================
                                 # TABARRU & UJRAH %
                                 # ==========================
-
                                 if nett_premium and nett_premium != 0:
-                                    tabarru_percentage = data["Reins Tabarru"]/nett_premium
-                                    ujrah_percentage = data["Reins Ujrah"]/nett_premium
+                                    tabarru_percentage = data["Reins Tabarru"] / nett_premium
+                                    ujrah_percentage   = data["Reins Ujrah"]   / nett_premium
                                 else:
                                     tabarru_percentage = 0
-                                    ujrah_percentage = 0
+                                    ujrah_percentage   = 0
 
                                 # ==========================
                                 # CALCULATION
                                 # ==========================
-
-                                premium = (sum_at_risk * rate) / 1000
-                                em_premium = (premium * em_rate) / 100
-                                er_premium = (sum_at_risk * er_rate) / 1000
+                                premium       = (sum_at_risk * rate) / 1000
+                                em_premium    = (premium * em_rate) / 100
+                                er_premium    = (sum_at_risk * er_rate) / 1000
                                 total_premium = premium + em_premium + er_premium
-                                nett_premium = total_premium - commission
-                                tabarru = nett_premium * tabarru_percentage
-                                ujrah = nett_premium * ujrah_percentage
+                                nett_premium  = total_premium - commission
+                                tabarru       = nett_premium * tabarru_percentage
+                                ujrah         = nett_premium * ujrah_percentage
 
                                 # ==========================
                                 # SAVE RESULT
                                 # ==========================
-
-                                review_df.at[idx, "Reins Premium (Calc)"] = premium
-                                review_df.at[idx, "Reins EM Premium (Calc)"] = em_premium
-                                review_df.at[idx, "Reins ER Premium (Calc)"] = er_premium
+                                review_df.at[idx, "Reins Premium (Calc)"]       = premium
+                                review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium
+                                review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium
                                 review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium
-                                review_df.at[idx, "Reins Nett Premium (Calc)"] = nett_premium
-                                review_df.at[idx, "Reins Tabarru (Calc)"] = tabarru
-                                review_df.at[idx, "Reins Ujrah (Calc)"] = ujrah
+                                review_df.at[idx, "Reins Nett Premium (Calc)"]  = nett_premium
+                                review_df.at[idx, "Reins Tabarru (Calc)"]       = tabarru
+                                review_df.at[idx, "Reins Ujrah (Calc)"]         = ujrah
 
                             # ==========================
                             # SUMMARY
