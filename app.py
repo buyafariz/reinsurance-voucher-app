@@ -3761,6 +3761,9 @@ with tab_calc:
                         rate_df["Effective Start"]  = pd.to_datetime(rate_df["Effective Start"], errors="coerce", dayfirst=True)
                         rate_df["Effective End"]    = pd.to_datetime(rate_df["Effective End"], errors="coerce", dayfirst=True)
 
+                        # ✅ TAMBAHKAN DI SINI — sebelum loop
+                        review_results = []
+
                         # ==========================
                         # LOOP EACH PML
                         # ==========================
