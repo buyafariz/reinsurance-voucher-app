@@ -753,6 +753,23 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     # =========================
     if reins_type == "INWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            # Ced EM Rate
+            if "ced em rate" not in df.columns:
+                errors.append("Tambahkan kolom Ced EM Rate")
+            else:
+                em_rate = (df["ced em rate"].fillna("").astype(str).str.strip())
+                if (em_rate == "").any():
+                    errors.append("Ced EM Rate tidak boleh kosong")
+
+            # Ced ER Rate
+            if "ced er rate" not in df.columns:
+                errors.append("Tambahkan kolom Ced ER Rate")
+            else:
+                er_rate = (df["ced er rate"].fillna("").astype(str).str.strip())
+                if (er_rate == "").any():
+                    errors.append("Ced ER Rate tidak boleh kosong")
+
+
             # KOB Code
             if "k.o.b code" not in df.columns:
                 errors.append("Tambahkan kolom K.O.B Code")
