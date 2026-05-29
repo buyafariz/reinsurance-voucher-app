@@ -3867,28 +3867,30 @@ with tab_calc:
                                 else:
                                     tabarru_percentage = 0
                                     ujrah_percentage   = 0
-
+                                    
                                 # ==========================
                                 # OVERRIDING %
                                 # ==========================
-                                if overriding != 0:
-                                    overriding_percentage = data["Reins Overriding"] / data["Reins Total Premium"]
+                                reins_total_premium = pd.to_numeric(data["Reins Total Premium"], errors="coerce")
+
+                                if pd.notna(overriding) and pd.notna(reins_total_premium) and reins_total_premium != 0:
+                                    overriding_percentage = overriding / reins_total_premium
                                 else:
-                                    overriding_percentage   = 0
+                                    overriding_percentage = 0
 
                                 # ==========================
                                 # CALCULATION
                                 # ==========================
-                                rate_ced             = (premium/sum_at_risk) * 1000
-                                premium_calc         = (sum_at_risk * rate) / 1000
-                                em_premium_calc      = (premium * em_rate) / 100
-                                er_premium_calc      = (sum_at_risk * er_rate) / 1000
-                                total_premium_calc   = premium + em_premium_calc + er_premium_calc
-                                overriding_calc      = total_premium_calc * overriding_percentage
-                                total_comm_calc      = overriding_calc
-                                nett_premium_calc    = total_premium_calc - total_comm_calc
-                                tabarru_calc         = nett_premium_calc * tabarru_percentage
-                                ujrah_calc           = nett_premium_calc * ujrah_percentage
+                                rate_ced           = (premium / sum_at_risk) * 1000
+                                premium_calc       = (sum_at_risk * rate) / 1000
+                                em_premium_calc    = (premium_calc * em_rate) / 100   
+                                er_premium_calc    = (sum_at_risk * er_rate) / 1000
+                                total_premium_calc = premium_calc + em_premium_calc + er_premium_calc
+                                overriding_calc    = total_premium_calc * overriding_percentage
+                                total_comm_calc    = overriding_calc
+                                nett_premium_calc  = total_premium_calc - total_comm_calc
+                                tabarru_calc       = nett_premium_calc * tabarru_percentage
+                                ujrah_calc         = nett_premium_calc * ujrah_percentage
 
 
                                 # ==========================
