@@ -3852,6 +3852,7 @@ with tab_calc:
                                 em_rate      = pd.to_numeric(data["Ced EM Rate"],       errors="coerce")
                                 er_rate      = pd.to_numeric(data["Ced ER Rate"],       errors="coerce")
                                 commission   = pd.to_numeric(data["Reins Total Comm"],  errors="coerce")
+                                premium      = pd.to_numeric(date["Reins Premium"]), errors="coerce"
                                 nett_premium = pd.to_numeric(data["Reins Nett Premium"], errors="coerce")
 
                                 # ==========================
@@ -3867,6 +3868,7 @@ with tab_calc:
                                 # ==========================
                                 # CALCULATION
                                 # ==========================
+                                rate          = (premium/sum_at_risk) * 1000
                                 premium       = (sum_at_risk * rate) / 1000
                                 em_premium    = (premium * em_rate) / 100
                                 er_premium    = (sum_at_risk * er_rate) / 1000
@@ -3878,6 +3880,7 @@ with tab_calc:
                                 # ==========================
                                 # SAVE RESULT
                                 # ==========================
+                                review_df.at[idx, "Rate"]                       = rate
                                 review_df.at[idx, "Reins Premium (Calc)"]       = premium
                                 review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium
                                 review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium
