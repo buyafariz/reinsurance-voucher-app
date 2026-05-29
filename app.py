@@ -2855,27 +2855,22 @@ with tab_calc:
             st.stop()
 
         # ==========================
-        # ENRICH DENGAN PRODUCT, CBY, CBM DARI FILE PML
+        # SUSUN ULANG KOLOM
+        # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
         # ==========================
-        if not df_posted.empty:
+        cols = list(df_posted.columns)
 
-            # ==========================
-            # SUSUN ULANG KOLOM
-            # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
-            # ==========================
-            cols = list(df_posted.columns)
+        for col in ["Product", "CBY", "CBM"]:
+            if col in cols:
+                cols.remove(col)
 
-            for col in ["Product", "CBY", "CBM"]:
-                if col in cols:
-                    cols.remove(col)
+        if "Cedant Company" in cols:
+            insert_pos = cols.index("Cedant Company") + 1
+            cols.insert(insert_pos, "Product")
+            cols.insert(insert_pos + 1, "CBY")
+            cols.insert(insert_pos + 2, "CBM")
 
-            if "Cedant Company" in cols:
-                insert_pos = cols.index("Cedant Company") + 1
-                cols.insert(insert_pos, "Product")
-                cols.insert(insert_pos + 1, "CBY")
-                cols.insert(insert_pos + 2, "CBM")
-
-            df_posted = df_posted[cols]
+        df_posted = df_posted[cols]
 
         # ==========================
         # REFRESH LOG PML
