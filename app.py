@@ -2835,6 +2835,18 @@ with tab_calc:
         log_df.columns = log_df.columns.str.strip()
 
         # ==========================
+        # SNAPSHOT LOG KE SESSION STATE
+        # Proteksi dari upload user lain saat sedang memilih
+        # ==========================
+        log_snapshot_key = f"log_snapshot_inward_{year}_{month}"
+
+        if log_snapshot_key not in st.session_state:
+            st.session_state[log_snapshot_key] = log_df.copy()
+
+        # Gunakan snapshot, bukan log_df langsung
+        df_working = st.session_state[log_snapshot_key]
+
+        # ==========================
         # VALIDASI KOLOM
         # ==========================
         required_cols = ["PML ID", "STATUS"]
@@ -2856,11 +2868,28 @@ with tab_calc:
 
         # ==========================
         # REFRESH LOG PML
-        # Reload log dari Google Sheet (bukan dari file PML)
         # ==========================
-        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
-            st.cache_data.clear()
-            st.rerun()
+        col_ref1, col_ref2 = st.columns([1, 5])
+
+        with col_ref1:
+            if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
+                # Hapus snapshot agar load ulang dari GSheet
+                if log_snapshot_key in st.session_state:
+                    del st.session_state[log_snapshot_key]
+                st.cache_data.clear()
+                st.rerun()
+
+        with col_ref2:
+            # Warning jika log GSheet lebih baru dari snapshot
+            current_posted_count = len(log_df[log_df["STATUS"] == "POSTED"])
+            snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
+
+            if current_posted_count != snapshot_posted_count:
+                st.warning(
+                    f"⚠️ Log PML telah diperbarui oleh user lain "
+                    f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                    f"Klik Refresh jika ingin memuat data terbaru."
+                )
 
         # ==========================
         # SEARCH (OPSIONAL)
@@ -3527,15 +3556,23 @@ with tab_calc:
                         # ==========================
                         # DONE
                         # ==========================
-                        end_time = time.time()
-                        duration = int(end_time - start_time)
-
                         if success_count > 0:
+
+                            # Hapus snapshot agar next load ambil data fresh
+                            if log_snapshot_key in st.session_state:
+                                del st.session_state[log_snapshot_key]
+
+                            # Reset pilih state
+                            st.session_state["pilih_state"] = {}
+
+                            end_time = time.time()
+                            duration = int(end_time - start_time)
 
                             st.success(
                                 f"✅ {success_count} voucher berhasil diposting "
                                 f"({duration} detik)"
                             )
+
 
                     except RuntimeError:
 
