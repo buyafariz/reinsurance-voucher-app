@@ -3792,6 +3792,8 @@ with tab_calc:
                                 "Reins ER Premium",
                                 "Reins Oth. Premium",
                                 "Reins Total Premium",
+                                "Reins Overriding",
+                                "Reins Total Comm",
                                 "Reins Tabarru",
                                 "Reins Ujrah",
                                 "Reins Nett Premium"
@@ -3848,11 +3850,12 @@ with tab_calc:
                                 # ==========================
                                 # NUMERIC CONVERSION
                                 # ==========================
-                                sum_at_risk  = pd.to_numeric(data["Reins Sum At Risk"], errors="coerce")
-                                em_rate      = pd.to_numeric(data["Ced EM Rate"],       errors="coerce")
-                                er_rate      = pd.to_numeric(data["Ced ER Rate"],       errors="coerce")
-                                commission   = pd.to_numeric(data["Reins Total Comm"],  errors="coerce")
-                                premium      = pd.to_numeric(data["Reins Premium"],     errors="coerce")
+                                sum_at_risk  = pd.to_numeric(data["Reins Sum At Risk"],  errors="coerce")
+                                em_rate      = pd.to_numeric(data["Ced EM Rate"],        errors="coerce")
+                                er_rate      = pd.to_numeric(data["Ced ER Rate"],        errors="coerce")
+                                overriding   = pd.to_numeric(data["Reins Overriding"],   errors="coerce")
+                                commission   = pd.to_numeric(data["Reins Total Comm"],   errors="coerce")
+                                premium      = pd.to_numeric(data["Reins Premium"],      errors="coerce")
                                 nett_premium = pd.to_numeric(data["Reins Nett Premium"], errors="coerce")
 
                                 # ==========================
@@ -3866,28 +3869,40 @@ with tab_calc:
                                     ujrah_percentage   = 0
 
                                 # ==========================
+                                # OVERRIDING %
+                                # ==========================
+                                if overriding != 0:
+                                    overriding_percentage = data["Reins Overriding"] / data["Reins Total Premium"]
+                                else:
+                                    overriding_percentage   = 0
+
+                                # ==========================
                                 # CALCULATION
                                 # ==========================
-                                rate_ced          = (premium/sum_at_risk) * 1000
-                                premium       = (sum_at_risk * rate) / 1000
-                                em_premium    = (premium * em_rate) / 100
-                                er_premium    = (sum_at_risk * er_rate) / 1000
-                                total_premium = premium + em_premium + er_premium
-                                nett_premium  = total_premium - commission
-                                tabarru       = nett_premium * tabarru_percentage
-                                ujrah         = nett_premium * ujrah_percentage
+                                rate_ced             = (premium/sum_at_risk) * 1000
+                                premium_calc         = (sum_at_risk * rate) / 1000
+                                em_premium_calc      = (premium * em_rate) / 100
+                                er_premium_calc      = (sum_at_risk * er_rate) / 1000
+                                total_premium_calc   = premium + em_premium_calc + er_premium_calc
+                                overriding_calc      = total_premium_calc * overriding_percentage
+                                total_comm_calc      = overriding_calc
+                                nett_premium_calc    = total_premium_calc - total_comm_calc
+                                tabarru_calc         = nett_premium_calc * tabarru_percentage
+                                ujrah_calc           = nett_premium_calc * ujrah_percentage
+
 
                                 # ==========================
                                 # SAVE RESULT
                                 # ==========================
                                 review_df.at[idx, "Rate"]                       = rate_ced
-                                review_df.at[idx, "Reins Premium (Calc)"]       = premium
-                                review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium
-                                review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium
-                                review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium
-                                review_df.at[idx, "Reins Nett Premium (Calc)"]  = nett_premium
-                                review_df.at[idx, "Reins Tabarru (Calc)"]       = tabarru
-                                review_df.at[idx, "Reins Ujrah (Calc)"]         = ujrah
+                                review_df.at[idx, "Reins Premium (Calc)"]       = premium_calc
+                                review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium_calc
+                                review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium_calc
+                                review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium_calc
+                                review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium_calc
+                                review_df.at[idx, "Reins Nett Premium (Calc)"]  = nett_premium_calc
+                                review_df.at[idx, "Reins Tabarru (Calc)"]       = tabarru_calc
+                                review_df.at[idx, "Reins Ujrah (Calc)"]         = ujrah_calc
 
                             # ==========================
                             # SUMMARY
