@@ -3867,7 +3867,7 @@ with tab_calc:
                                 else:
                                     tabarru_percentage = 0
                                     ujrah_percentage   = 0
-                                    
+
                                 # ==========================
                                 # OVERRIDING %
                                 # ==========================
@@ -3901,7 +3901,8 @@ with tab_calc:
                                 review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium_calc
                                 review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium_calc
                                 review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium_calc
-                                review_df.at[idx, "Reins Total Premium (Calc)"] = total_premium_calc
+                                review_df.at[idx, "Reins Overriding (Calc)"]    = overriding_calc
+                                review_df.at[idx, "Reins Total Comm (Calc)"]    = total_comm_calc
                                 review_df.at[idx, "Reins Nett Premium (Calc)"]  = nett_premium_calc
                                 review_df.at[idx, "Reins Tabarru (Calc)"]       = tabarru_calc
                                 review_df.at[idx, "Reins Ujrah (Calc)"]         = ujrah_calc
