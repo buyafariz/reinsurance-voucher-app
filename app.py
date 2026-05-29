@@ -3852,7 +3852,7 @@ with tab_calc:
                                 em_rate      = pd.to_numeric(data["Ced EM Rate"],       errors="coerce")
                                 er_rate      = pd.to_numeric(data["Ced ER Rate"],       errors="coerce")
                                 commission   = pd.to_numeric(data["Reins Total Comm"],  errors="coerce")
-                                premium      = pd.to_numeric(date["Reins Premium"]), errors="coerce"
+                                premium      = pd.to_numeric(date["Reins Premium"],     errors="coerce")
                                 nett_premium = pd.to_numeric(data["Reins Nett Premium"], errors="coerce")
 
                                 # ==========================
