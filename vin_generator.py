@@ -521,6 +521,9 @@ def split_upload_with_log(
         # HITUNG NILAI
         # ==========================
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            product = group["References No"][0]
+            cby = group["CBY"][0]
+            cbm = group["CBM"][0]
             total_contribution = group["Reins Total Premium"].sum()
             commission = group["Reins Total Comm"].sum()
             overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
@@ -539,6 +542,9 @@ def split_upload_with_log(
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
                 "PIC": base_info["pic"],
+                "Product": product,
+                "CBY": cby,
+                "CBM": cbm,
                 "Curr": base_info["curr"],
                 "Total Contribution": total_contribution,
                 "Commission": commission,
@@ -563,6 +569,9 @@ def split_upload_with_log(
 
         elif biz_type == "Claim":
             claim = group["Marein Share IDR"].sum()
+            product = group["References No"][0]
+            cby = group["CedBookYear"][0]
+            cbm = group["CedBookMonth"][0]
 
             # ==========================
             # LOG
@@ -575,6 +584,9 @@ def split_upload_with_log(
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
                 "PIC": base_info["pic"],
+                "Product": product,
+                "CBY": cby,
+                "CBM": cbm,
                 "Curr": base_info["curr"],
                 "Total Contribution": 0,
                 "Commission": 0,
@@ -682,6 +694,10 @@ def split_upload_with_log_outward(
         # HITUNG NILAI
         # ==========================
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            product = group["References No"][0]
+            cby = group["Ced Book Year"][0]
+            cbm = group["Ced Book Month"][0]
+
             total_contribution = group["Retro Total Premium"].sum()
             commission = group["Retro Total Comm"].sum()
             overriding = group["Retro Overriding"].sum() if "Retro Overriding" in group.columns else 0
@@ -700,6 +716,9 @@ def split_upload_with_log_outward(
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
                 "PIC": base_info["pic"],
+                "Product": product,
+                "CBY": cby,
+                "CBM": cbm,
                 "Curr": base_info["curr"],
                 "Total Contribution": total_contribution,
                 "Commission": commission,
@@ -724,6 +743,9 @@ def split_upload_with_log_outward(
 
         elif biz_type == "Claim":
             claim = group["Your Share"].sum()
+            product = group["Voucher Desc"][0]
+            cby = group["Ced Book Year"][0]
+            cbm = group["Ced Book Month"][0]
 
             # ==========================
             # LOG
@@ -736,6 +758,9 @@ def split_upload_with_log_outward(
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
                 "PIC": base_info["pic"],
+                "Product": product,
+                "CBY": cby,
+                "CBM": cbm,
                 "Curr": base_info["curr"],
                 "Total Contribution": 0,
                 "Commission": 0,
