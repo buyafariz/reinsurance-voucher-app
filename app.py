@@ -3798,9 +3798,12 @@ with tab_calc:
                             ]
 
                             premium_idx = review_df.columns.get_loc("Reins Premium")
-
                             if "Rate (Calc)" not in review_df.columns:
                                 review_df.insert(premium_idx, "Rate (Calc)", None)
+
+                            rate_calc_idx = review_df.columns.get_loc("Rate (Calc)")
+                            if "Rate" not in review_df.columns:
+                                review_df.insert(rate_calc_idx, "Rate", None)
 
                             for col in calc_pairs:
                                 idx = review_df.columns.get_loc(col)
