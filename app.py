@@ -2856,6 +2856,7 @@ with tab_calc:
 
         # ==========================
         # SUSUN ULANG KOLOM
+        # Product, CBY, CBM langsung dari log — tidak perlu mapping
         # Urutan: ... Cedant Company | Product | CBY | CBM | PIC ...
         # ==========================
         cols = list(df_posted.columns)
@@ -2866,7 +2867,7 @@ with tab_calc:
 
         if "Cedant Company" in cols:
             insert_pos = cols.index("Cedant Company") + 1
-            cols.insert(insert_pos, "Product")
+            cols.insert(insert_pos,     "Product")
             cols.insert(insert_pos + 1, "CBY")
             cols.insert(insert_pos + 2, "CBM")
 
