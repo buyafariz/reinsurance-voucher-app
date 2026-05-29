@@ -2860,7 +2860,7 @@ with tab_calc:
         # ==========================
         # FILTER STATUS POSTED
         # ==========================
-        df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
+        df_posted = df_working[df_working["STATUS"] == "POSTED"].copy()
 
         if df_posted.empty:
             st.info("Tidak ada data dengan status POSTED")
@@ -3741,7 +3741,7 @@ with tab_calc:
 
                     try:
                         
-# ==========================
+                        # ==========================
                         # LOAD RATE FILE
                         # ==========================
                         rate_stream = download_file_from_drive(service, rate_file_id)
@@ -4223,282 +4223,6 @@ with tab_calc:
                             "✅ Calculation selesai"
                         )
 
-
-                    #     # 🔒 LOCK SEKALI SAJA
-                    #     acquire_drive_lock(service, PERIOD_DRIVE_ID)
-
-                    #     sheets_service = init_sheets_service(creds)
-
-                    #     success_count = 0
-
-                    #     # ==========================
-                    #     # LOOP POSTING
-                    #     # ==========================
-                    #     for item in validated_data:
-
-                    #         row = item["row"]
-                    #         df = item["df"]
-
-                    #         try:
-
-                    #             biz_type = row["Biz Type"]
-
-                    #             # ==========================
-                    #             # GENERATE VOUCHER
-                    #             # ==========================
-                    #             voucher, seq_no, _ = generate_vin_from_drive(
-                    #                 service=service,
-                    #                 period_folder_id=PERIOD_DRIVE_ID,
-                    #                 year=int(year),
-                    #                 month=int(month),
-                    #                 find_drive_file=find_drive_file,
-                    #                 biz_type=biz_type
-                    #             )
-
-                    #             # ==========================
-                    #             # BUILD LOG ENTRY
-                    #             # ==========================
-                    #             if biz_type in [
-                    #                 "Kontribusi",
-                    #                 "Refund",
-                    #                 "Alteration",
-                    #                 "Retur",
-                    #                 "Revise",
-                    #                 "Batal",
-                    #                 "Cancel"
-                    #             ]:
-
-                    #                 total_contribution = df["Reins Total Premium"].sum()
-
-                    #                 commission = df["Reins Total Comm"].sum()
-
-                    #                 overriding = (
-                    #                     df["Reins Overriding"].sum()
-                    #                     if "Reins Overriding" in df.columns
-                    #                     else 0
-                    #                 )
-
-                    #                 total_commission = commission + overriding
-
-                    #                 claim_amount = (
-                    #                     df["Claim"].sum()
-                    #                     if "Claim" in df.columns
-                    #                     else 0
-                    #                 )
-
-                    #                 balance = (
-                    #                     total_contribution
-                    #                     - total_commission
-                    #                     - claim_amount
-                    #                 )
-
-                    #                 log_entry = {
-                    #                     "Seq No": seq_no,
-                    #                     "Department": row["Department"],
-                    #                     "Biz Type": row["Biz Type"],
-                    #                     "Voucher No": voucher,
-                    #                     "Account With": row["Account With"],
-                    #                     "Cedant Company": row["Cedant Company"],
-                    #                     "PIC": row["PIC"],
-                    #                     "Product": df["References No"].iloc[0],
-                    #                     "CBY": df["CBY"].iloc[0],
-                    #                     "CBM": df["CBM"].iloc[0],
-                    #                     "OBY": int(year),
-                    #                     "OBM": int(month),
-                    #                     "KOB": df["K.O.B Code"].iloc[0],
-                    #                     "COB": df["COB"].iloc[0],
-                    #                     "MOP": df["Pay Period Type"].iloc[0],
-                    #                     "Curr": df["Ccy Code"].iloc[0],
-
-                    #                     "Total Contribution": total_contribution,
-                    #                     "Commission": commission,
-                    #                     "Overriding": overriding,
-                    #                     "Total Commission": total_commission,
-                    #                     "Gross Premium Income": total_contribution - total_commission,
-                    #                     "Tabarru": df["Reins Tabarru"].sum(),
-                    #                     "Ujrah": df["Reins Ujrah"].sum(),
-                    #                     "Claim": 0,
-                    #                     "Balance": balance,
-                    #                     "Check Balance": "",
-
-                    #                     "Rate Exchange": rate_exchange,
-
-                    #                     "Kontribusi (IDR)": total_contribution * rate_exchange,
-                    #                     "Commission (IDR)": commission * rate_exchange,
-                    #                     "Overiding (IDR)": overriding * rate_exchange,
-                    #                     "Total Commission (IDR)": total_commission * rate_exchange,
-                    #                     "Gross Premium Income (IDR)": (
-                    #                         total_contribution - total_commission
-                    #                     ) * rate_exchange,
-
-                    #                     "Tabarru (IDR)": (
-                    #                         df["Reins Tabarru"].sum()
-                    #                         * rate_exchange
-                    #                     ),
-
-                    #                     "Ujrah (IDR)": (
-                    #                         df["Reins Ujrah"].sum()
-                    #                         * rate_exchange
-                    #                     ),
-
-                    #                     "Claim (IDR)": 0,
-
-                    #                     "Balance (IDR)": (
-                    #                         balance * rate_exchange
-                    #                     ),
-
-                    #                     "Check Balance (IDR)": "",
-
-                    #                     "REMARKS": "-",
-                    #                     "PML ID": row["PML ID"],
-                    #                     "STATUS": "POSTED",
-                    #                     "CREATED AT": now_wib_naive(),
-                    #                     "CREATED BY": row["PIC"],
-                    #                     "Due Date": due_date,
-                    #                     "Subject Email": row["Subject Email"],
-                    #                     "Email Date": row["Email Date"],
-                    #                     "CANCELED AT": "-",
-                    #                     "CANCELED BY": "-",
-                    #                     "CANCEL OF VOUCHER": "-",
-                    #                     "CANCEL REASON": "-"
-                    #                 }
-
-                    #             elif biz_type == "Claim":
-
-                    #                 claim_amount = (
-                    #                     df["Marein Share IDR"].sum()
-                    #                     if "Marein Share IDR" in df.columns
-                    #                     else 0
-                    #                 )
-
-                    #                 balance = -claim_amount
-
-                    #                 log_entry = {
-                    #                     "Seq No": seq_no,
-                    #                     "Department": row["Department"],
-                    #                     "Biz Type": row["Biz Type"],
-                    #                     "Voucher No": voucher,
-                    #                     "Account With": row["Account With"],
-                    #                     "Cedant Company": row["Cedant Company"],
-                    #                     "PIC": row["PIC"],
-                    #                     "Product": df["References No"].iloc[0],
-                    #                     "CBY": df["CedBookYear"].iloc[0],
-                    #                     "CBM": df["CedBookMonth"].iloc[0],
-                    #                     "OBY": int(year),
-                    #                     "OBM": int(month),
-                    #                     "KOB": df["KindOfBusiness"].iloc[0],
-                    #                     "COB": df["ClassOfBusiness"].iloc[0],
-                    #                     "MOP": df["PayPeriodType"].iloc[0],
-                    #                     "Curr": df["Currency"].iloc[0],
-
-                    #                     "Total Contribution": 0,
-                    #                     "Commission": 0,
-                    #                     "Overriding": 0,
-                    #                     "Total Commission": 0,
-                    #                     "Gross Premium Income": 0,
-                    #                     "Tabarru": 0,
-                    #                     "Ujrah": 0,
-                    #                     "Claim": claim_amount,
-                    #                     "Balance": balance,
-                    #                     "Check Balance": "",
-
-                    #                     "Rate Exchange": rate_exchange,
-
-                    #                     "Kontribusi (IDR)": 0,
-                    #                     "Commission (IDR)": 0,
-                    #                     "Overiding (IDR)": 0,
-                    #                     "Total Commission (IDR)": 0,
-                    #                     "Gross Premium Income (IDR)": 0,
-                    #                     "Tabarru (IDR)": 0,
-                    #                     "Ujrah (IDR)": 0,
-
-                    #                     "Claim (IDR)": (
-                    #                         claim_amount * rate_exchange
-                    #                     ),
-
-                    #                     "Balance (IDR)": (
-                    #                         balance * rate_exchange
-                    #                     ),
-
-                    #                     "Check Balance (IDR)": "",
-
-                    #                     "REMARKS": "-",
-                    #                     "PML ID": row["PML ID"],
-                    #                     "STATUS": "POSTED",
-                    #                     "CREATED AT": now_wib_naive(),
-                    #                     "CREATED BY": row["PIC"],
-                    #                     "Due Date": due_date,
-                    #                     "Subject Email": row["Subject Email"],
-                    #                     "Email Date": row["Email Date"],
-                    #                     "CANCELED AT": "-",
-                    #                     "CANCELED BY": "-",
-                    #                     "CANCEL OF VOUCHER": "-",
-                    #                     "CANCEL REASON": "-"
-                    #                 }
-
-                    #             # ==========================
-                    #             # APPEND LOG
-                    #             # ==========================
-                    #             append_gsheet(
-                    #                 service=sheets_service,
-                    #                 spreadsheet_id=log_drive_id,
-                    #                 row_dict=log_entry
-                    #             )
-
-                    #             # ==========================
-                    #             # UPLOAD VOUCHER FILE
-                    #             # ==========================
-                    #             upload_dataframe_to_drive(
-                    #                 service=service,
-                    #                 df=df,
-                    #                 template_columns=(
-                    #                     columns_template
-                    #                     if biz_type != "Claim"
-                    #                     else columns_template_claim
-                    #                 ),
-                    #                 voucher_id=voucher,
-                    #                 filename=f"{voucher}.xlsx",
-                    #                 folder_id=CEDING_DRIVE_ID,
-                    #                 file_type="Voucher"
-                    #             )
-
-                    #             # ==========================
-                    #             # UPDATE STATUS
-                    #             # ==========================
-                    #             update_pml_status_to_calculated(
-                    #                 service=sheets_service,
-                    #                 spreadsheet_id=log_pml_drive_id,
-                    #                 pml_id=[str(row["PML ID"])]
-                    #             )
-
-                    #             success_count += 1
-
-                    #         except Exception as e:
-
-                    #             st.error(
-                    #                 f"❌ Error posting PML {row['PML ID']}: {e}"
-                    #             )
-
-                    #     # ==========================
-                    #     # DONE
-                    #     # ==========================
-                    #     end_time = time.time()
-                    #     duration = int(end_time - start_time)
-
-                    #     if success_count > 0:
-
-                    #         st.success(
-                    #             f"✅ {success_count} voucher berhasil diposting "
-                    #             f"({duration} detik)"
-                    #         )
-
-                    # except RuntimeError:
-
-                    #     st.error(
-                    #         "⛔ Log sedang digunakan user lain. "
-                    #         "Silakan coba lagi."
-                    #     )
-
                     finally:
 
                         release_drive_lock(service, PERIOD_DRIVE_ID)
@@ -4571,6 +4295,16 @@ with tab_calc:
         log_df.columns = log_df.columns.str.strip()
 
         # ==========================
+        # SNAPSHOT LOG KE SESSION STATE
+        # ==========================
+        log_snapshot_key = f"log_snapshot_outward_{year}_{month}"
+
+        if log_snapshot_key not in st.session_state:
+            st.session_state[log_snapshot_key] = log_df.copy()
+
+        df_working = st.session_state[log_snapshot_key]
+
+        # ==========================
         # VALIDASI KOLOM
         # ==========================
         required_cols = ["PML ID", "STATUS"]
@@ -4584,11 +4318,35 @@ with tab_calc:
         # ==========================
         # FILTER STATUS POSTED
         # ==========================
-        df_posted = log_df[log_df["STATUS"] == "POSTED"].copy()
+        df_posted = df_working[df_working["STATUS"] == "POSTED"].copy()
 
         if df_posted.empty:
             st.info("Tidak ada data dengan status POSTED")
             st.stop()
+
+        # ==========================
+        # REFRESH LOG PML
+        # ==========================
+        col_ref1, col_ref2 = st.columns([2, 5])
+
+        with col_ref1:
+            if st.button("🔄 Refresh Log PML", key="btn_refresh_pml_outward"):
+                if log_snapshot_key in st.session_state:
+                    del st.session_state[log_snapshot_key]
+                st.cache_data.clear()
+                st.rerun()
+
+        with col_ref2:
+            current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
+            snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
+
+            if current_posted_count != snapshot_posted_count:
+                st.warning(
+                    f"⚠️ Log PML telah diperbarui oleh user lain "
+                    f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                    f"Klik Refresh jika ingin memuat data terbaru."
+                )
+
 
         # ==========================
         # SEARCH (OPSIONAL)
@@ -4600,39 +4358,101 @@ with tab_calc:
                 df_posted["PML ID"].astype(str).str.contains(search, case=False, na=False)
             ]
 
-        st.write(f"Total PML POSTED: {len(df_posted)}")
+        # ==========================
+        # FILTER
+        # ==========================
+        with st.expander("🔽 Filter Data", expanded=False):
+
+            col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+
+            with col_f1:
+                cedant_options = ["(Semua)"] + sorted(df_posted["Cedant Company"].dropna().unique().tolist())
+                filter_cedant = st.selectbox("Cedant Company", cedant_options, key="filter_cedant_outward")
+
+            with col_f2:
+                filter_product = st.text_input("🔍 Product", key="filter_product_outward")
+
+            with col_f3:
+                cby_options = ["(Semua)"] + sorted(df_posted["CBY"].dropna().unique().tolist())
+                filter_cby = st.selectbox("CBY", cby_options, key="filter_cby_outward")
+
+            with col_f4:
+                cbm_options = ["(Semua)"] + sorted(df_posted["CBM"].dropna().unique().tolist())
+                filter_cbm = st.selectbox("CBM", cbm_options, key="filter_cbm_outward")
+
+        # Terapkan filter
+        df_filtered = df_posted.copy()
+
+        if filter_cedant != "(Semua)":
+            df_filtered = df_filtered[df_filtered["Cedant Company"] == filter_cedant]
+
+        if filter_product.strip():
+            df_filtered = df_filtered[
+                df_filtered["Product"].astype(str).str.contains(filter_product.strip(), case=False, na=False)
+            ]
+
+        if filter_cby != "(Semua)":
+            df_filtered = df_filtered[df_filtered["CBY"] == filter_cby]
+
+        if filter_cbm != "(Semua)":
+            df_filtered = df_filtered[df_filtered["CBM"] == filter_cbm]
+
+        st.write(f"Total PML POSTED: {len(df_filtered)} {'(difilter)' if len(df_filtered) != len(df_posted) else ''}")
 
         # ==========================
-        # UI SELECT (SAMA DENGAN SPLIT)
+        # UI SELECT
         # ==========================
-        # st.markdown("### 📋 Pilih Data PML untuk Di-Calculate")
         st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
-        if not df_posted.empty:
+        if not df_filtered.empty:
 
-            # Tambahkan checkbox column
-            df_to_edit = df_posted.copy()
-            df_to_edit.insert(0, "Pilih", False)
+            # ==========================
+            # SELECT ALL / DESELECT ALL
+            # ==========================
+            col_btn1, col_btn2, col_btn3 = st.columns([2.5, 3, 10])
 
-            # Data editor (CONSISTENT UI)
+            with col_btn1:
+                select_all = st.button("✅ Select All", key="btn_select_all_outward")
 
-            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission",  "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+            with col_btn2:
+                deselect_all = st.button("⬜ Deselect All", key="btn_deselect_all_outward")
+
+            if "pilih_state_outward" not in st.session_state:
+                st.session_state["pilih_state_outward"] = {}
+
+            if select_all:
+                for idx in df_filtered.index:
+                    st.session_state["pilih_state_outward"][idx] = True
+
+            if deselect_all:
+                for idx in df_filtered.index:
+                    st.session_state["pilih_state_outward"][idx] = False
+
+            # Tambahkan checkbox column berdasarkan state
+            df_to_edit = df_filtered.copy()
+            df_to_edit.insert(
+                0, "Pilih",
+                df_to_edit.index.map(lambda i: st.session_state["pilih_state_outward"].get(i, False))
+            )
+
+            # ==========================
+            # CLEAN NUMERIC
+            # ==========================
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
-
                 def clean_number(x):
                     x = str(x)
-
-                    # kalau ada dua separator → anggap titik ribuan, koma desimal
                     if "." in x and "," in x:
                         x = x.replace(".", "").replace(",", ".")
                     else:
                         x = x.replace(",", "")
-
                     return pd.to_numeric(x, errors="coerce")
-
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
 
+            # ==========================
+            # DATA EDITOR
+            # ==========================
             edited_df = st.data_editor(
                 df_to_edit,
                 column_config={
@@ -4641,70 +4461,48 @@ with tab_calc:
                         help="Pilih baris ini untuk di-calculate",
                         default=False,
                     ),
-                    "PML ID": st.column_config.Column(disabled=True),
-                    "STATUS": st.column_config.Column(disabled=True),
-                    "Product": st.column_config.Column(disabled=True),
-
-                    "Total Contribution": st.column_config.NumberColumn(
-                        "Total Contribution",
-                        format="%,.0f"
-                    ),
-                    "Commission": st.column_config.NumberColumn(
-                        "Commission",
-                        format="%,.0f"
-                    ),
-                    "Overriding": st.column_config.NumberColumn(
-                        "Overriding",
-                        format="%,.0f"
-                    ),
-                    "Total Commission": st.column_config.NumberColumn(
-                        "Total Commission",
-                        format="%,.0f"
-                    ),
-                    "Gross Premium Income": st.column_config.NumberColumn(
-                        "Gross Premium Income",
-                        format="%,.0f"
-                    ),
-                    "Tabarru": st.column_config.NumberColumn(
-                        "Tabarru",
-                        format="%,.0f"
-                    ),
-                    "Ujrah": st.column_config.NumberColumn(
-                        "Ujrah",
-                        format="%,.0f"
-                    ),
-                    "Claim": st.column_config.NumberColumn(
-                        "Claim",
-                        format="%,.0f"
-                    ),
-                    "Balance": st.column_config.NumberColumn(
-                        "Balance",
-                        format="%,.0f"
-                    ),
+                    "PML ID":  st.column_config.Column(disabled=True),
+                    "STATUS":  st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column("Product", disabled=True),
+                    "CBY":     st.column_config.Column("CBY", disabled=True),
+                    "CBM":     st.column_config.Column("CBM", disabled=True),
+                    "Total Contribution": st.column_config.NumberColumn("Total Contribution", format="%,.0f"),
+                    "Commission":         st.column_config.NumberColumn("Commission",         format="%,.0f"),
+                    "Overriding":         st.column_config.NumberColumn("Overriding",         format="%,.0f"),
+                    "Total Commission":   st.column_config.NumberColumn("Total Commission",   format="%,.0f"),
+                    "Gross Premium Income": st.column_config.NumberColumn("Gross Premium Income", format="%,.0f"),
+                    "Tabarru": st.column_config.NumberColumn("Tabarru", format="%,.0f"),
+                    "Ujrah":   st.column_config.NumberColumn("Ujrah",   format="%,.0f"),
+                    "Claim":   st.column_config.NumberColumn("Claim",   format="%,.0f"),
+                    "Balance": st.column_config.NumberColumn("Balance", format="%,.0f"),
                 },
-                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "TOtal Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                disabled=[
+                    "No", "PML ID", "STATUS", "Product", "CBY", "CBM",
+                    "Total Contribution", "Commission", "Overriding",
+                    "Total Commission", "Gross Premium Income",
+                    "Tabarru", "Ujrah", "Claim", "Balance"
+                ],
                 hide_index=True,
                 use_container_width=True,
+                key="data_editor_calculate_outward"
             )
+
+            # ==========================
+            # SYNC STATE DARI EDITED DF
+            # ==========================
+            for idx, row in edited_df.iterrows():
+                st.session_state["pilih_state_outward"][idx] = row["Pilih"]
 
             # ==========================
             # AMBIL YANG DIPILIH
             # ==========================
             selected_rows = edited_df[edited_df["Pilih"] == True]
 
-            # ==========================
-            # VALIDASI
-            # ==========================
             if selected_rows.empty:
                 st.info("Silakan pilih minimal satu baris untuk melanjutkan.")
                 selected_rows = None
-
             else:
                 st.success(f"✅ {len(selected_rows)} baris terpilih")
-
-                # tampilkan list PML biar user yakin
-                # st.write("PML terpilih:")
-                # st.write(selected_rows["PML ID"].tolist())
 
         
             # ==========================
