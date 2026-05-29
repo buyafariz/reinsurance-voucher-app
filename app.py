@@ -3868,7 +3868,7 @@ with tab_calc:
                                 # ==========================
                                 # CALCULATION
                                 # ==========================
-                                rate          = (premium/sum_at_risk) * 1000
+                                rate_ced          = (premium/sum_at_risk) * 1000
                                 premium       = (sum_at_risk * rate) / 1000
                                 em_premium    = (premium * em_rate) / 100
                                 er_premium    = (sum_at_risk * er_rate) / 1000
@@ -3880,7 +3880,7 @@ with tab_calc:
                                 # ==========================
                                 # SAVE RESULT
                                 # ==========================
-                                review_df.at[idx, "Rate"]                       = rate
+                                review_df.at[idx, "Rate"]                       = rate_ced
                                 review_df.at[idx, "Reins Premium (Calc)"]       = premium
                                 review_df.at[idx, "Reins EM Premium (Calc)"]    = em_premium
                                 review_df.at[idx, "Reins ER Premium (Calc)"]    = er_premium
