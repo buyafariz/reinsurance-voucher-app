@@ -2869,7 +2869,7 @@ with tab_calc:
         # ==========================
         # REFRESH LOG PML
         # ==========================
-        col_ref1, col_ref2 = st.columns([1, 5])
+        col_ref1, col_ref2 = st.columns([2, 5])
 
         with col_ref1:
             if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
