@@ -1593,12 +1593,51 @@ with tab_split:
 
         if not df_posted.empty:
 
+            # ==========================
+            # SNAPSHOT LOG KE SESSION STATE
+            # ==========================
+            log_snapshot_key = f"log_snapshot_split_inward_{year}_{month}"
+
+            if log_snapshot_key not in st.session_state:
+                st.session_state[log_snapshot_key] = df_posted.copy()
+
+            df_working = st.session_state[log_snapshot_key]
+
+            # ==========================
+            # REFRESH LOG PML
+            # ==========================
+            col_ref1, col_ref2 = st.columns([2, 5])
+
+            with col_ref1:
+                if st.button("🔄 Refresh Log PML", key="btn_refresh_pml_split_inward"):
+                    if log_snapshot_key in st.session_state:
+                        del st.session_state[log_snapshot_key]
+                    st.cache_data.clear()
+                    st.rerun()
+
+            with col_ref2:
+                current_posted_count  = len(df_posted)
+                snapshot_posted_count = len(df_working)
+
+                if current_posted_count != snapshot_posted_count:
+                    st.warning(
+                        f"⚠️ Log PML telah diperbarui oleh user lain "
+                        f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                        f"Klik Refresh jika ingin memuat data terbaru."
+                    )
+
+            # Gunakan snapshot
+            df_posted = df_working.copy()
+
+            # Terapkan filter
+            df_filtered = df_posted.copy()
+
+
             # Tambahkan checkbox column
-            df_to_edit = df_posted.copy()
+            df_to_edit = df_filtered.copy()
             df_to_edit.insert(0, "Pilih", False)
 
             # Data editor (CONSISTENT UI)
-
             cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
@@ -1621,60 +1660,35 @@ with tab_split:
                 column_config={
                     "Pilih": st.column_config.CheckboxColumn(
                         "Pilih",
-                        help="Pilih baris ini untuk di-calculate",
+                        help="Pilih baris ini untuk di-split",
                         default=False,
                     ),
-                    "PML ID": st.column_config.Column(disabled=True),
-                    "STATUS": st.column_config.Column(disabled=True),
-                    "Product": st.column_config.Column(disabled=True),
-
-                    "Total Contribution": st.column_config.NumberColumn(
-                        "Total Contribution",
-                        format="%,.0f"
-                    ),
-
-                    "Commission": st.column_config.NumberColumn(
-                        "Commission",
-                        format="%,.0f"
-                    ),
-
-                    "Overriding": st.column_config.NumberColumn(
-                        "Overriding",
-                        format="%,.0f"
-                    ),
-
-                    "Total Commission": st.column_config.NumberColumn(
-                        "Total Commission",
-                        format="%,.0f"
-                    ),
-
-                    "Gross Premium Income": st.column_config.NumberColumn(
-                        "Gross Premium Income",
-                        format="%,.0f"
-                    ),
-                    "Tabarru": st.column_config.NumberColumn(
-                        "Tabarru",
-                        format="%,.0f"
-                    ),
-                    "Ujrah": st.column_config.NumberColumn(
-                        "Ujrah",
-                        format="%,.0f"
-                    ),
-                    "Claim": st.column_config.NumberColumn(
-                        "Claim",
-                        format="%,.0f"
-                    ),
-                    "Balance": st.column_config.NumberColumn(
-                        "Balance",
-                        format="%,.0f"
-                    ),
+                    "PML ID":  st.column_config.Column(disabled=True),
+                    "STATUS":  st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column("Product", disabled=True),
+                    "CBY":     st.column_config.Column("CBY", disabled=True),
+                    "CBM":     st.column_config.Column("CBM", disabled=True),
+                    "Total Contribution":   st.column_config.NumberColumn("Total Contribution",   format="%,.0f"),
+                    "Commission":           st.column_config.NumberColumn("Commission",           format="%,.0f"),
+                    "Overriding":           st.column_config.NumberColumn("Overriding",           format="%,.0f"),
+                    "Total Commission":     st.column_config.NumberColumn("Total Commission",     format="%,.0f"),
+                    "Gross Premium Income": st.column_config.NumberColumn("Gross Premium Income", format="%,.0f"),
+                    "Tabarru": st.column_config.NumberColumn("Tabarru", format="%,.0f"),
+                    "Ujrah":   st.column_config.NumberColumn("Ujrah",   format="%,.0f"),
+                    "Claim":   st.column_config.NumberColumn("Claim",   format="%,.0f"),
+                    "Balance": st.column_config.NumberColumn("Balance", format="%,.0f"),
                 },
-                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                disabled=[
+                    "No", "PML ID", "STATUS", "Product", "CBY", "CBM",
+                    "Total Contribution", "Commission", "Overriding",
+                    "Total Commission", "Gross Premium Income",
+                    "Tabarru", "Ujrah", "Claim", "Balance"
+                ],
                 hide_index=True,
                 use_container_width=True,
+                key="data_editor_split_inward"
             )
 
-            # 4. Filter Baris yang Dipilih
             selected_rows = edited_df[edited_df["Pilih"] == True]
 
             # 5. Logika Validasi Pilihan
@@ -2147,13 +2161,51 @@ with tab_split:
         st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
         if not df_posted.empty:
+            # ==========================
+            # SNAPSHOT LOG KE SESSION STATE
+            # ==========================
+            log_snapshot_key = f"log_snapshot_split_outward_{year}_{month}"
+
+            if log_snapshot_key not in st.session_state:
+                st.session_state[log_snapshot_key] = df_posted.copy()
+
+            df_working = st.session_state[log_snapshot_key]
+
+            # ==========================
+            # REFRESH LOG PML
+            # ==========================
+            col_ref1, col_ref2 = st.columns([2, 5])
+
+            with col_ref1:
+                if st.button("🔄 Refresh Log PML", key="btn_refresh_pml_split_outward"):
+                    if log_snapshot_key in st.session_state:
+                        del st.session_state[log_snapshot_key]
+                    st.cache_data.clear()
+                    st.rerun()
+
+            with col_ref2:
+                current_posted_count  = len(df_posted)
+                snapshot_posted_count = len(df_working)
+
+                if current_posted_count != snapshot_posted_count:
+                    st.warning(
+                        f"⚠️ Log PML telah diperbarui oleh user lain "
+                        f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                        f"Klik Refresh jika ingin memuat data terbaru."
+                    )
+
+            # Gunakan snapshot
+            df_posted = df_working.copy()
+
+            # Terapkan filter
+            df_filtered = df_posted.copy()
+
 
             # Tambahkan checkbox column
-            df_to_edit = df_posted.copy()
+            df_to_edit = df_filtered.copy()
             df_to_edit.insert(0, "Pilih", False)
 
             # Data editor (CONSISTENT UI)
-
             cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
@@ -2176,60 +2228,35 @@ with tab_split:
                 column_config={
                     "Pilih": st.column_config.CheckboxColumn(
                         "Pilih",
-                        help="Pilih baris ini untuk di-calculate",
+                        help="Pilih baris ini untuk di-split",
                         default=False,
                     ),
-                    "PML ID": st.column_config.Column(disabled=True),
-                    "STATUS": st.column_config.Column(disabled=True),
-                    "Product": st.column_config.Column(disabled=True),
-
-                    "Total Contribution": st.column_config.NumberColumn(
-                        "Total Contribution",
-                        format="%,.0f"
-                    ),
-
-                    "Commission": st.column_config.NumberColumn(
-                        "Commission",
-                        format="%,.0f"
-                    ),
-
-                    "Overriding": st.column_config.NumberColumn(
-                        "Overriding",
-                        format="%,.0f"
-                    ),
-
-                    "Total Commission": st.column_config.NumberColumn(
-                        "Total Commission",
-                        format="%,.0f"
-                    ),
-
-                    "Gross Premium Income": st.column_config.NumberColumn(
-                        "Gross Premium Income",
-                        format="%,.0f"
-                    ),
-                    "Tabarru": st.column_config.NumberColumn(
-                        "Tabarru",
-                        format="%,.0f"
-                    ),
-                    "Ujrah": st.column_config.NumberColumn(
-                        "Ujrah",
-                        format="%,.0f"
-                    ),
-                    "Claim": st.column_config.NumberColumn(
-                        "Claim",
-                        format="%,.0f"
-                    ),
-                    "Balance": st.column_config.NumberColumn(
-                        "Balance",
-                        format="%,.0f"
-                    ),
+                    "PML ID":  st.column_config.Column(disabled=True),
+                    "STATUS":  st.column_config.Column(disabled=True),
+                    "Product": st.column_config.Column("Product", disabled=True),
+                    "CBY":     st.column_config.Column("CBY", disabled=True),
+                    "CBM":     st.column_config.Column("CBM", disabled=True),
+                    "Total Contribution":   st.column_config.NumberColumn("Total Contribution",   format="%,.0f"),
+                    "Commission":           st.column_config.NumberColumn("Commission",           format="%,.0f"),
+                    "Overriding":           st.column_config.NumberColumn("Overriding",           format="%,.0f"),
+                    "Total Commission":     st.column_config.NumberColumn("Total Commission",     format="%,.0f"),
+                    "Gross Premium Income": st.column_config.NumberColumn("Gross Premium Income", format="%,.0f"),
+                    "Tabarru": st.column_config.NumberColumn("Tabarru", format="%,.0f"),
+                    "Ujrah":   st.column_config.NumberColumn("Ujrah",   format="%,.0f"),
+                    "Claim":   st.column_config.NumberColumn("Claim",   format="%,.0f"),
+                    "Balance": st.column_config.NumberColumn("Balance", format="%,.0f"),
                 },
-                disabled=["No", "PML ID", "STATUS", "Product", "Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"],
+                disabled=[
+                    "No", "PML ID", "STATUS", "Product", "CBY", "CBM",
+                    "Total Contribution", "Commission", "Overriding",
+                    "Total Commission", "Gross Premium Income",
+                    "Tabarru", "Ujrah", "Claim", "Balance"
+                ],
                 hide_index=True,
                 use_container_width=True,
+                key="data_editor_split_outward"
             )
 
-            # 4. Filter Baris yang Dipilih
             selected_rows = edited_df[edited_df["Pilih"] == True]
 
             # 5. Logika Validasi Pilihan
