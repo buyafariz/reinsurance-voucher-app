@@ -1587,10 +1587,6 @@ with tab_split:
             if PERIOD_DRIVE_ID:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
-        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
-        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
-
         if not df_posted.empty:
 
             # ==========================
@@ -1632,6 +1628,9 @@ with tab_split:
             # Terapkan filter
             df_filtered = df_posted.copy()
 
+            # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+            st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+            st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
             # Tambahkan checkbox column
             df_to_edit = df_filtered.copy()
@@ -2156,10 +2155,6 @@ with tab_split:
             if PERIOD_DRIVE_ID:
                 release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
-        # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
-        st.markdown("### 📋 Pilih Data PML untuk Di-Split")
-        st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
-
         if not df_posted.empty:
             # ==========================
             # SNAPSHOT LOG KE SESSION STATE
@@ -2200,6 +2195,9 @@ with tab_split:
             # Terapkan filter
             df_filtered = df_posted.copy()
 
+            # --- 5. RENDER UI DENGAN PEMILIHAN (CHECKBOX) ---
+            st.markdown("### 📋 Pilih Data PML untuk Di-Split")
+            st.info("Centang pada kolom **'Pilih'** untuk menentukan baris yang akan diproses.")
 
             # Tambahkan checkbox column
             df_to_edit = df_filtered.copy()
