@@ -2897,27 +2897,22 @@ with tab_calc:
         # ==========================
         # REFRESH LOG PML
         # ==========================
-        col_ref1, col_ref2 = st.columns([2, 5])
+        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
+            if log_snapshot_key in st.session_state:
+                del st.session_state[log_snapshot_key]
+            st.cache_data.clear()
+            st.rerun()
 
-        with col_ref1:
-            if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
-                # Hapus snapshot agar load ulang dari GSheet
-                if log_snapshot_key in st.session_state:
-                    del st.session_state[log_snapshot_key]
-                st.cache_data.clear()
-                st.rerun()
+        # Warning di bawah tombol
+        current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
+        snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
 
-        with col_ref2:
-            # Warning jika log GSheet lebih baru dari snapshot
-            current_posted_count = len(log_df[log_df["STATUS"] == "POSTED"])
-            snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
-
-            if current_posted_count != snapshot_posted_count:
-                st.warning(
-                    f"⚠️ Log PML telah diperbarui oleh user lain "
-                    f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
-                    f"Klik Refresh jika ingin memuat data terbaru."
-                )
+        if current_posted_count != snapshot_posted_count:
+            st.warning(
+                f"⚠️ Log PML telah diperbarui oleh user lain "
+                f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                f"Klik Refresh jika ingin memuat data terbaru."
+            )
 
         # ==========================
         # SEARCH (OPSIONAL)
@@ -4362,26 +4357,22 @@ with tab_calc:
         # ==========================
         # REFRESH LOG PML
         # ==========================
-        col_ref1, col_ref2 = st.columns([2, 5])
+        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
+            if log_snapshot_key in st.session_state:
+                del st.session_state[log_snapshot_key]
+            st.cache_data.clear()
+            st.rerun()
 
-        with col_ref1:
-            if st.button("🔄 Refresh Log PML", key="btn_refresh_pml_outward"):
-                if log_snapshot_key in st.session_state:
-                    del st.session_state[log_snapshot_key]
-                st.cache_data.clear()
-                st.rerun()
+        # Warning di bawah tombol
+        current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
+        snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
 
-        with col_ref2:
-            current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
-            snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
-
-            if current_posted_count != snapshot_posted_count:
-                st.warning(
-                    f"⚠️ Log PML telah diperbarui oleh user lain "
-                    f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
-                    f"Klik Refresh jika ingin memuat data terbaru."
-                )
-
+        if current_posted_count != snapshot_posted_count:
+            st.warning(
+                f"⚠️ Log PML telah diperbarui oleh user lain "
+                f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                f"Klik Refresh jika ingin memuat data terbaru."
+            )
 
         # ==========================
         # SEARCH (OPSIONAL)
