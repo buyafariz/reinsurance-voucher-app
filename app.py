@@ -1548,7 +1548,7 @@ with tab_split:
 
         try:
             # 2. LOCKING (Gunakan Drive Service)
-            acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
+            # acquire_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
             # 3. MENCARI & MEMBACA DATA
             # Cari Folder PML
@@ -1582,10 +1582,10 @@ with tab_split:
         except Exception as e:
             st.error(f"Terjadi kesalahan saat memproses data: {e}")
         
-        finally:
-            # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
-            if PERIOD_DRIVE_ID:
-                release_drive_lock(drive_service, PERIOD_DRIVE_ID)
+        # finally:
+        #     # 4. RELEASE LOCK (Selalu dijalankan meskipun error di atas)
+        #     if PERIOD_DRIVE_ID:
+        #         release_drive_lock(drive_service, PERIOD_DRIVE_ID)
 
         if not df_posted.empty:
 
@@ -1820,9 +1820,9 @@ with tab_split:
                         progress_bar = st.progress(0)
                         status_text = st.empty()
 
-                        acquire_drive_lock(service, PERIOD_DRIVE_ID)
-
                         try:
+                            acquire_drive_lock(service, PERIOD_DRIVE_ID)
+                            
                             sheets_service = init_sheets_service(creds)
 
                             log_pml_drive_id = find_drive_file(
@@ -1893,6 +1893,9 @@ with tab_split:
 
                             for r in results:
                                 st.write(f"📄 {r['pml_id']} → {r['rows']} rows ({r['split_value']})")
+
+                        except RuntimeError:
+                            st.error("⛔ Log sedang digunakan user lain. Silakan coba lagi.")
 
                         finally:
                             release_drive_lock(service, PERIOD_DRIVE_ID)
