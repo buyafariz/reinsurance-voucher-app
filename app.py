@@ -1886,18 +1886,6 @@ with tab_split:
                                 pml_id=selected_pml_id
                             )
 
-                            # 🔥 UPDATE STATUS
-                            update_result = update_pml_status_to_splitted(
-                                service=sheets_service,
-                                spreadsheet_id=log_pml_drive_id,
-                                pml_id=selected_pml_id
-                            )
-
-                            # DEBUG SEMENTARA
-                            st.write(f"**Debug update_result:** `{update_result}`")
-                            st.write(f"**Debug selected_pml_id:** `{selected_pml_id}`")
-                            st.write(f"**Debug log_pml_drive_id:** `{log_pml_drive_id}`")
-
                             progress_bar.progress(1.0)
                             status_text.text("✅ Selesai!")
 

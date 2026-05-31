@@ -260,48 +260,26 @@ def download_file_csv_from_drive(service, file_id):
 
 
 def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
-
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="A:BZ"
+        range="A:Z"
     ).execute()
 
     values = result.get("values", [])
 
     if not values:
-        print("DEBUG: values kosong")
         return False
 
     headers = values[0]
-    print(f"DEBUG headers: {headers}")
 
-    try:
-        pml_col    = headers.index("PML ID")
-        status_col = headers.index("STATUS")
-        print(f"DEBUG pml_col={pml_col}, status_col={status_col}")
-    except ValueError as e:
-        print(f"DEBUG ValueError: {e}")
-        raise
-
-    def col_index_to_letter(idx):
-        result = ""
-        idx += 1
-        while idx > 0:
-            idx, remainder = divmod(idx - 1, 26)
-            result = chr(65 + remainder) + result
-        return result
+    pml_col = headers.index("PML ID")
+    status_col = headers.index("STATUS")
 
     for i, row in enumerate(values[1:], start=2):
-        padded_row = row + [""] * (len(headers) - len(row))
-        cell_value = padded_row[pml_col].strip()
-        
-        # DEBUG: print semua nilai PML ID yang ditemukan
-        print(f"DEBUG row {i}: pml_id_cell='{cell_value}' vs target='{str(pml_id).strip()}'")
+        if len(row) > pml_col and row[pml_col] == pml_id:
 
-        if cell_value == str(pml_id).strip():
-            col_letter   = col_index_to_letter(status_col)
+            col_letter = chr(65 + status_col)
             range_update = f"{col_letter}{i}"
-            print(f"DEBUG: MATCH FOUND → update range {range_update}")
 
             service.spreadsheets().values().update(
                 spreadsheetId=spreadsheet_id,
@@ -312,8 +290,8 @@ def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
 
             return True
 
-    print(f"DEBUG: pml_id '{pml_id}' TIDAK DITEMUKAN di log")
     return False
+
 
 def update_pml_status_to_calculated(service, spreadsheet_id, pml_id):
     result = service.spreadsheets().values().get(
