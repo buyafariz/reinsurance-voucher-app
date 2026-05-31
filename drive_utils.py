@@ -260,9 +260,11 @@ def download_file_csv_from_drive(service, file_id):
 
 
 def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
+
+    # ✅ Gunakan range yang lebih luas
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id,
-        range="A:Z"
+        range="A:BZ"
     ).execute()
 
     values = result.get("values", [])
@@ -272,13 +274,30 @@ def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
 
     headers = values[0]
 
-    pml_col = headers.index("PML ID")
-    status_col = headers.index("STATUS")
+    try:
+        pml_col    = headers.index("PML ID")
+        status_col = headers.index("STATUS")
+    except ValueError as e:
+        raise ValueError(f"Kolom tidak ditemukan di header: {e}")
+
+    # ✅ Konversi index kolom ke huruf yang benar (support AA, AB, dst)
+    def col_index_to_letter(idx):
+        """0-based index → letter (0→A, 25→Z, 26→AA)"""
+        result = ""
+        idx += 1  # convert to 1-based
+        while idx > 0:
+            idx, remainder = divmod(idx - 1, 26)
+            result = chr(65 + remainder) + result
+        return result
 
     for i, row in enumerate(values[1:], start=2):
-        if len(row) > pml_col and row[pml_col] == pml_id:
 
-            col_letter = chr(65 + status_col)
+        # ✅ Pad row jika lebih pendek dari header
+        padded_row = row + [""] * (len(headers) - len(row))
+
+        if padded_row[pml_col].strip() == str(pml_id).strip():
+
+            col_letter   = col_index_to_letter(status_col)
             range_update = f"{col_letter}{i}"
 
             service.spreadsheets().values().update(
@@ -291,7 +310,6 @@ def update_pml_status_to_splitted(service, spreadsheet_id, pml_id):
             return True
 
     return False
-
 
 def update_pml_status_to_calculated(service, spreadsheet_id, pml_id):
     result = service.spreadsheets().values().get(
