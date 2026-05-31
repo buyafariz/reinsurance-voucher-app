@@ -521,9 +521,9 @@ def split_upload_with_log(
         # HITUNG NILAI
         # ==========================
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-            product = group["References No"][0]
-            cby = group["CBY"][0]
-            cbm = group["CBM"][0]
+            product = group["References No"].iloc[0]
+            cby = group["CBY"].iloc[0]
+            cbm = group["CBM"].iloc[0]
             total_contribution = group["Reins Total Premium"].sum()
             commission = group["Reins Total Comm"].sum()
             overriding = group["Reins Overriding"].sum() if "Reins Overriding" in group.columns else 0
@@ -569,9 +569,9 @@ def split_upload_with_log(
 
         elif biz_type == "Claim":
             claim = group["Marein Share IDR"].sum()
-            product = group["References No"][0]
-            cby = group["CedBookYear"][0]
-            cbm = group["CedBookMonth"][0]
+            product = group["References No"].iloc[0]
+            cby = group["CedBookYear"].iloc[0]
+            cbm = group["CedBookMonth"].iloc[0]
 
             # ==========================
             # LOG
