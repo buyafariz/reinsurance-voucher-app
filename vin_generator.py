@@ -694,9 +694,9 @@ def split_upload_with_log_outward(
         # HITUNG NILAI
         # ==========================
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
-            product = group["References No"][0]
-            cby = group["Ced Book Year"][0]
-            cbm = group["Ced Book Month"][0]
+            product = group["References No"].iloc[0]
+            cby = group["Ced Book Year"].iloc[0]
+            cbm = group["Ced Book Month"].iloc[0]
 
             total_contribution = group["Retro Total Premium"].sum()
             commission = group["Retro Total Comm"].sum()
@@ -743,9 +743,9 @@ def split_upload_with_log_outward(
 
         elif biz_type == "Claim":
             claim = group["Your Share"].sum()
-            product = group["Voucher Desc"][0]
-            cby = group["Ced Book Year"][0]
-            cbm = group["Ced Book Month"][0]
+            product = group["Voucher Desc"].iloc[0]
+            cby = group["Ced Book Year"].iloc[0]
+            cbm = group["Ced Book Month"].iloc[0]
 
             # ==========================
             # LOG
