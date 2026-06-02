@@ -4282,6 +4282,8 @@ with tab_calc:
 
         PERIOD_DRIVE_ID = drive_folders["period_id"]
 
+        st.write(PERIOD_DRIVE_ID)
+
         # ==========================
         # GET PML FOLDER
         # ==========================
@@ -4293,6 +4295,8 @@ with tab_calc:
 
         PML_DRIVE_ID = pml_drive
 
+        st.write(PML_DRIVE_ID)
+
         # ==========================
         # GET LOG PML FILE
         # ==========================
@@ -4302,6 +4306,8 @@ with tab_calc:
             parent_id=PML_DRIVE_ID,
             mime_type="application/vnd.google-apps.spreadsheet"
         )
+
+        st.write(log_pml_drive_id)
 
         if not log_pml_drive_id:
             st.warning("⚠️ Log PML belum tersedia")
