@@ -327,7 +327,12 @@ def validate_voucher(df, biz_type: str, reins_type:str):
     if reins_type == "OUTWARD":
         if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             for col in DATE_COLUMNS:
+                # 🔹 CEK DULU ADA ATAU TIDAK
+                if col not in df.columns:
+                    errors.append(f"Kolom {col} tidak ditemukan di file")
+                    continue
                 converted = pd.to_datetime(df[col], errors="coerce")
+                
                 if converted.isna().any():
                     errors.append(f"Kolom {col} harus bertipe tanggal (date)")
                 df[col] = converted
