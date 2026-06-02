@@ -2789,16 +2789,18 @@ with tab_calc:
         "CANCEL REASON"
     ]
 
+
+    st.subheader("📊 Calculate PML")
+
+    reins_type = st.selectbox(
+        "Reinsurance Type",
+        ["INWARD", "OUTWARD"],
+        key="reins_type_calculate",
+        index=0) #INWARD
+        #disabled=True
+
+
     if reins_type == "INWARD":
-
-        st.subheader("📊 Calculate PML")
-
-        reins_type = st.selectbox(
-            "Reinsurance Type",
-            ["INWARD", "OUTWARD"],
-            key="reins_type_calculate",
-            index=0) #INWARD
-            #disabled=True
 
         # ==========================
         # INIT SERVICE
@@ -4252,15 +4254,6 @@ with tab_calc:
 
 
     elif reins_type == "OUTWARD":
-
-        st.subheader("📊 Calculate PML")
-
-        reins_type = st.selectbox(
-            "Reinsurance Type",
-            ["INWARD", "OUTWARD"],
-            key="reins_type_calculate",
-            index=0) #INWARD
-            #disabled=True
 
         # ==========================
         # INIT SERVICE
