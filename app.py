@@ -907,7 +907,7 @@ with tab_upload:
             "Curr",
             "Total Contribution",
             "Commission",
-            "Overriding",
+            "Overiding",
             "Total Commission",
             "Gross Premium Income",
             "Tabarru",
@@ -919,7 +919,7 @@ with tab_upload:
             "Rate Exchange",
             "Kontribusi (IDR)",
             "Commission (IDR)",
-            "Overriding (IDR)",
+            "Overiding (IDR)",
             "Total Commission (IDR)",
             "Gross Premium Income (IDR)",
             "Tabarru (IDR)",
@@ -4831,7 +4831,7 @@ with tab_calc:
 
                                         "Total Contribution": total_contribution,
                                         "Commission": commission,
-                                        "Overriding": overriding,
+                                        "Overiding": overriding,
                                         "Total Commission": total_commission,
                                         "Gross Premium Income": total_contribution - total_commission,
                                         "Tabarru": df["Retro Tabarru"].sum(),
@@ -4844,7 +4844,7 @@ with tab_calc:
 
                                         "Kontribusi (IDR)": total_contribution * rate_exchange,
                                         "Commission (IDR)": commission * rate_exchange,
-                                        "Overriding (IDR)": overriding * rate_exchange,
+                                        "Overiding (IDR)": overriding * rate_exchange,
                                         "Total Commission (IDR)": total_commission * rate_exchange,
                                         "Gross Premium Income (IDR)": (
                                             total_contribution - total_commission
