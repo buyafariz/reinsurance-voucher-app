@@ -10,7 +10,7 @@ REQUIRED_COLUMNS_INWARD = [
     "insured full name",
     "gender",
     "main pol no",
-    "moin policy",
+    "main policy",
     "pol holder no",
     "policy holder",
     "birth date",
