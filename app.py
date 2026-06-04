@@ -2888,6 +2888,27 @@ with tab_calc:
             st.stop()
 
         # ==========================
+        # REFRESH LOG PML
+        # ✅ Letakkan sebelum pengecekan df_posted.empty
+        # ==========================
+        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
+            if log_snapshot_key in st.session_state:
+                del st.session_state[log_snapshot_key]
+            st.cache_data.clear()
+            st.rerun()
+
+        # Warning jika log lebih baru dari snapshot
+        current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
+        snapshot_posted_count = len(df_working[df_working["STATUS"] == "POSTED"])
+
+        if current_posted_count != snapshot_posted_count:
+            st.warning(
+                f"⚠️ Log PML telah diperbarui oleh user lain "
+                f"({snapshot_posted_count} → {current_posted_count} baris POSTED). "
+                f"Klik Refresh jika ingin memuat data terbaru."
+            )
+
+        # ==========================
         # FILTER STATUS POSTED
         # ==========================
         df_posted = df_working[df_working["STATUS"] == "POSTED"].copy()
@@ -2895,15 +2916,6 @@ with tab_calc:
         if df_posted.empty:
             st.info("Tidak ada data dengan status POSTED")
             st.stop()
-
-        # ==========================
-        # REFRESH LOG PML
-        # ==========================
-        if st.button("🔄 Refresh Log PML", key="btn_refresh_pml"):
-            if log_snapshot_key in st.session_state:
-                del st.session_state[log_snapshot_key]
-            st.cache_data.clear()
-            st.rerun()
 
         # Warning di bawah tombol
         current_posted_count  = len(log_df[log_df["STATUS"] == "POSTED"])
