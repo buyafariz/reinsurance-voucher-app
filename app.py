@@ -2935,8 +2935,8 @@ with tab_calc:
 
             with col_f1:
                 # Filter Cedant Company
-                cedant_options = ["(Semua)"] + sorted(df_posted["Cedant Company"].dropna().unique().tolist())
-                filter_cedant = st.selectbox("Cedant Company", cedant_options, key="filter_cedant")
+                cedant_options = ["(Semua)"] + sorted(df_posted["Account With"].dropna().unique().tolist())
+                filter_cedant = st.selectbox("Account With", cedant_options, key="filter_cedant")
 
             with col_f2:
                 # ✅ Ganti selectbox → text_input untuk pencarian bebas
@@ -2959,7 +2959,7 @@ with tab_calc:
         df_filtered = df_posted.copy()
 
         if filter_cedant != "(Semua)":
-            df_filtered = df_filtered[df_filtered["Cedant Company"] == filter_cedant]
+            df_filtered = df_filtered[df_filtered["Account With"] == filter_cedant]
 
         # ✅ Hanya filter jika ada keyword yang diketik (kosong = tampil semua)
         if filter_product.strip():  # <-- ini yang perlu diperbaiki
@@ -4386,8 +4386,8 @@ with tab_calc:
             col_f1, col_f2, col_f3, col_f4 = st.columns(4)
 
             with col_f1:
-                cedant_options = ["(Semua)"] + sorted(df_posted["Cedant Company"].dropna().unique().tolist())
-                filter_cedant = st.selectbox("Cedant Company", cedant_options, key="filter_cedant_outward")
+                cedant_options = ["(Semua)"] + sorted(df_posted["Account With"].dropna().unique().tolist())
+                filter_cedant = st.selectbox("Account With", cedant_options, key="filter_cedant_outward")
 
             with col_f2:
                 filter_product = st.text_input("🔍 Product", key="filter_product_outward")
@@ -4404,7 +4404,7 @@ with tab_calc:
         df_filtered = df_posted.copy()
 
         if filter_cedant != "(Semua)":
-            df_filtered = df_filtered[df_filtered["Cedant Company"] == filter_cedant]
+            df_filtered = df_filtered[df_filtered["Account With"] == filter_cedant]
 
         if filter_product.strip():
             df_filtered = df_filtered[
