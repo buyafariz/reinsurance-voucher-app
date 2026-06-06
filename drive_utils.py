@@ -1233,3 +1233,15 @@ def get_pml_metadata(_service, pml_id, pml_drive_id):
 
     except Exception:
         return {"product": "-", "cby": "-", "cbm": "-"}
+
+
+def download_with_retry(service, file_id, max_retries=3, delay=2):
+    """Download file dengan retry jika timeout."""
+    for attempt in range(max_retries):
+        try:
+            return download_file_from_drive(service, file_id)
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(delay * (attempt + 1))  # exponential backoff
+                continue
+            raise e

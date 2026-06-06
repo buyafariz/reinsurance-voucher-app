@@ -3350,245 +3350,257 @@ with tab_calc:
                             row = item["row"]
                             df = item["df"]
 
-                            try:
+                            # ✅ Retry wrapper
+                            max_retries = 3
+                            for attempt in range(max_retries):
 
-                                biz_type = row["Biz Type"]
+                                try:
 
-                                # ==========================
-                                # GENERATE VOUCHER
-                                # ==========================
-                                voucher, seq_no, _ = generate_vin_from_drive(
-                                    service=service,
-                                    period_folder_id=PERIOD_DRIVE_ID,
-                                    year=int(year),
-                                    month=int(month),
-                                    find_drive_file=find_drive_file,
-                                    biz_type=biz_type
-                                )
+                                    biz_type = row["Biz Type"]
 
-                                # ==========================
-                                # BUILD LOG ENTRY
-                                # ==========================
-                                if biz_type in [
-                                    "Kontribusi",
-                                    "Refund",
-                                    "Alteration",
-                                    "Retur",
-                                    "Revise",
-                                    "Batal",
-                                    "Cancel"
-                                ]:
-
-                                    total_contribution = df["Reins Total Premium"].sum()
-
-                                    commission = df["Reins Comm"].sum()
-
-                                    overriding = (
-                                        df["Reins Overriding"].sum()
-                                        if "Reins Overriding" in df.columns
-                                        else 0
+                                    # ==========================
+                                    # GENERATE VOUCHER
+                                    # ==========================
+                                    voucher, seq_no, _ = generate_vin_from_drive(
+                                        service=service,
+                                        period_folder_id=PERIOD_DRIVE_ID,
+                                        year=int(year),
+                                        month=int(month),
+                                        find_drive_file=find_drive_file,
+                                        biz_type=biz_type
                                     )
 
-                                    total_commission = commission + overriding
+                                    # ==========================
+                                    # BUILD LOG ENTRY
+                                    # ==========================
+                                    if biz_type in [
+                                        "Kontribusi",
+                                        "Refund",
+                                        "Alteration",
+                                        "Retur",
+                                        "Revise",
+                                        "Batal",
+                                        "Cancel"
+                                    ]:
 
-                                    claim_amount = (
-                                        df["Claim"].sum()
-                                        if "Claim" in df.columns
-                                        else 0
+                                        total_contribution = df["Reins Total Premium"].sum()
+
+                                        commission = df["Reins Comm"].sum()
+
+                                        overriding = (
+                                            df["Reins Overriding"].sum()
+                                            if "Reins Overriding" in df.columns
+                                            else 0
+                                        )
+
+                                        total_commission = commission + overriding
+
+                                        claim_amount = (
+                                            df["Claim"].sum()
+                                            if "Claim" in df.columns
+                                            else 0
+                                        )
+
+                                        balance = (
+                                            total_contribution
+                                            - total_commission
+                                            - claim_amount
+                                        )
+
+                                        log_entry = {
+                                            "Seq No": seq_no,
+                                            "Department": row["Department"],
+                                            "Biz Type": row["Biz Type"],
+                                            "Voucher No": voucher,
+                                            "Account With": row["Account With"],
+                                            "Cedant Company": row["Cedant Company"],
+                                            "PIC": row["PIC"],
+                                            "Product": df["References No"].iloc[0],
+                                            "CBY": df["CBY"].iloc[0],
+                                            "CBM": df["CBM"].iloc[0],
+                                            "OBY": int(year),
+                                            "OBM": int(month),
+                                            "KOB": df["K.O.B Code"].iloc[0],
+                                            "COB": df["COB"].iloc[0],
+                                            "MOP": df["Pay Period Type"].iloc[0],
+                                            "Curr": df["Ccy Code"].iloc[0],
+
+                                            "Total Contribution": total_contribution,
+                                            "Commission": commission,
+                                            "Overriding": overriding,
+                                            "Total Commission": total_commission,
+                                            "Gross Premium Income": total_contribution - total_commission,
+                                            "Tabarru": df["Reins Tabarru"].sum(),
+                                            "Ujrah": df["Reins Ujrah"].sum(),
+                                            "Claim": 0,
+                                            "Balance": balance,
+                                            "Check Balance": "",
+
+                                            "Rate Exchange": rate_exchange,
+
+                                            "Kontribusi (IDR)": total_contribution * rate_exchange,
+                                            "Commission (IDR)": commission * rate_exchange,
+                                            "Overiding (IDR)": overriding * rate_exchange,
+                                            "Total Commission (IDR)": total_commission * rate_exchange,
+                                            "Gross Premium Income (IDR)": (
+                                                total_contribution - total_commission
+                                            ) * rate_exchange,
+
+                                            "Tabarru (IDR)": (
+                                                df["Reins Tabarru"].sum()
+                                                * rate_exchange
+                                            ),
+
+                                            "Ujrah (IDR)": (
+                                                df["Reins Ujrah"].sum()
+                                                * rate_exchange
+                                            ),
+
+                                            "Claim (IDR)": 0,
+
+                                            "Balance (IDR)": (
+                                                balance * rate_exchange
+                                            ),
+
+                                            "Check Balance (IDR)": "",
+
+                                            "REMARKS": "-",
+                                            "PML ID": row["PML ID"],
+                                            "STATUS": "POSTED",
+                                            "CREATED AT": now_wib_naive(),
+                                            "CREATED BY": row["PIC"],
+                                            "Due Date": due_date,
+                                            "Subject Email": row["Subject Email"],
+                                            "Email Date": row["Email Date"],
+                                            "CANCELED AT": "-",
+                                            "CANCELED BY": "-",
+                                            "CANCEL OF VOUCHER": "-",
+                                            "CANCEL REASON": "-"
+                                        }
+
+                                    elif biz_type == "Claim":
+
+                                        claim_amount = (
+                                            df["Marein Share IDR"].sum()
+                                            if "Marein Share IDR" in df.columns
+                                            else 0
+                                        )
+
+                                        balance = -claim_amount
+
+                                        log_entry = {
+                                            "Seq No": seq_no,
+                                            "Department": row["Department"],
+                                            "Biz Type": row["Biz Type"],
+                                            "Voucher No": voucher,
+                                            "Account With": row["Account With"],
+                                            "Cedant Company": row["Cedant Company"],
+                                            "PIC": row["PIC"],
+                                            "Product": df["References No"].iloc[0],
+                                            "CBY": df["CedBookYear"].iloc[0],
+                                            "CBM": df["CedBookMonth"].iloc[0],
+                                            "OBY": int(year),
+                                            "OBM": int(month),
+                                            "KOB": df["KindOfBusiness"].iloc[0],
+                                            "COB": df["ClassOfBusiness"].iloc[0],
+                                            "MOP": df["PayPeriodType"].iloc[0],
+                                            "Curr": df["Currency"].iloc[0],
+
+                                            "Total Contribution": 0,
+                                            "Commission": 0,
+                                            "Overriding": 0,
+                                            "Total Commission": 0,
+                                            "Gross Premium Income": 0,
+                                            "Tabarru": 0,
+                                            "Ujrah": 0,
+                                            "Claim": claim_amount,
+                                            "Balance": balance,
+                                            "Check Balance": "",
+
+                                            "Rate Exchange": rate_exchange,
+
+                                            "Kontribusi (IDR)": 0,
+                                            "Commission (IDR)": 0,
+                                            "Overiding (IDR)": 0,
+                                            "Total Commission (IDR)": 0,
+                                            "Gross Premium Income (IDR)": 0,
+                                            "Tabarru (IDR)": 0,
+                                            "Ujrah (IDR)": 0,
+
+                                            "Claim (IDR)": (
+                                                claim_amount * rate_exchange
+                                            ),
+
+                                            "Balance (IDR)": (
+                                                balance * rate_exchange
+                                            ),
+
+                                            "Check Balance (IDR)": "",
+
+                                            "REMARKS": "-",
+                                            "PML ID": row["PML ID"],
+                                            "STATUS": "POSTED",
+                                            "CREATED AT": now_wib_naive(),
+                                            "CREATED BY": row["PIC"],
+                                            "Due Date": due_date,
+                                            "Subject Email": row["Subject Email"],
+                                            "Email Date": row["Email Date"],
+                                            "CANCELED AT": "-",
+                                            "CANCELED BY": "-",
+                                            "CANCEL OF VOUCHER": "-",
+                                            "CANCEL REASON": "-"
+                                        }
+
+                                    # ==========================
+                                    # APPEND LOG
+                                    # ==========================
+                                    append_gsheet(
+                                        service=sheets_service,
+                                        spreadsheet_id=log_drive_id,
+                                        row_dict=log_entry
                                     )
 
-                                    balance = (
-                                        total_contribution
-                                        - total_commission
-                                        - claim_amount
+                                    # ==========================
+                                    # UPLOAD VOUCHER FILE
+                                    # ==========================
+                                    upload_dataframe_to_drive(
+                                        service=service,
+                                        df=df,
+                                        template_columns=(
+                                            columns_template
+                                            if biz_type != "Claim"
+                                            else columns_template_claim
+                                        ),
+                                        voucher_id=voucher,
+                                        filename=f"{voucher}.xlsx",
+                                        folder_id=CEDING_DRIVE_ID,
+                                        file_type="Voucher"
                                     )
 
-                                    log_entry = {
-                                        "Seq No": seq_no,
-                                        "Department": row["Department"],
-                                        "Biz Type": row["Biz Type"],
-                                        "Voucher No": voucher,
-                                        "Account With": row["Account With"],
-                                        "Cedant Company": row["Cedant Company"],
-                                        "PIC": row["PIC"],
-                                        "Product": df["References No"].iloc[0],
-                                        "CBY": df["CBY"].iloc[0],
-                                        "CBM": df["CBM"].iloc[0],
-                                        "OBY": int(year),
-                                        "OBM": int(month),
-                                        "KOB": df["K.O.B Code"].iloc[0],
-                                        "COB": df["COB"].iloc[0],
-                                        "MOP": df["Pay Period Type"].iloc[0],
-                                        "Curr": df["Ccy Code"].iloc[0],
-
-                                        "Total Contribution": total_contribution,
-                                        "Commission": commission,
-                                        "Overriding": overriding,
-                                        "Total Commission": total_commission,
-                                        "Gross Premium Income": total_contribution - total_commission,
-                                        "Tabarru": df["Reins Tabarru"].sum(),
-                                        "Ujrah": df["Reins Ujrah"].sum(),
-                                        "Claim": 0,
-                                        "Balance": balance,
-                                        "Check Balance": "",
-
-                                        "Rate Exchange": rate_exchange,
-
-                                        "Kontribusi (IDR)": total_contribution * rate_exchange,
-                                        "Commission (IDR)": commission * rate_exchange,
-                                        "Overiding (IDR)": overriding * rate_exchange,
-                                        "Total Commission (IDR)": total_commission * rate_exchange,
-                                        "Gross Premium Income (IDR)": (
-                                            total_contribution - total_commission
-                                        ) * rate_exchange,
-
-                                        "Tabarru (IDR)": (
-                                            df["Reins Tabarru"].sum()
-                                            * rate_exchange
-                                        ),
-
-                                        "Ujrah (IDR)": (
-                                            df["Reins Ujrah"].sum()
-                                            * rate_exchange
-                                        ),
-
-                                        "Claim (IDR)": 0,
-
-                                        "Balance (IDR)": (
-                                            balance * rate_exchange
-                                        ),
-
-                                        "Check Balance (IDR)": "",
-
-                                        "REMARKS": "-",
-                                        "PML ID": row["PML ID"],
-                                        "STATUS": "POSTED",
-                                        "CREATED AT": now_wib_naive(),
-                                        "CREATED BY": row["PIC"],
-                                        "Due Date": due_date,
-                                        "Subject Email": row["Subject Email"],
-                                        "Email Date": row["Email Date"],
-                                        "CANCELED AT": "-",
-                                        "CANCELED BY": "-",
-                                        "CANCEL OF VOUCHER": "-",
-                                        "CANCEL REASON": "-"
-                                    }
-
-                                elif biz_type == "Claim":
-
-                                    claim_amount = (
-                                        df["Marein Share IDR"].sum()
-                                        if "Marein Share IDR" in df.columns
-                                        else 0
+                                    # ==========================
+                                    # UPDATE STATUS
+                                    # ==========================
+                                    update_pml_status_to_calculated(
+                                        service=sheets_service,
+                                        spreadsheet_id=log_pml_drive_id,
+                                        pml_id=[str(row["PML ID"])]
                                     )
 
-                                    balance = -claim_amount
+                                    success_count += 1
 
-                                    log_entry = {
-                                        "Seq No": seq_no,
-                                        "Department": row["Department"],
-                                        "Biz Type": row["Biz Type"],
-                                        "Voucher No": voucher,
-                                        "Account With": row["Account With"],
-                                        "Cedant Company": row["Cedant Company"],
-                                        "PIC": row["PIC"],
-                                        "Product": df["References No"].iloc[0],
-                                        "CBY": df["CedBookYear"].iloc[0],
-                                        "CBM": df["CedBookMonth"].iloc[0],
-                                        "OBY": int(year),
-                                        "OBM": int(month),
-                                        "KOB": df["KindOfBusiness"].iloc[0],
-                                        "COB": df["ClassOfBusiness"].iloc[0],
-                                        "MOP": df["PayPeriodType"].iloc[0],
-                                        "Curr": df["Currency"].iloc[0],
+                                    # ✅ Jeda antar PML
+                                    time.sleep(1)
 
-                                        "Total Contribution": 0,
-                                        "Commission": 0,
-                                        "Overriding": 0,
-                                        "Total Commission": 0,
-                                        "Gross Premium Income": 0,
-                                        "Tabarru": 0,
-                                        "Ujrah": 0,
-                                        "Claim": claim_amount,
-                                        "Balance": balance,
-                                        "Check Balance": "",
+                                    break  # ✅ Keluar dari retry loop jika berhasil
 
-                                        "Rate Exchange": rate_exchange,
-
-                                        "Kontribusi (IDR)": 0,
-                                        "Commission (IDR)": 0,
-                                        "Overiding (IDR)": 0,
-                                        "Total Commission (IDR)": 0,
-                                        "Gross Premium Income (IDR)": 0,
-                                        "Tabarru (IDR)": 0,
-                                        "Ujrah (IDR)": 0,
-
-                                        "Claim (IDR)": (
-                                            claim_amount * rate_exchange
-                                        ),
-
-                                        "Balance (IDR)": (
-                                            balance * rate_exchange
-                                        ),
-
-                                        "Check Balance (IDR)": "",
-
-                                        "REMARKS": "-",
-                                        "PML ID": row["PML ID"],
-                                        "STATUS": "POSTED",
-                                        "CREATED AT": now_wib_naive(),
-                                        "CREATED BY": row["PIC"],
-                                        "Due Date": due_date,
-                                        "Subject Email": row["Subject Email"],
-                                        "Email Date": row["Email Date"],
-                                        "CANCELED AT": "-",
-                                        "CANCELED BY": "-",
-                                        "CANCEL OF VOUCHER": "-",
-                                        "CANCEL REASON": "-"
-                                    }
-
-                                # ==========================
-                                # APPEND LOG
-                                # ==========================
-                                append_gsheet(
-                                    service=sheets_service,
-                                    spreadsheet_id=log_drive_id,
-                                    row_dict=log_entry
-                                )
-
-                                # ==========================
-                                # UPLOAD VOUCHER FILE
-                                # ==========================
-                                upload_dataframe_to_drive(
-                                    service=service,
-                                    df=df,
-                                    template_columns=(
-                                        columns_template
-                                        if biz_type != "Claim"
-                                        else columns_template_claim
-                                    ),
-                                    voucher_id=voucher,
-                                    filename=f"{voucher}.xlsx",
-                                    folder_id=CEDING_DRIVE_ID,
-                                    file_type="Voucher"
-                                )
-
-                                # ==========================
-                                # UPDATE STATUS
-                                # ==========================
-                                update_pml_status_to_calculated(
-                                    service=sheets_service,
-                                    spreadsheet_id=log_pml_drive_id,
-                                    pml_id=[str(row["PML ID"])]
-                                )
-
-                                success_count += 1
-
-                            except Exception as e:
-
-                                st.error(
-                                    f"❌ Error posting PML {row['PML ID']}: {e}"
-                                )
+                                except Exception as e:
+                                    if "timed out" in str(e).lower() and attempt < max_retries - 1:
+                                        st.warning(f"⚠️ Timeout pada {row['PML ID']}, retry {attempt + 1}/{max_retries - 1}...")
+                                        time.sleep(3 * (attempt + 1))  # exponential backoff
+                                        continue
+                                    else:
+                                        st.error(f"❌ Error posting PML {row['PML ID']}: {e}")
+                                        break
 
                         # ==========================
                         # DONE
@@ -4780,242 +4792,254 @@ with tab_calc:
                             row = item["row"]
                             df = item["df"]
 
-                            try:
+                            # ✅ Retry wrapper
+                            max_retries = 3
+                            for attempt in range(max_retries):
 
-                                biz_type = row["Biz Type"]
+                                try:
 
-                                # ==========================
-                                # GENERATE VOUCHER
-                                # ==========================
-                                voucher, seq_no, _ = generate_vou_from_drive(
-                                    service=service,
-                                    period_folder_id=OUTWARD_DRIVE_ID,
-                                    year=int(year),
-                                    month=int(month),
-                                    find_drive_file=find_drive_file,
-                                    biz_type=biz_type
-                                )
+                                    biz_type = row["Biz Type"]
 
-                                # ==========================
-                                # BUILD LOG ENTRY
-                                # ==========================
-                                if biz_type in [
-                                    "Kontribusi",
-                                    "Refund",
-                                    "Alteration",
-                                    "Retur",
-                                    "Revise",
-                                    "Batal",
-                                    "Cancel"
-                                ]:
-
-                                    total_contribution = df["Retro Total Premium"].sum()
-
-                                    commission = df["Retro Total Comm"].sum()
-
-                                    overriding = (
-                                        df["Retro Overriding"].sum()
-                                        if "Retro Overriding" in df.columns
-                                        else 0
+                                    # ==========================
+                                    # GENERATE VOUCHER
+                                    # ==========================
+                                    voucher, seq_no, _ = generate_vou_from_drive(
+                                        service=service,
+                                        period_folder_id=OUTWARD_DRIVE_ID,
+                                        year=int(year),
+                                        month=int(month),
+                                        find_drive_file=find_drive_file,
+                                        biz_type=biz_type
                                     )
 
-                                    total_commission = commission + overriding
+                                    # ==========================
+                                    # BUILD LOG ENTRY
+                                    # ==========================
+                                    if biz_type in [
+                                        "Kontribusi",
+                                        "Refund",
+                                        "Alteration",
+                                        "Retur",
+                                        "Revise",
+                                        "Batal",
+                                        "Cancel"
+                                    ]:
 
-                                    claim_amount = (
-                                        df["Claim"].sum()
-                                        if "Claim" in df.columns
-                                        else 0
+                                        total_contribution = df["Retro Total Premium"].sum()
+
+                                        commission = df["Retro Total Comm"].sum()
+
+                                        overriding = (
+                                            df["Retro Overriding"].sum()
+                                            if "Retro Overriding" in df.columns
+                                            else 0
+                                        )
+
+                                        total_commission = commission + overriding
+
+                                        claim_amount = (
+                                            df["Claim"].sum()
+                                            if "Claim" in df.columns
+                                            else 0
+                                        )
+
+                                        balance = (
+                                            total_contribution
+                                            - total_commission
+                                            - claim_amount
+                                        )
+
+                                        log_entry = {
+                                            "Seq No": seq_no,
+                                            "Department": row["Department"],
+                                            "Biz Type": row["Biz Type"],
+                                            "Retro Type": df["Retro Type"].iloc[0],
+                                            "Inward VIN Ref": df["Inw Vouc ID"].iloc[0],
+                                            "Voucher No": voucher,
+                                            "Account With": row["Account With"],
+                                            "Cedant Company": row["Cedant Company"],
+                                            "PIC": row["PIC"],
+                                            "Product": df["References No"].iloc[0],
+                                            "CBY": df["Ced Book Year"].iloc[0],
+                                            "CBM": df["Ced Book Month"].iloc[0],
+                                            "OBY": int(year),
+                                            "OBM": int(month),
+                                            "KOB": df["KOB Code"].iloc[0],
+                                            "COB": df["COB"].iloc[0],
+                                            "MOP": df["Out Pay Period Type"].iloc[0],
+                                            "Curr": df["Premium Ccy"].iloc[0],
+
+                                            "Total Contribution": total_contribution,
+                                            "Commission": commission,
+                                            "Overiding": overriding,
+                                            "Total Commission": total_commission,
+                                            "Gross Premium Income": total_contribution - total_commission,
+                                            "Tabarru": df["Retro Tabarru"].sum(),
+                                            "Ujrah": df["Retro Ujrah"].sum(),
+                                            "Claim": 0,
+                                            "Balance": balance,
+                                            "Check Balance": "",
+
+                                            "Rate Exchange": rate_exchange,
+
+                                            "Kontribusi (IDR)": total_contribution * rate_exchange,
+                                            "Commission (IDR)": commission * rate_exchange,
+                                            "Overiding (IDR)": overriding * rate_exchange,
+                                            "Total Commission (IDR)": total_commission * rate_exchange,
+                                            "Gross Premium Income (IDR)": (
+                                                total_contribution - total_commission
+                                            ) * rate_exchange,
+
+                                            "Tabarru (IDR)": (
+                                                df["Retro Tabarru"].sum()
+                                                * rate_exchange
+                                            ),
+
+                                            "Ujrah (IDR)": (
+                                                df["Retro Ujrah"].sum()
+                                                * rate_exchange
+                                            ),
+
+                                            "Claim (IDR)": 0,
+
+                                            "Balance (IDR)": (
+                                                balance * rate_exchange
+                                            ),
+
+                                            "Check Balance (IDR)": "",
+
+                                            "REMARKS": "-",
+                                            "PML ID": row["PML ID"],
+                                            "STATUS": "POSTED",
+                                            "CREATED AT": now_wib_naive(),
+                                            "CREATED BY": row["PIC"],
+                                            "Due Date": due_date,
+                                            "Subject Email": row["Subject Email"],
+                                            "Email Date": row["Email Date"],
+                                            "CANCELED AT": "-",
+                                            "CANCELED BY": "-",
+                                            "CANCEL OF VOUCHER": "-",
+                                            "CANCEL REASON": "-"
+                                        }
+
+                                    elif biz_type == "Claim":
+
+                                        claim_amount = (
+                                            df["Your Share"].sum()
+                                            if "Your Share" in df.columns
+                                            else 0
+                                        )
+
+                                        balance = -claim_amount
+
+                                        log_entry = {
+                                            "Seq No": seq_no,
+                                            "Department": row["Department"],
+                                            "Biz Type": row["Biz Type"],
+                                            "Retro Type": df["Retro Type"].iloc[0],
+                                            "Inward VIN Ref": df["Voucher ID"].iloc[0],
+                                            "Voucher No": voucher,
+                                            "Account With": row["Account With"],
+                                            "Cedant Company": row["Cedant Company"],
+                                            "PIC": row["PIC"],
+                                            "Product": df["Voucher Desc"].iloc[0],
+                                            "CBY": df["Ced Book Year"].iloc[0],
+                                            "CBM": df["Ced Book Month"].iloc[0],
+                                            "OBY": int(year),
+                                            "OBM": int(month),
+                                            "KOB": df["KOB Code"].iloc[0],
+                                            "COB": df["COB Detail"].iloc[0],
+                                            "MOP": df["Method of Payment"].iloc[0],
+                                            "Curr": df["Curr"].iloc[0],
+
+                                            "Total Contribution": 0,
+                                            "Commission": 0,
+                                            "Overriding": 0,
+                                            "Total Commission": 0,
+                                            "Gross Premium Income": 0,
+                                            "Tabarru": 0,
+                                            "Ujrah": 0,
+                                            "Claim": claim_amount,
+                                            "Balance": balance,
+                                            "Check Balance": "",
+
+                                            "Rate Exchange": rate_exchange,
+
+                                            "Kontribusi (IDR)": 0,
+                                            "Commission (IDR)": 0,
+                                            "Overiding (IDR)": 0,
+                                            "Total Commission (IDR)": 0,
+                                            "Gross Premium Income (IDR)": 0,
+                                            "Tabarru (IDR)": 0,
+                                            "Ujrah (IDR)": 0,
+
+                                            "Claim (IDR)": (
+                                                claim_amount * rate_exchange
+                                            ),
+
+                                            "Balance (IDR)": (
+                                                balance * rate_exchange
+                                            ),
+
+                                            "Check Balance (IDR)": "",
+
+                                            "REMARKS": "-",
+                                            "PML ID": row["PML ID"],
+                                            "STATUS": "POSTED",
+                                            "CREATED AT": now_wib_naive(),
+                                            "CREATED BY": row["PIC"],
+                                            "Due Date": due_date,
+                                            "Subject Email": row["Subject Email"],
+                                            "Email Date": row["Email Date"],
+                                            "CANCELED AT": "-",
+                                            "CANCELED BY": "-",
+                                            "CANCEL OF VOUCHER": "-",
+                                            "CANCEL REASON": "-"
+                                        }
+
+                                    # ==========================
+                                    # APPEND LOG
+                                    # ==========================
+                                    append_gsheet(
+                                        service=sheets_service,
+                                        spreadsheet_id=log_drive_id,
+                                        row_dict=log_entry
                                     )
 
-                                    balance = (
-                                        total_contribution
-                                        - total_commission
-                                        - claim_amount
+                                    # ==========================
+                                    # UPLOAD FILE
+                                    # ==========================
+                                    upload_dataframe_to_drive_outward(
+                                        service=service,
+                                        df=df,
+                                        template_columns=(
+                                            columns_template_outward
+                                            if biz_type != "Claim"
+                                            else columns_template_claim_outward
+                                        ),
+                                        voucher_id=voucher,
+                                        filename=f"{voucher}.xlsx",
+                                        folder_id=CEDING_DRIVE_ID,
+                                        biz_type=biz_type,
+                                        pic=row["PIC"],
+                                        date=now_wib_naive()
                                     )
 
-                                    log_entry = {
-                                        "Seq No": seq_no,
-                                        "Department": row["Department"],
-                                        "Biz Type": row["Biz Type"],
-                                        "Retro Type": df["Retro Type"].iloc[0],
-                                        "Inward VIN Ref": df["Inw Vouc ID"].iloc[0],
-                                        "Voucher No": voucher,
-                                        "Account With": row["Account With"],
-                                        "Cedant Company": row["Cedant Company"],
-                                        "PIC": row["PIC"],
-                                        "Product": df["References No"].iloc[0],
-                                        "CBY": df["Ced Book Year"].iloc[0],
-                                        "CBM": df["Ced Book Month"].iloc[0],
-                                        "OBY": int(year),
-                                        "OBM": int(month),
-                                        "KOB": df["KOB Code"].iloc[0],
-                                        "COB": df["COB"].iloc[0],
-                                        "MOP": df["Out Pay Period Type"].iloc[0],
-                                        "Curr": df["Premium Ccy"].iloc[0],
+                                    success_count += 1
 
-                                        "Total Contribution": total_contribution,
-                                        "Commission": commission,
-                                        "Overiding": overriding,
-                                        "Total Commission": total_commission,
-                                        "Gross Premium Income": total_contribution - total_commission,
-                                        "Tabarru": df["Retro Tabarru"].sum(),
-                                        "Ujrah": df["Retro Ujrah"].sum(),
-                                        "Claim": 0,
-                                        "Balance": balance,
-                                        "Check Balance": "",
+                                    # ✅ Jeda antar PML
+                                    time.sleep(1)
 
-                                        "Rate Exchange": rate_exchange,
+                                    break  # ✅ Keluar dari retry loop jika berhasil
 
-                                        "Kontribusi (IDR)": total_contribution * rate_exchange,
-                                        "Commission (IDR)": commission * rate_exchange,
-                                        "Overiding (IDR)": overriding * rate_exchange,
-                                        "Total Commission (IDR)": total_commission * rate_exchange,
-                                        "Gross Premium Income (IDR)": (
-                                            total_contribution - total_commission
-                                        ) * rate_exchange,
-
-                                        "Tabarru (IDR)": (
-                                            df["Retro Tabarru"].sum()
-                                            * rate_exchange
-                                        ),
-
-                                        "Ujrah (IDR)": (
-                                            df["Retro Ujrah"].sum()
-                                            * rate_exchange
-                                        ),
-
-                                        "Claim (IDR)": 0,
-
-                                        "Balance (IDR)": (
-                                            balance * rate_exchange
-                                        ),
-
-                                        "Check Balance (IDR)": "",
-
-                                        "REMARKS": "-",
-                                        "PML ID": row["PML ID"],
-                                        "STATUS": "POSTED",
-                                        "CREATED AT": now_wib_naive(),
-                                        "CREATED BY": row["PIC"],
-                                        "Due Date": due_date,
-                                        "Subject Email": row["Subject Email"],
-                                        "Email Date": row["Email Date"],
-                                        "CANCELED AT": "-",
-                                        "CANCELED BY": "-",
-                                        "CANCEL OF VOUCHER": "-",
-                                        "CANCEL REASON": "-"
-                                    }
-
-                                elif biz_type == "Claim":
-
-                                    claim_amount = (
-                                        df["Your Share"].sum()
-                                        if "Your Share" in df.columns
-                                        else 0
-                                    )
-
-                                    balance = -claim_amount
-
-                                    log_entry = {
-                                        "Seq No": seq_no,
-                                        "Department": row["Department"],
-                                        "Biz Type": row["Biz Type"],
-                                        "Retro Type": df["Retro Type"].iloc[0],
-                                        "Inward VIN Ref": df["Voucher ID"].iloc[0],
-                                        "Voucher No": voucher,
-                                        "Account With": row["Account With"],
-                                        "Cedant Company": row["Cedant Company"],
-                                        "PIC": row["PIC"],
-                                        "Product": df["Voucher Desc"].iloc[0],
-                                        "CBY": df["Ced Book Year"].iloc[0],
-                                        "CBM": df["Ced Book Month"].iloc[0],
-                                        "OBY": int(year),
-                                        "OBM": int(month),
-                                        "KOB": df["KOB Code"].iloc[0],
-                                        "COB": df["COB Detail"].iloc[0],
-                                        "MOP": df["Method of Payment"].iloc[0],
-                                        "Curr": df["Curr"].iloc[0],
-
-                                        "Total Contribution": 0,
-                                        "Commission": 0,
-                                        "Overriding": 0,
-                                        "Total Commission": 0,
-                                        "Gross Premium Income": 0,
-                                        "Tabarru": 0,
-                                        "Ujrah": 0,
-                                        "Claim": claim_amount,
-                                        "Balance": balance,
-                                        "Check Balance": "",
-
-                                        "Rate Exchange": rate_exchange,
-
-                                        "Kontribusi (IDR)": 0,
-                                        "Commission (IDR)": 0,
-                                        "Overiding (IDR)": 0,
-                                        "Total Commission (IDR)": 0,
-                                        "Gross Premium Income (IDR)": 0,
-                                        "Tabarru (IDR)": 0,
-                                        "Ujrah (IDR)": 0,
-
-                                        "Claim (IDR)": (
-                                            claim_amount * rate_exchange
-                                        ),
-
-                                        "Balance (IDR)": (
-                                            balance * rate_exchange
-                                        ),
-
-                                        "Check Balance (IDR)": "",
-
-                                        "REMARKS": "-",
-                                        "PML ID": row["PML ID"],
-                                        "STATUS": "POSTED",
-                                        "CREATED AT": now_wib_naive(),
-                                        "CREATED BY": row["PIC"],
-                                        "Due Date": due_date,
-                                        "Subject Email": row["Subject Email"],
-                                        "Email Date": row["Email Date"],
-                                        "CANCELED AT": "-",
-                                        "CANCELED BY": "-",
-                                        "CANCEL OF VOUCHER": "-",
-                                        "CANCEL REASON": "-"
-                                    }
-
-                                # ==========================
-                                # APPEND LOG
-                                # ==========================
-                                append_gsheet(
-                                    service=sheets_service,
-                                    spreadsheet_id=log_drive_id,
-                                    row_dict=log_entry
-                                )
-
-                                # ==========================
-                                # UPLOAD FILE
-                                # ==========================
-                                upload_dataframe_to_drive_outward(
-                                    service=service,
-                                    df=df,
-                                    template_columns=(
-                                        columns_template_outward
-                                        if biz_type != "Claim"
-                                        else columns_template_claim_outward
-                                    ),
-                                    voucher_id=voucher,
-                                    filename=f"{voucher}.xlsx",
-                                    folder_id=CEDING_DRIVE_ID,
-                                    biz_type=biz_type,
-                                    pic=row["PIC"],
-                                    date=now_wib_naive()
-                                )
-
-                                success_count += 1
-
-                            except Exception as e:
-
-                                st.error(
-                                    f"❌ Error posting PML {row['PML ID']}: {e}"
-                                )
+                                except Exception as e:
+                                    if "timed out" in str(e).lower() and attempt < max_retries - 1:
+                                        st.warning(f"⚠️ Timeout pada {row['PML ID']}, retry {attempt + 1}/{max_retries - 1}...")
+                                        time.sleep(3 * (attempt + 1))
+                                        continue
+                                    else:
+                                        st.error(f"❌ Error posting PML {row['PML ID']}: {e}")
+                                        break
 
                         # ==========================
                         # UPDATE STATUS
