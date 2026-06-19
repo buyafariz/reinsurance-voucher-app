@@ -640,14 +640,14 @@ with tab_upload:
                                 "CBM": df["cbm"][0],
                                 "Curr":curr,
                                 "Total Contribution": df["reins total premium"].sum(),
-                                "Commission": df["reins comm"].sum(),
+                                "Commission": df["Reins Comm"].sum() + df["Reins EM Comm"].sum() + df["Reins ER Comm"].sum() + df["Reins Oth. Comm"].sum() + df["Reins Profit Share"].sum() + df["Reins Broker Fee"].sum(),
                                 "Overriding": df["reins overriding"].sum() if "reins overriding" in df.columns else 0,
-                                "Total Commission": (df["reins comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
-                                "Gross Premium Income": df["reins total premium"].sum() - ((df["reins total comm"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
+                                "Total Commission": (df["Reins Comm"].sum() + df["Reins EM Comm"].sum() + df["Reins ER Comm"].sum() + df["Reins Oth. Comm"].sum() + df["Reins Profit Share"].sum() + df["Reins Broker Fee"].sum()) + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0),
+                                "Gross Premium Income": df["reins total premium"].sum() - (df["Reins Comm"].sum() + df["Reins EM Comm"].sum() + df["Reins ER Comm"].sum() + df["Reins Oth. Comm"].sum() + df["Reins Profit Share"].sum() + df["Reins Broker Fee"].sum() + (df["reins overriding"].sum() if "reins overriding" in df.columns else 0)),
                                 "Tabarru": df["reins tabarru"].sum(),
                                 "Ujrah": df["reins ujrah"].sum(),
                                 "Claim": 0,
-                                "Balance": df["reins total premium"].sum() - df["reins comm"].sum() - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
+                                "Balance": df["reins total premium"].sum() - (df["Reins Comm"].sum() + df["Reins EM Comm"].sum() + df["Reins ER Comm"].sum() + df["Reins Oth. Comm"].sum() + df["Reins Profit Share"].sum() + df["Reins Broker Fee"].sum()) - (df["reins overriding"].sum() if "reins overriding" in df.columns else 0) - (df["claim"].sum() if "claim" in df.columns else 0),
                                 "REMARKS": remarks,
                                 "STATUS": "POSTED",
                                 #"ENTRY_TYPE": entry_type,
@@ -3385,7 +3385,7 @@ with tab_calc:
 
                                         total_contribution = df["Reins Total Premium"].sum()
 
-                                        commission = df["Reins Comm"].sum()
+                                        commission = df["Reins Comm"].sum() + df["Reins EM Comm"].sum() + df["Reins ER Comm"].sum() + df["Reins Oth. Comm"].sum() + df["Reins Profit Share"].sum() + df["Reins Broker Fee"].sum()
 
                                         overriding = (
                                             df["Reins Overriding"].sum()
