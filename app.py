@@ -3027,7 +3027,7 @@ with tab_calc:
             # ==========================
             # CLEAN NUMERIC
             # ==========================
-            cols_numeric = ["Total Contribution", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
             for col in cols_numeric:
                 def clean_number(x):
@@ -3068,6 +3068,15 @@ with tab_calc:
                     "Total Contribution": st.column_config.NumberColumn(
                         "Total Contribution", format="%,.0f"
                     ),
+                    "Commission": st.column_config.NumberColumn(
+                        "Commission", format="%,.0f"
+                    ),
+                    "Overriding": st.column_config.NumberColumn(
+                        "Overriding", format="%,.0f"
+                    ),
+                    "Total Commission": st.column_config.NumberColumn(
+                        "Total Commission", format="%,.0f"
+                    ),
                     "Gross Premium Income": st.column_config.NumberColumn(
                         "Gross Premium Income", format="%,.0f"
                     ),
@@ -3086,7 +3095,7 @@ with tab_calc:
                 },
                 disabled=[
                     "No", "PML ID", "STATUS", "Product", "CBY", "CBM",
-                    "Total Contribution", "Gross Premium Income",
+                    "Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income",
                     "Tabarru", "Ujrah", "Claim", "Balance"
                 ],
                 hide_index=True,
