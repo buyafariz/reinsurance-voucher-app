@@ -619,7 +619,7 @@ with tab_upload:
                             month=month
                         )
 
-                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                             if biz_type == "Kontribusi":
                                 df["trans category"] = "PREMIUM"
 
@@ -661,7 +661,7 @@ with tab_upload:
                                 "CANCEL REASON":"-"
                             }
 
-                        elif biz_type == "Claim":
+                        elif department == "CLAIM":
                             log_pml = {
                                 "Seq No": seq_no,
                                 "Department":department,
