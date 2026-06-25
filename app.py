@@ -507,21 +507,7 @@ with tab_upload:
             # ==========================
             st.subheader("💰 Summary Financial")
 
-            if department == "Claim":
-                summary_df = pd.DataFrame({
-                    "Keterangan": [
-                        "Amount of Claim IDR",
-                        "Reins Claim IDR",
-                        "Marein Share IDR"
-                    ],
-                    "Nilai": [
-                        df["amount of claim idr"].sum(),
-                        df["reins claim idr"].sum(),
-                        df["marein share idr"].sum()
-                        ]
-                })
-
-            elif department == "Admin" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                 summary_df = pd.DataFrame({
                     "Keterangan": [
                         "Total Contribution",
@@ -537,6 +523,20 @@ with tab_upload:
                         df["reins ujrah"].sum(),
                         df["reins nett premium"].sum(),
                     ]
+                })
+
+            elif department == "CLAIM":
+                summary_df = pd.DataFrame({
+                    "Keterangan": [
+                        "Amount of Claim IDR",
+                        "Reins Claim IDR",
+                        "Marein Share IDR"
+                    ],
+                    "Nilai": [
+                        df["amount of claim idr"].sum(),
+                        df["reins claim idr"].sum(),
+                        df["marein share idr"].sum()
+                        ]
                 })
                 
 
