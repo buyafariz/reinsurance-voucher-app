@@ -719,7 +719,7 @@ with tab_upload:
                             row_dict=log_pml
                         )
 
-                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,
@@ -730,7 +730,7 @@ with tab_upload:
                                 file_type = "PML"
                             )
 
-                        elif biz_type == "Claim" :
+                        elif department == "CLAIM" :
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,
@@ -1257,7 +1257,7 @@ with tab_upload:
                             month=month
                         )
 
-                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                             log_pml = {
                                 "Seq No": seq_no,
                                 "Department":department,
@@ -1292,7 +1292,7 @@ with tab_upload:
                                 "CANCEL REASON":"-"
                             }
 
-                        elif biz_type == "Claim":
+                        elif department == "CLAIM":
                             log_pml = {
                                 "Seq No": seq_no,
                                 "Department":department,
@@ -1350,7 +1350,7 @@ with tab_upload:
                             row_dict=log_pml
                         )
 
-                        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                             upload_dataframe_to_drive(
                                 service=service,
                                 df=df,
@@ -1361,7 +1361,7 @@ with tab_upload:
                                 file_type = "PML"
                             )
 
-                        elif biz_type == "Claim" :
+                        elif department == "CLAIM":
                             df["dla out voucher id"] = pml_id
                             upload_dataframe_to_drive(
                                 service=service,
