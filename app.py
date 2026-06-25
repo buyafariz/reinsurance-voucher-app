@@ -3598,7 +3598,7 @@ with tab_calc:
                                     success_count += 1
 
                                     # ✅ Jeda antar PML
-                                    time.sleep(1)
+                                    time.sleep(2 ** attempt)  # exponential backoff
 
                                     break  # ✅ Keluar dari retry loop jika berhasil
 
@@ -5037,7 +5037,7 @@ with tab_calc:
                                     success_count += 1
 
                                     # ✅ Jeda antar PML
-                                    time.sleep(1)
+                                    time.sleep(2 ** attempt)  # exponential backoff
 
                                     break  # ✅ Keluar dari retry loop jika berhasil
 
