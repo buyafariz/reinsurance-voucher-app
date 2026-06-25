@@ -600,6 +600,7 @@ with tab_upload:
                             year=int(year),
                             month=int(month),
                             find_drive_file=find_drive_file,
+                            department=department,
                             biz_type = biz_type
                         )
 
@@ -1238,6 +1239,7 @@ with tab_upload:
                             year=int(year),
                             month=int(month),
                             find_drive_file=find_drive_file,
+                            department=department,
                             biz_type = biz_type
                         )
 

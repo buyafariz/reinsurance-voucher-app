@@ -199,6 +199,7 @@ def generate_pml_from_drive(
     year,
     month,
     find_drive_file,
+    department,
     biz_type
 ):
     filename = get_log_pml_filename(year,month)
@@ -236,10 +237,10 @@ def generate_pml_from_drive(
     # ==========================
     # Format Voucher
     # ==========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"PML{year}{month:02d}LIS{next_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif department == "CLAIM":
         voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq, file_id
@@ -251,6 +252,7 @@ def generate_pml_outward_from_drive(
     year,
     month,
     find_drive_file,
+    department,
     biz_type
 ):
     filename = f"{get_log_pml_filename(year,month)} (Outward)"
@@ -288,10 +290,10 @@ def generate_pml_outward_from_drive(
     # ==========================
     # Format Voucher
     # ==========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"PML{year}{month:02d}LIS{next_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif department == "CLAIM":
         voucher = f"PLA{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq, file_id
@@ -451,12 +453,12 @@ def get_last_seq_no(sheets_service, spreadsheet_id):
     return max(seq_numbers) if seq_numbers else 0
 
 
-def generate_pml_id(seq_no, year, month, biz_type):
+def generate_pml_id(seq_no, year, month, department, biz_type):
     new_seq = seq_no + 1
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
         voucher = f"PML{year}{month:02d}LIS{new_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif department == "CLAIM":
         voucher = f"PLA{year}{month:02d}LSC{new_seq:04d}"
 
     return voucher, new_seq
@@ -514,6 +516,7 @@ def split_upload_with_log(
             current_seq,
             year,
             month,
+            base_info["department"],
             biz_type
         )
 
@@ -687,13 +690,14 @@ def split_upload_with_log_outward(
             current_seq,
             year,
             month,
+            base_info["department"],
             biz_type
         )
 
         # ==========================
         # HITUNG NILAI
         # ==========================
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if base_info["department"] == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             product = group["References No"].iloc[0]
             cby = group["Ced Book Year"].iloc[0]
             cbm = group["Ced Book Month"].iloc[0]
@@ -741,7 +745,7 @@ def split_upload_with_log_outward(
                 "CANCEL REASON": "-"
             }
 
-        elif biz_type == "Claim":
+        elif base_info["department"] == "CLAIM":
             claim = group["Your Share"].sum()
             product = group["Voucher Desc"].iloc[0]
             cby = group["Ced Book Year"].iloc[0]
