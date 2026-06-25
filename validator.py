@@ -258,7 +258,7 @@ INTEGER_COLUMNS_CLAIM_OUTWARD = [
 ]
 
 
-def validate_voucher(df, biz_type: str, reins_type:str):
+def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
     errors = []
 
@@ -287,7 +287,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
 
-        elif biz_type == "Claim":
+        elif department == "Claim" and biz_type == "Claim":
             missing_cols = set(REQUIRED_COLUMNS_CLAIM_INWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
@@ -300,7 +300,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
 
 
-        elif biz_type == "Claim":
+        elif department == "Claim" and biz_type == "Claim":
             missing_cols = set(REQUIRED_COLUMNS_CLAIM_OUTWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
@@ -317,7 +317,7 @@ def validate_voucher(df, biz_type: str, reins_type:str):
                     errors.append(f"Kolom {col} harus bertipe tanggal (date)")
                 df[col] = converted
 
-        elif biz_type == "Claim":
+        elif department == "Claim" and biz_type == "Claim":
             for col in DATE_COLUMNS_CLAIM_INWARD:
                 converted = pd.to_datetime(df[col], errors="coerce")
                 if converted.isna().any():

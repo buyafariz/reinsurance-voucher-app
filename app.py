@@ -299,7 +299,7 @@ with tab_upload:
             # ==========================
             # VALIDATION
             # ==========================
-            errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
+            errors = validate_voucher(df, st.session_state["department_upload"], st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
 
             if errors:
                 st.error("❌ VALIDASI GAGAL")
@@ -956,7 +956,7 @@ with tab_upload:
             # ==========================
             # VALIDATION
             # ==========================
-            errors = validate_voucher(df, st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
+            errors = validate_voucher(df, st.session_state["department_upload"], st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
 
             if errors:
                 st.error("❌ VALIDASI GAGAL")
