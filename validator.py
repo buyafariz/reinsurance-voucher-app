@@ -396,11 +396,22 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     continue
 
                 # 🔹 Kontribusi → tidak boleh negatif
-                if department in "CLAIM":
+                if biz_type == "Claim":
                     if (numeric < 0).any():
                         errors.append(
                             f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
                         )
+
+                # 🔹 Refund, Retur, Batal → harus negatif
+                if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
+                    if col in [
+                        "reins claim idr",
+                        "marein share idr",
+                    ]:
+                        if (numeric > 0).any():
+                            errors.append(
+                                f"Kolom {col} harus bernilai negatif ({biz_type})"
+                            )
         
                 df[col] = numeric
 
