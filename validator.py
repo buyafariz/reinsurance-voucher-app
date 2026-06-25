@@ -282,7 +282,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 1. KOLOM WAJIB
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             missing_cols = set(REQUIRED_COLUMNS_INWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
@@ -294,7 +294,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
   
             
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             missing_cols = set(REQUIRED_COLUMNS_OUTWARD) - set(df.columns)
             if missing_cols:
                 errors.append(f"Kolom tidak ditemukan: {sorted(missing_cols)}")
@@ -325,7 +325,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 df[col] = converted
         
     if reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             for col in DATE_COLUMNS:
                 # 🔹 CEK DULU ADA ATAU TIDAK
                 if col not in df.columns:
@@ -337,7 +337,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     errors.append(f"Kolom {col} harus bertipe tanggal (date)")
                 df[col] = converted
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             for col in DATE_COLUMNS_CLAIM_OUTWARD:
                 converted = pd.to_datetime(df[col], errors="coerce")
                 if converted.isna().any():
@@ -348,7 +348,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
         
             for col in NUMERIC_COLUMNS_INWARD:
 
@@ -387,7 +387,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 df[col] = numeric
 
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             for col in NUMERIC_COLUMNS_CLAIM_INWARD:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -396,7 +396,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     continue
 
                 # 🔹 Kontribusi → tidak boleh negatif
-                if biz_type == "Claim":
+                if department in "CLAIM":
                     if (numeric < 0).any():
                         errors.append(
                             f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
@@ -405,7 +405,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 df[col] = numeric
 
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
     
             for col in NUMERIC_COLUMNS_OUTWARD:
 
@@ -445,7 +445,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 df[col] = numeric
 
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             for col in NUMERIC_COLUMNS_CLAIM_OUTWARD:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -454,7 +454,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     continue
 
                 # 🔹 Kontribusi → tidak boleh negatif
-                if biz_type == "Claim":
+                if department in "CLAIM":
                     if (numeric < 0).any():
                         errors.append(
                             f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
@@ -473,7 +473,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 5. INTEGER >= 0 (AGE AT, TERM)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             for col in INTEGER_COLUMNS:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -492,7 +492,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 # ✅ AMAN untuk casting
                 df[col] = numeric.astype("Int64")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             for col in INTEGER_COLUMNS_CLAIM_INWARD:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -513,7 +513,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
 
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             for col in INTEGER_COLUMNS:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -532,7 +532,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 # ✅ AMAN untuk casting
                 df[col] = numeric.astype("Int64")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             for col in INTEGER_COLUMNS_CLAIM_OUTWARD:
                 numeric = pd.to_numeric(df[col], errors="coerce")
 
@@ -562,26 +562,26 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 7. MEDICAL (M / N)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
             if not df["medical"].isin(["M", "N"]).all():
                 errors.append("Kolom medical hanya boleh bernilai M atau N")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             df["medicalcategory"] = df["medicalcategory"].astype(str).str.strip().str.upper()
 
             if not df["medicalcategory"].isin(["M", "N"]).all():
                 errors.append("Kolom medical hanya boleh bernilai M atau N")
 
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
             if not df["medical"].isin(["M", "N"]).all():
                 errors.append("Kolom medical hanya boleh bernilai M atau N")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
             if not df["medical"].isin(["M", "N"]).all():
@@ -591,7 +591,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 7. SMOKER (S / N)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if "smoker" not in df.columns:
                 errors.append("Tambahkan kolom Smoker")
             else:
@@ -600,20 +600,20 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 if not df["smoker"].isin(["S", "N"]).all():
                     errors.append("Kolom smoker hanya boleh bernilai S atau N")
 
-        # elif biz_type == "Claim":
+        # elif department in "CLAIM":
         #     df["medicalcategory"] = df["medicalcategory"].astype(str).str.strip().str.upper()
 
         #     if not df["medicalcategory"].isin(["M", "N"]).all():
         #         errors.append("Kolom medical hanya boleh bernilai M atau N")
 
     # elif reins_type == "OUTWARD":
-    #     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    #     if department in "ADMIN":
     #         df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
     #         if not df["medical"].isin(["M", "N"]).all():
     #             errors.append("Kolom medical hanya boleh bernilai M atau N")
 
-    #     elif biz_type == "Claim":
+    #     elif department in "CLAIM":
     #         df["medical"] = df["medical"].astype(str).str.strip().str.upper()
 
     #         if not df["medical"].isin(["M", "N"]).all():
@@ -624,20 +624,20 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 8. CCY CODE (3 HURUF)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if not df["ccy code"].str.match(r"^[A-Z]{3}$").all():
                 errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             if not df["currency"].str.match(r"^[A-Z]{3}$").all():
                 errors.append("Currency harus 3 huruf kapital (contoh: IDR, USD)")
 
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if not df["ccy code"].str.match(r"^[A-Z]{3}$").all():
                 errors.append("ccy code harus 3 huruf kapital (contoh: IDR, USD)")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             if not df["curr"].str.match(r"^[A-Z]{3}$").all():
                 errors.append("Currency harus 3 huruf kapital (contoh: IDR, USD)")
 
@@ -645,20 +645,20 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 9. EXPIRED DATE > ISSUE DATE
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if not (df["expired date"] > df["issue date"]).all():
                 errors.append("expired date harus lebih besar dari issue date")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             if not (df["end date policy"] > df["issue date"]).all():
                 errors.append("end date policy harus lebih besar dari issue date")      
 
     # elif reins_type == "OUTWARD":
-    #     if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    #     if department in "ADMIN":
     #         if not (df["ri period until"] > df["issue date"]).all():
     #             errors.append("ri period until harus lebih besar dari issue date")
 
-        # elif biz_type == "Claim":
+        # elif department in "CLAIM":
         #     if not (df["end date policy"] > df["issue date"]).all():
         #         errors.append("end date policy harus lebih besar dari issue date")      
 
@@ -667,7 +667,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 10. REINS VS ORIGINAL LIMIT
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if not (df["reins sum insured"] <= df["sum insured"]).all():
                 errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
 
@@ -680,7 +680,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
             if not (df["reins sum at risk"] <= df["reins sum insured"]).all():
                 errors.append("reins sum at risk tidak boleh lebih besar dari reins sum insured")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
                 errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
 
@@ -691,7 +691,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
 
     if reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             if not (df["reins sum insured"] <= df["sum insured"]).all():
                 errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
 
@@ -704,7 +704,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
             # if not (df["retro sum at risk"] <= df["reins sum at risk"]).all():
             #     errors.append("retro sum at risk tidak boleh lebih besar dari reins sum at risk")
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             if not (df["reins claim"] >= df["your share"]).all():
                 errors.append("your share tidak boleh lebih besar dari reins claim")
 
@@ -713,7 +713,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             diff_nett = (
                 df["reins total premium"]
                 - df["reins total comm"]
@@ -733,7 +733,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 errors.append("tabarru + ujrah ≠ reins nett premium")
         
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             diff_nett = (
                 df["retro total premium"]
                 - df["retro total comm"]
@@ -757,7 +757,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 12. KOB Code, Pay Period Type, COB
     # =========================
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             # Ced EM Rate
             if "ced em rate" not in df.columns:
                 errors.append("Tambahkan kolom Ced EM Rate")
@@ -828,7 +828,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     errors.append("CBM tidak boleh kosong")
 
 
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             # COB
             if "classofbusiness" not in df.columns:
                 errors.append("Tambahkan kolom ClassofBusiness")
@@ -883,7 +883,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
 
     if reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department in "ADMIN":
             # Retro Type
             if "retro type" not in df.columns:
                 errors.append("Tambahkan kolom Retro Type")
@@ -949,7 +949,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     errors.append(f"COB harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_cob))}")
 
                          
-        elif biz_type == "Claim":
+        elif department in "CLAIM":
             # Retro Type
             if "retro type" not in df.columns:
                 errors.append("Tambahkan kolom Retro Type")
