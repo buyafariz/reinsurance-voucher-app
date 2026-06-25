@@ -3299,6 +3299,7 @@ with tab_calc:
                             # ==========================
                             errors = validate_calculate(
                                 df,
+                                row["Department"],
                                 row["Biz Type"],
                                 reins_type
                             )
@@ -3754,6 +3755,7 @@ with tab_calc:
                             # ==========================
                             errors = validate_calculate(
                                 df,
+                                row["Department"],
                                 row["Biz Type"],
                                 reins_type
                             )
@@ -4748,6 +4750,7 @@ with tab_calc:
 
                             errors = validate_calculate(
                                 df,
+                                row["Department"],
                                 row["Biz Type"],
                                 reins_type
                             )

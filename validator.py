@@ -1019,10 +1019,10 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     return errors
 
 
-def validate_calculate(df, biz_type: str, reins_type: str):
+def validate_calculate(df, department:str, biz_type: str, reins_type: str):
 
     if reins_type == "INWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             errors = []
 
             for col in ["K.O.B Code", "Ccy Code", "Pay Period Type", "CBY", "CBM", "COB", "References No"]:
@@ -1048,7 +1048,7 @@ def validate_calculate(df, biz_type: str, reins_type: str):
                 if len(unique) > 1:
                     errors.append(col)
 
-        if biz_type == "Claim":
+        if department == "CLAIM":
             errors = []
 
             for col in ["CedBookYear", "CedBookMonth", "ClassOfBusiness", "PayPeriodType", "KindOfBusiness", "Currency", "References No"]:
@@ -1075,7 +1075,7 @@ def validate_calculate(df, biz_type: str, reins_type: str):
                     errors.append(col)
 
     elif reins_type == "OUTWARD":
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             errors = []
 
             for col in ["Retro Type", "Acc With Name", "KOB Code", "Ccy Code", "Premium Ccy", "Ced Book Year", "Ced Book Month", "Out Pay Period Type", "COB", "References No"]:
@@ -1101,7 +1101,7 @@ def validate_calculate(df, biz_type: str, reins_type: str):
                 if len(unique) > 1:
                     errors.append(col)
 
-        if biz_type == "Claim":
+        if department == "CLAIM":
             errors = []
 
             for col in ["Retro Type", "Cedant Name", "COB Detail", "KOB Code", "Ced Book Year", "Ced Book Month", "Method of Payment", "Curr", "Reinsurer Name", "Voucher Desc"]:
