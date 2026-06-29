@@ -948,12 +948,12 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 errors.append(f"Out Pay Period Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_out_pay_period))}")
 
             # COB
-            if "cob detail" not in df.columns:
-                errors.append("Tambahkan kolom COB Detail")
+            if "cob" not in df.columns:
+                errors.append("Tambahkan kolom COB")
             else:
-                cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
+                cob_series = (df["cob"].fillna("").astype(str).str.strip())
                 if (cob_series == "").any():
-                    errors.append("COB Detail tidak boleh kosong")
+                    errors.append("COB tidak boleh kosong")
                 allowed_cob = {"CREDIT GROUP", "HEALTH GROUP", "HEALTH INDIVIDUAL", "LIFE GROUP", "LIFE INDIVIDUAL", "P.A GROUP", "P.A INDIVIDUAL"}
                 invalid_cob = set(cob_series[cob_series != ""].unique()) - allowed_cob
                 if invalid_cob:
@@ -974,8 +974,8 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     errors.append(f"Retro Type harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_retro))}")
 
             # COB
-            if "cob" not in df.columns:
-                errors.append("Tambahkan kolom COB")
+            if "cob detail" not in df.columns:
+                errors.append("Tambahkan kolom COB Detail")
             else:
                 cob_series = (df["cob detail"].fillna("").astype(str).str.strip())
                 if (cob_series == "").any():
