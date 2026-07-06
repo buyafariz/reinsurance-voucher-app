@@ -404,8 +404,13 @@ with tab_upload:
                 col1, col2 = st.columns(2)
 
                 with col1:
+                    
+                    options = ["Ardelia", "Buya", "Khansa", "Prabu"]
 
-                    pic = st.selectbox("PIC", ["Ardelia", "Buya", "Khansa", "Prabu"])
+                    if department == "ADMIN":
+                        pic = st.selectbox("PIC", options, index=options.index("Buya"))  # Default to "Buya"
+                    elif department == "CLAIM":
+                        pic = st.selectbox("PIC", options, index=options.index("Khansa"))  # Default to "Khansa"
 
                     account_with = st.selectbox(
                         "Account With",
