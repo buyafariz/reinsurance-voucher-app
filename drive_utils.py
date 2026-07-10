@@ -1143,6 +1143,15 @@ def create_review_spreadsheet(
         ]
     )
 
+    # ==========================
+    # CONVERT TO NATIVE PYTHON TYPES
+    # (numpy.float64 / numpy.int64 tidak JSON-serializable)
+    # ==========================
+    total_original = float(total_original)
+    total_calc = float(total_calc)
+    total_diff = float(total_diff)
+    missing_rate = int(missing_rate)
+
     summary_data = [
 
         ["PML ID", pml_id],
