@@ -582,7 +582,7 @@ def split_upload_with_log(
             log_pml = {
                 "Seq No": current_seq,
                 "Department": base_info["department"],
-                "Biz Type": base_info["biz_type"],
+                "Biz Type": base_info["biz type"],
                 "PML ID": pml_id,
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
