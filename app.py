@@ -1850,7 +1850,7 @@ with tab_split:
                                 "source_pml": selected_rows.iloc[0]["PML ID"]
                             }
 
-                            if selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+                            if selected_rows.iloc[0]["Department"] == "ADMIN" and selected_rows.iloc[0]["Biz Type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                                 results = split_upload_with_log(
                                     service=service,
                                     sheets_service=sheets_service,
@@ -1861,14 +1861,14 @@ with tab_split:
                                     log_pml_drive_id=log_pml_drive_id,
                                     year=int(year),
                                     month=int(month),
-                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    biz_type=selected_rows.iloc[0]["Department"],
                                     base_info=base_info,
                                     columns_template=columns_template,
                                     progress_bar=progress_bar,
                                     status_text=status_text
                                 )
 
-                            elif selected_rows.iloc[0]["Biz Type"] == "Claim":
+                            elif selected_rows.iloc[0]["Department"] == "CLAIM":
                                     results = split_upload_with_log(
                                     service=service,
                                     sheets_service=sheets_service,
@@ -1879,7 +1879,7 @@ with tab_split:
                                     log_pml_drive_id=log_pml_drive_id,
                                     year=int(year),
                                     month=int(month),
-                                    biz_type=selected_rows.iloc[0]["Biz Type"],
+                                    biz_type=selected_rows.iloc[0]["Department"],
                                     base_info=base_info,
                                     columns_template=columns_template_claim,
                                     progress_bar=progress_bar,
