@@ -479,7 +479,7 @@ def split_upload_with_log(
     log_pml_drive_id,
     year,
     month,
-    biz_type,
+    dept_type,
     base_info,
     columns_template,
     progress_bar=None,
@@ -517,13 +517,13 @@ def split_upload_with_log(
             year,
             month,
             base_info["department"],
-            biz_type
+            base_info["biz_type"]
         )
 
         # ==========================
         # HITUNG NILAI
         # ==========================
-        if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+        if dept_type == "ADMIN" and base_info["biz_type"] in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             product = group["References No"].iloc[0]
             cby = group["CBY"].iloc[0]
             cbm = group["CBM"].iloc[0]
@@ -540,7 +540,7 @@ def split_upload_with_log(
             log_pml = {
                 "Seq No": current_seq,
                 "Department": base_info["department"],
-                "Biz Type": biz_type,
+                "Biz Type": base_info["biz_type"],
                 "PML ID": pml_id,
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
@@ -570,7 +570,7 @@ def split_upload_with_log(
                 "CANCEL REASON": "-"
             }
 
-        elif biz_type == "Claim":
+        elif dept_type == "CLAIM":
             claim = group["Marein Share IDR"].sum()
             product = group["References No"].iloc[0]
             cby = group["CedBookYear"].iloc[0]
@@ -582,7 +582,7 @@ def split_upload_with_log(
             log_pml = {
                 "Seq No": current_seq,
                 "Department": base_info["department"],
-                "Biz Type": biz_type,
+                "Biz Type": base_info["biz_type"],
                 "PML ID": pml_id,
                 "Account With": base_info["account_with"],
                 "Cedant Company": base_info["cedant_company"],
