@@ -1841,6 +1841,7 @@ with tab_split:
 
                             base_info = {
                                 "department": selected_rows.iloc[0]["Department"],
+                                "biz_type": selected_rows.iloc[0]["Biz Type"],
                                 "account_with": selected_rows.iloc[0]["Account With"],
                                 "cedant_company": selected_rows.iloc[0]["Cedant Company"],
                                 "pic": selected_rows.iloc[0]["PIC"],
