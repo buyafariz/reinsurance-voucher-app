@@ -703,7 +703,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
 
             else:
-                if not (df["sum insured idr"] <= df["sum reinsured idr"]).all():
+                if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
                     errors.append("sum reinsured idr tidak boleh lebih kecil dari sum insured idr")
 
                 if not (df["amount of claim idr"] <= df["reins claim idr"]).all():
