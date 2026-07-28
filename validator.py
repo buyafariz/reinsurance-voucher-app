@@ -716,8 +716,12 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
             #     errors.append("retro sum at risk tidak boleh lebih besar dari reins sum at risk")
 
         elif department in "CLAIM":
-            if not (df["reins claim"] >= df["your share"]).all():
-                errors.append("your share tidak boleh lebih besar dari reins claim")
+            if biz_type not in ["Refund", "Retur", "Batal", "Cancel"]:
+                if not (df["reins claim"] >= df["your share"]).all():
+                    errors.append("your share tidak boleh lebih besar dari reins claim")
+            else:
+                if not (df["reins claim"] <= df["your share"]).all():
+                    errors.append("your share tidak boleh lebih kecil dari reins claim")
 
 
     # =========================
