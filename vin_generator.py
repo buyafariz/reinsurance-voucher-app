@@ -517,7 +517,7 @@ def split_upload_with_log(
             year,
             month,
             base_info["department"],
-            base_info["biz type"]
+            base_info["biz_type"]
         )
 
         # ==========================
