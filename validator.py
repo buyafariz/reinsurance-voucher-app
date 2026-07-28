@@ -692,14 +692,25 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 errors.append("reins sum at risk tidak boleh lebih besar dari reins sum insured")
 
         elif department in "CLAIM":
-            if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
-                errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
+            if biz_type not in ["Refund", "Retur", "Batal", "Cancel"]:
+                if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
+                    errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
 
-            if not (df["amount of claim idr"] >= df["reins claim idr"]).all():
-                errors.append("reins claim idr tidak boleh lebih besar dari amount of claim idr")
+                if not (df["amount of claim idr"] >= df["reins claim idr"]).all():
+                    errors.append("reins claim idr tidak boleh lebih besar dari amount of claim idr")
 
-            if not (df["amount of claim idr"] >= df["marein share idr"]).all():
-                errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
+                if not (df["amount of claim idr"] >= df["marein share idr"]).all():
+                    errors.append("marein share idr tidak boleh lebih besar dari amount of claim idr")
+
+            else:
+                if not (df["sum insured idr"] <= df["sum reinsured idr"]).all():
+                    errors.append("sum reinsured idr tidak boleh lebih kecil dari sum insured idr")
+
+                if not (df["amount of claim idr"] <= df["reins claim idr"]).all():
+                    errors.append("reins claim idr tidak boleh lebih kecil dari amount of claim idr")
+
+                if not (df["amount of claim idr"] <= df["marein share idr"]).all():
+                    errors.append("marein share idr tidak boleh lebih kecil dari amount of claim idr")
 
     if reins_type == "OUTWARD":
         if department in "ADMIN":
