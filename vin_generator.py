@@ -96,7 +96,7 @@ def generate_vin_from_drive(
     year,
     month,
     find_drive_file,
-    biz_type
+    dept_type
 ):
     filename = get_log_filename(year,month)
 
@@ -133,10 +133,10 @@ def generate_vin_from_drive(
     # ==========================
     # Format Voucher
     # ==========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if dept_type == "ADMIN":
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif dept_type == "CLAIM":
         voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq, file_id
@@ -147,7 +147,7 @@ def generate_vou_from_drive(
     year,
     month,
     find_drive_file,
-    biz_type
+    dept_type
 ):
     filename = f"{get_log_filename(year,month)} (Outward)"
 
@@ -184,10 +184,10 @@ def generate_vou_from_drive(
     # ==========================
     # Format Voucher
     # ==========================
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if dept_type == "ADMIN":
         voucher = f"VOU{year}{month:02d}LST{next_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif dept_type == "CLAIM":
         voucher = f"VCR{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq, file_id

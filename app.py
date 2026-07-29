@@ -4820,6 +4820,7 @@ with tab_calc:
                                 try:
 
                                     biz_type = row["Biz Type"]
+                                    dept_type = row["Department"]
 
                                     # ==========================
                                     # GENERATE VOUCHER
@@ -4830,7 +4831,7 @@ with tab_calc:
                                         year=int(year),
                                         month=int(month),
                                         find_drive_file=find_drive_file,
-                                        biz_type=biz_type
+                                        dept_type=dept_type
                                     )
 
                                     # ==========================
