@@ -300,16 +300,16 @@ def generate_pml_outward_from_drive(
 
 
 
-def generate_vin_from_drive_log(log_df, year, month, biz_type):
+def generate_vin_from_drive_log(log_df, year, month, dept_type):
     if log_df.empty:
         next_seq = 1
     else:
         next_seq = int(log_df["Seq No"].max()) + 1
 
-    if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+    if dept_type == "ADMIN":
         voucher = f"VIN{year}{month:02d}LST{next_seq:04d}"
 
-    elif biz_type == "Claim":
+    elif dept_type == "CLAIM":
         voucher = f"VCL{year}{month:02d}LSC{next_seq:04d}"
 
     return voucher, next_seq
