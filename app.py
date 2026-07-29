@@ -3587,7 +3587,7 @@ with tab_calc:
                                         df=df,
                                         template_columns=(
                                             columns_template
-                                            if biz_type != "Claim"
+                                            if department_type != "CLAIM"
                                             else columns_template_claim
                                         ),
                                         voucher_id=voucher,
