@@ -3375,6 +3375,7 @@ with tab_calc:
                                 try:
 
                                     biz_type = row["Biz Type"]
+                                    department_type = row["Department"]
 
                                     # ==========================
                                     # GENERATE VOUCHER
@@ -3391,7 +3392,7 @@ with tab_calc:
                                     # ==========================
                                     # BUILD LOG ENTRY
                                     # ==========================
-                                    if biz_type in [
+                                    if department_type == "ADMIN" and biz_type in [
                                         "Kontribusi",
                                         "Refund",
                                         "Alteration",
@@ -3496,7 +3497,7 @@ with tab_calc:
                                             "CANCEL REASON": "-"
                                         }
 
-                                    elif biz_type == "Claim":
+                                    elif department_type == "CLAIM":
 
                                         claim_amount = (
                                             df["Marein Share IDR"].sum()
