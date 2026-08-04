@@ -3145,15 +3145,6 @@ with tab_calc:
                 else:
                     selected_account = unique_accounts[0]
 
-                # Ambil unique currency
-                unique_currencies = selected_rows["Curr"].dropna().unique()
-
-                if len(unique_currencies) > 1:
-                    st.error("❌ Currency harus sama untuk proses calculate")
-                    selected_account = None
-                else:
-                    selected_account = unique_accounts[0]
-
             # ==========================
             # CEK RATE FILE DI DRIVE
             # ==========================
@@ -3245,13 +3236,6 @@ with tab_calc:
                     )
 
                     CEDING_DRIVE_ID = ceding_drive["ceding_id"]
-
-                    rate_exchange = get_exchange_rate(
-                        service=service,
-                        config_folder_id=CONFIG_FOLDER_ID,
-                        currency=selected_rows.iloc[0]["Curr"],
-                        month=month
-                    )
 
                     due_date = calculate_due_date(
                         account_with=selected_account,
@@ -3385,6 +3369,13 @@ with tab_calc:
 
                                     biz_type = row["Biz Type"]
                                     department_type = row["Department"]
+
+                                    rate_exchange = get_exchange_rate(
+                                        service=service,
+                                        config_folder_id=CONFIG_FOLDER_ID,
+                                        currency=row["Curr"],
+                                        month=month
+                                    )
 
                                     # ==========================
                                     # GENERATE VOUCHER
