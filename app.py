@@ -3145,6 +3145,15 @@ with tab_calc:
                 else:
                     selected_account = unique_accounts[0]
 
+                # Ambil unique currency
+                unique_currencies = selected_rows["Curr"].dropna().unique()
+
+                if len(unique_currencies) > 1:
+                    st.error("❌ Currency harus sama untuk proses calculate")
+                    selected_account = None
+                else:
+                    selected_account = unique_accounts[0]
+
             # ==========================
             # CEK RATE FILE DI DRIVE
             # ==========================
