@@ -939,18 +939,24 @@ def load_exchange_rate_config(service, config_folder_id):
 
 def get_exchange_rate(service, config_folder_id, currency, month):
     df_rate = load_exchange_rate_config(service, config_folder_id)
+    st.write("DEBUG df_rate empty?", df_rate.empty)
 
     if df_rate.empty:
         return 1
 
     df_rate.columns = df_rate.columns.map(str)
+    st.write("DEBUG columns:", df_rate.columns.tolist())
+    st.write("DEBUG unique CcyID:", df_rate["CcyID"].unique())
+    st.write("DEBUG currency input:", repr(currency), "month input:", repr(month))
 
     row = df_rate[df_rate["CcyID"] == currency]
+    st.write("DEBUG row match:", row)
 
     if row.empty:
         return 1
 
     month_col = str(month)
+    st.write("DEBUG month_col:", repr(month_col), "in columns?", month_col in df_rate.columns)
 
     if month_col not in df_rate.columns:
         return 1
