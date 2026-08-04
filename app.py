@@ -3244,6 +3244,16 @@ with tab_calc:
                         month=month
                     )
 
+                    st.write("DEBUG config folder id ditemukan?:", CONFIG_FOLDER_ID)
+
+                    file_id = find_drive_file(
+                        service=service,
+                        filename="Rate Change.xlsx",
+                        parent_id=CONFIG_FOLDER_ID
+                    )
+
+                    st.write("DEBUG rate file id ditemukan?:", file_id)
+
                     due_date = calculate_due_date(
                         account_with=selected_account,
                         year=year,
