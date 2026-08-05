@@ -3005,7 +3005,7 @@ with tab_calc:
             # ==========================
             # SELECT ALL BUTTON
             # ==========================
-            col_btn1, col_btn2, col_btn3 = st.columns([3, 3.5, 15])
+            col_btn1, col_btn2, col_btn3 = st.columns([3, 3.5, 10])
 
             with col_btn1:
                 select_all = st.button("✅ Select All", key="btn_select_all")
@@ -4485,7 +4485,7 @@ with tab_calc:
             # ==========================
             # SELECT ALL / DESELECT ALL
             # ==========================
-            col_btn1, col_btn2, col_btn3 = st.columns([5, 5.5, 10])
+            col_btn1, col_btn2, col_btn3 = st.columns([3, 3.5, 10])
 
             with col_btn1:
                 select_all = st.button("✅ Select All", key="btn_select_all_outward")
