@@ -1143,7 +1143,7 @@ with tab_upload:
             # ==========================
             st.subheader("💰 Summary Financial")
 
-            if biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
+            if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
                 summary_df = pd.DataFrame({
                     "Keterangan": [
                         "Total Contribution",
@@ -1163,7 +1163,7 @@ with tab_upload:
                     ]
                 })
 
-            elif biz_type == "Claim":
+            elif department == "CLAIM" and biz_type == "Claim":
                 summary_df = pd.DataFrame({
                     "Keterangan": [
                         "Reins Claim",
