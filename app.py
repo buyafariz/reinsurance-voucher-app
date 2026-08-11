@@ -5036,7 +5036,7 @@ with tab_calc:
                                         df=df,
                                         template_columns=(
                                             columns_template_outward
-                                            if biz_type != "Claim"
+                                            if dept_type != "CLAIM"
                                             else columns_template_claim_outward
                                         ),
                                         voucher_id=voucher,
