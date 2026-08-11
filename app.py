@@ -4944,15 +4944,7 @@ with tab_calc:
                                             "CANCEL REASON": "-"
                                         }
 
-                                    elif dept_type == "Claim" and biz_type in [
-                                        "Claim",
-                                        "Refund",
-                                        "Alteration",
-                                        "Retur",
-                                        "Revise",
-                                        "Batal",
-                                        "Cancel"
-                                    ]:
+                                    elif dept_type == "CLAIM":
 
                                         claim_amount = (
                                             df["Your Share"].sum()
