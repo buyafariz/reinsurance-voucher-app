@@ -1163,7 +1163,7 @@ with tab_upload:
                     ]
                 })
 
-            elif department == "CLAIM" and biz_type == "Claim":
+            elif department == "CLAIM":
                 summary_df = pd.DataFrame({
                     "Keterangan": [
                         "Reins Claim",
