@@ -4837,7 +4837,7 @@ with tab_calc:
                                     # ==========================
                                     # BUILD LOG ENTRY
                                     # ==========================
-                                    if biz_type in [
+                                    if dept_type == "ADMIN" and biz_type in [
                                         "Kontribusi",
                                         "Refund",
                                         "Alteration",
@@ -4944,7 +4944,7 @@ with tab_calc:
                                             "CANCEL REASON": "-"
                                         }
 
-                                    elif biz_type == "Claim":
+                                    elif dept_type == "Claim":
 
                                         claim_amount = (
                                             df["Your Share"].sum()
