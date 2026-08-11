@@ -5065,7 +5065,7 @@ with tab_calc:
                                         if "Length mismatch" in str(e):
                                             template = (
                                                 columns_template_outward
-                                                if biz_type != "Claim"
+                                                if dept_type != "CLAIM"
                                                 else columns_template_claim_outward
                                             )
                                             with st.expander(f"🔍 Detail mismatch kolom — {row['PML ID']}"):
