@@ -5061,6 +5061,23 @@ with tab_calc:
                                         continue
                                     else:
                                         st.error(f"❌ Error posting PML {row['PML ID']}: {e}")
+                                        # 🔎 DEBUG: tampilkan detail kolom jika error length mismatch
+                                        if "Length mismatch" in str(e):
+                                            template = (
+                                                columns_template_outward
+                                                if biz_type != "Claim"
+                                                else columns_template_claim_outward
+                                            )
+                                            with st.expander(f"🔍 Detail mismatch kolom — {row['PML ID']}"):
+                                                st.write(f"Jumlah kolom di **df** (source): `{len(df.columns)}`")
+                                                st.write(f"Jumlah kolom di **template**: `{len(template)}`")
+                                                col_a, col_b = st.columns(2)
+                                                with col_a:
+                                                    st.write("**Kolom df (source):**")
+                                                    st.write(df.columns.tolist())
+                                                with col_b:
+                                                    st.write("**Kolom template:**")
+                                                    st.write(list(template))
                                         break
 
                         # ==========================
