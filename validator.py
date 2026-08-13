@@ -1118,10 +1118,10 @@ def validate_calculate(df, department:str, biz_type: str, reins_type: str):
                     errors.append(f"Kolom {col} terdapat data kosong")
                     continue
 
-                unique = series.unique()
+                # unique = series.unique()
 
-                if len(unique) > 1:
-                    errors.append(col)
+                # if len(unique) > 1:
+                #     errors.append(col)
 
         if department == "CLAIM":
             errors = []
