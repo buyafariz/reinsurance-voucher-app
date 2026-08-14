@@ -260,15 +260,19 @@ INTEGER_COLUMNS_CLAIM_OUTWARD = [
 
 def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
+    def clean_numeric_id(series: pd.Series) -> pd.Series:
+        s = series.astype(str).str.strip()
+        s = s.str.replace(r"[Rr][Pp]\.?\s*", "", regex=True)   # buang "Rp"
+        s = s.str.replace(r"[^\d,.\-]", "", regex=True)         # sisakan digit, koma, titik, minus
+        # Format Indonesia: titik = ribuan, koma = desimal
+        s = s.str.replace(r"\.(?=\d{3}(?:\D|$))", "", regex=True)  # hapus titik ribuan
+        s = s.str.replace(",", ".", regex=False)                    # koma desimal -> titik
+        s = s.replace("", None)
+        return pd.to_numeric(s, errors="coerce")
+
     for col in NUMERIC_COLUMNS_INWARD:
         if col in df.columns:
-            df[col] = (
-                df[col]
-                .astype(str)
-                .str.replace(r"[^\d\.\-]", "", regex=True)  # hapus Rp, koma, spasi, dll.
-                .replace("", "0")
-                .astype(float)
-            )
+            df[col] = clean_numeric_id(df[col])
 
     errors = []
 
