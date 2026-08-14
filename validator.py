@@ -260,6 +260,16 @@ INTEGER_COLUMNS_CLAIM_OUTWARD = [
 
 def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
+    for col in NUMERIC_COLUMNS_INWARD:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.replace(r"[^\d\.\-]", "", regex=True)  # hapus Rp, koma, spasi, dll.
+                .replace("", "0")
+                .astype(float)
+            )
+
     errors = []
 
     # =========================
