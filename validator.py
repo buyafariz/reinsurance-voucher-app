@@ -362,43 +362,43 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 3. NUMERIC VALIDATION (BY BUSINESS EVENT)
     # =========================
     if reins_type == "INWARD":
-        # if department in "ADMIN":
+        if department in "ADMIN":
         
-        #     for col in NUMERIC_COLUMNS_INWARD:
+            for col in NUMERIC_COLUMNS_INWARD:
 
-        #         # 🔹 CEK DULU ADA ATAU TIDAK
-        #         if col not in df.columns:
-        #             errors.append(f"Kolom {col} tidak ditemukan di file")
-        #             continue
+                # 🔹 CEK DULU ADA ATAU TIDAK
+                if col not in df.columns:
+                    errors.append(f"Kolom {col} tidak ditemukan di file")
+                    continue
 
-        #         numeric = pd.to_numeric(df[col], errors="coerce")
+                numeric = pd.to_numeric(df[col], errors="coerce")
 
-        #         if numeric.isna().any():
-        #             errors.append(f"Kolom {col} harus numerik")
-        #             continue
+                if numeric.isna().any():
+                    errors.append(f"Kolom {col} harus numerik")
+                    continue
 
-        #         # 🔹 Kontribusi → tidak boleh negatif
-        #         if biz_type == "Kontribusi":
-        #             if (numeric < 0).any():
-        #                 errors.append(
-        #                     f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
-        #                 )
+                # 🔹 Kontribusi → tidak boleh negatif
+                if biz_type == "Kontribusi":
+                    if (numeric < 0).any():
+                        errors.append(
+                            f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
+                        )
 
-        #         # 🔹 Refund, Retur, Batal → harus negatif
-        #         if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
-        #             if col in [
-        #                 "reins total premium",
-        #                 "reins total comm",
-        #                 "reins tabarru",
-        #                 "reins ujrah",
-        #                 "reins nett premium"
-        #             ]:
-        #                 if (numeric > 0).any():
-        #                     errors.append(
-        #                         f"Kolom {col} harus bernilai negatif ({biz_type})"
-        #                     )
+                # 🔹 Refund, Retur, Batal → harus negatif
+                if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
+                    if col in [
+                        "reins total premium",
+                        "reins total comm",
+                        "reins tabarru",
+                        "reins ujrah",
+                        "reins nett premium"
+                    ]:
+                        if (numeric > 0).any():
+                            errors.append(
+                                f"Kolom {col} harus bernilai negatif ({biz_type})"
+                            )
 
-        #         df[col] = numeric
+                df[col] = numeric
 
 
         if department in "CLAIM":
@@ -759,28 +759,28 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # =========================
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)
     # =========================
-    # if reins_type == "INWARD":
-    #     if department in "ADMIN":
-    #         diff_nett = (
-    #             df["reins total premium"]
-    #             - df["reins total comm"]
-    #             - df["reins nett premium"]
-    #         ).abs()
+    if reins_type == "INWARD":
+        if department in "ADMIN":
+            diff_nett = (
+                df["reins total premium"]
+                - df["reins total comm"]
+                - df["reins nett premium"]
+            ).abs()
 
-    #         if not (diff_nett < 0.01).all():
-    #             errors.append("reins nett premium ≠ total premium - total comm")
+            if not (diff_nett < 0.01).all():
+                errors.append("reins nett premium ≠ total premium - total comm")
 
-    #         diff_tab = (
-    #             df["reins tabarru"]
-    #             + df["reins ujrah"]
-    #             - df["reins total comm"]
-    #             - df["reins nett premium"]
-    #         ).abs()
+            diff_tab = (
+                df["reins tabarru"]
+                + df["reins ujrah"]
+                - df["reins total comm"]
+                - df["reins nett premium"]
+            ).abs()
 
-    #         if not (diff_tab < 0.01).all():
-    #             errors.append("tabarru + ujrah ≠ reins nett premium")
+            if not (diff_tab < 0.01).all():
+                errors.append("tabarru + ujrah ≠ reins nett premium")
         
-    if reins_type == "OUTWARD":
+    elif reins_type == "OUTWARD":
         if department in "ADMIN":
             diff_nett = (
                 df["retro total premium"]
