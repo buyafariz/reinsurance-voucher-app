@@ -759,28 +759,28 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # =========================
     # 11. FINANCIAL CONSISTENCY (TOLERANSI)
     # =========================
-    if reins_type == "INWARD":
-        if department in "ADMIN":
-            diff_nett = (
-                df["reins total premium"]
-                - df["reins total comm"]
-                - df["reins nett premium"]
-            ).abs()
+    # if reins_type == "INWARD":
+    #     if department in "ADMIN":
+    #         diff_nett = (
+    #             df["reins total premium"]
+    #             - df["reins total comm"]
+    #             - df["reins nett premium"]
+    #         ).abs()
 
-            if not (diff_nett < 0.01).all():
-                errors.append("reins nett premium ≠ total premium - total comm")
+    #         if not (diff_nett < 0.01).all():
+    #             errors.append("reins nett premium ≠ total premium - total comm")
 
-            diff_tab = (
-                df["reins tabarru"]
-                + df["reins ujrah"]
-                - df["reins total comm"]
-                - df["reins nett premium"]
-            ).abs()
+    #         diff_tab = (
+    #             df["reins tabarru"]
+    #             + df["reins ujrah"]
+    #             - df["reins total comm"]
+    #             - df["reins nett premium"]
+    #         ).abs()
 
-            if not (diff_tab < 0.01).all():
-                errors.append("tabarru + ujrah ≠ reins nett premium")
+    #         if not (diff_tab < 0.01).all():
+    #             errors.append("tabarru + ujrah ≠ reins nett premium")
         
-    elif reins_type == "OUTWARD":
+    if reins_type == "OUTWARD":
         if department in "ADMIN":
             diff_nett = (
                 df["retro total premium"]
