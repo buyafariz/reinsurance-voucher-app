@@ -385,18 +385,18 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 #         )
 
                 # 🔹 Refund, Retur, Batal → harus negatif
-                if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
-                    if col in [
-                        "reins total premium",
-                        "reins total comm",
-                        "reins tabarru",
-                        "reins ujrah",
-                        "reins nett premium"
-                    ]:
-                        if (numeric > 0).any():
-                            errors.append(
-                                f"Kolom {col} harus bernilai negatif ({biz_type})"
-                            )
+                # if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
+                #     if col in [
+                #         "reins total premium",
+                #         "reins total comm",
+                #         "reins tabarru",
+                #         "reins ujrah",
+                #         "reins nett premium"
+                #     ]:
+                #         if (numeric > 0).any():
+                #             errors.append(
+                #                 f"Kolom {col} harus bernilai negatif ({biz_type})"
+                #             )
 
                 df[col] = numeric
 
