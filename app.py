@@ -320,6 +320,8 @@ with tab_upload:
             # ==========================
             errors = validate_voucher(df, st.session_state["department_upload"], st.session_state["biz_type_upload"], st.session_state["reins_type_upload"])
 
+            print(df[["reins tabarru", "reins ujrah", "reins total comm", "reins nett premium"]].dtypes)
+
             if errors:
                 st.error("❌ VALIDASI GAGAL")
                 for err in errors:
