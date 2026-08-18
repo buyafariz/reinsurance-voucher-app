@@ -776,8 +776,8 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
             diff_tab = (
                 df["reins tabarru"]
                 + df["reins ujrah"]
-                - df["reins total comm"]
-                - df["reins nett premium"]
+                - df["reins total premium"]
+                + df["reins total comm"]
             ).abs()
 
             mask_fail = diff_tab >= 0.01
