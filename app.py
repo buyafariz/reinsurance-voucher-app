@@ -2222,24 +2222,22 @@ with tab_split:
             # Data editor (CONSISTENT UI)
             cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
 
+            def clean_number(x):
+                if pd.isna(x):
+                    return np.nan
+                x = str(x).strip()
+                if x.lower() in ("none", "nan", ""):
+                    return np.nan
+                if "." in x and "," in x:
+                    x = x.replace(".", "").replace(",", ".")
+                else:
+                    x = x.replace(",", "")
+                return x
+
             for col in cols_numeric:
-
-                def clean_number(x):
-                    x = str(x)
-
-                    # kalau ada dua separator → anggap titik ribuan, koma desimal
-                    if "." in x and "," in x:
-                        x = x.replace(".", "").replace(",", ".")
-                    else:
-                        x = x.replace(",", "")
-
-                    return pd.to_numeric(x, errors="coerce")
-
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
+                # 🔹 Paksa jadi float64 murni di level KOLOM, bukan elemen
                 df_to_edit[col] = pd.to_numeric(df_to_edit[col], errors="coerce")
-
-            st.write(df_to_edit[cols_numeric].dtypes)
-            st.write(df_to_edit["Total Contribution"].apply(type).value_counts())
 
             edited_df = st.data_editor(
                 df_to_edit,
