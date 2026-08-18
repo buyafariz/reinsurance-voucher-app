@@ -3066,18 +3066,50 @@ with tab_calc:
             # ==========================
             # CLEAN NUMERIC
             # ==========================
-            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission", "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+            cols_numeric = ["Total Contribution", "Commission", "Overriding", "Total Commission",
+                            "Gross Premium Income", "Tabarru", "Ujrah", "Claim", "Balance"]
+
+            def clean_number(x):
+                if pd.isna(x):
+                    return np.nan
+
+                # Kalau sudah numerik asli (int/float), langsung pakai
+                if isinstance(x, (int, float)):
+                    return x
+
+                x = str(x).strip()
+                if x.lower() in ("none", "nan", ""):
+                    return np.nan
+
+                # 🔹 Deteksi format akuntansi: (1,234.56) → negatif
+                is_negative = False
+                if x.startswith("(") and x.endswith(")"):
+                    is_negative = True
+                    x = x[1:-1].strip()
+
+                # Buang simbol selain digit, koma, titik, minus
+                x = re.sub(r"[^\d,.\-]", "", x)
+
+                # Format US/internasional: koma = ribuan, titik = desimal
+                x = x.replace(",", "")
+
+                result = pd.to_numeric(x, errors="coerce")
+
+                if is_negative and pd.notna(result):
+                    result = -abs(result)
+
+                return result
 
             for col in cols_numeric:
-                def clean_number(x):
-                    x = str(x)
-                    if "." in x and "," in x:
-                        x = x.replace(".", "").replace(",", ".")
-                    else:
-                        x = x.replace(",", "")
-                    return pd.to_numeric(x, errors="coerce")
-
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
+                numeric_result = pd.to_numeric(df_to_edit[col], errors="coerce")
+
+                # Diagnostik: cek apakah masih ada yang gagal parse padahal aslinya tidak kosong
+                failed_mask = numeric_result.isna() & df_filtered[col].notna()
+                if failed_mask.any():
+                    st.warning(f"⚠️ Kolom '{col}': {failed_mask.sum()} nilai gagal di-parse")
+
+                df_to_edit[col] = numeric_result.fillna(0)
 
             # ==========================
             # DATA EDITOR
