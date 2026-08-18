@@ -4,6 +4,7 @@ import os
 import time
 import st_aggrid
 import numpy as np
+import re
 
 
 from datetime import datetime
@@ -1656,14 +1657,34 @@ with tab_split:
             def clean_number(x):
                 if pd.isna(x):
                     return np.nan
+                
+                # Kalau sudah numerik asli (int/float dari gspread), langsung pakai
                 if isinstance(x, (int, float)):
                     return x
+                
                 x = str(x).strip()
                 if x.lower() in ("none", "nan", ""):
                     return np.nan
+                
+                # 🔹 Deteksi format akuntansi: (1,234.56) → negatif
+                is_negative = False
+                if x.startswith("(") and x.endswith(")"):
+                    is_negative = True
+                    x = x[1:-1].strip()  # buang tanda kurung
+                
+                # Buang simbol mata uang / karakter selain digit, koma, titik, minus
+                x = re.sub(r"[^\d,.\-]", "", x)
+                
                 # Format US/internasional: koma = ribuan, titik = desimal
+                # (berdasarkan contoh Anda: "10,223.84", "1866132.832")
                 x = x.replace(",", "")
-                return x
+                
+                result = pd.to_numeric(x, errors="coerce")
+                
+                if is_negative and pd.notna(result):
+                    result = -abs(result)
+                
+                return result
 
             for col in cols_numeric:
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
