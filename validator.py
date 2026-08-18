@@ -777,8 +777,16 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                 - df["reins nett premium"]
             ).abs()
 
-            if not (diff_tab < 0.01).all():
-                errors.append("tabarru + ujrah ≠ reins nett premium")
+            mask_fail = diff_tab >= 0.01
+            if mask_fail.any():
+                bad_rows = df.loc[mask_fail, [
+                    "certificate no", "reins tabarru", "reins ujrah",
+                    "reins total comm", "reins nett premium"
+                ]]
+                errors.append(
+                    f"tabarru + ujrah ≠ nett premium + total comm pada {mask_fail.sum()} baris: "
+                    + ", ".join(bad_rows["certificate no"].astype(str).tolist()[:5])
+                )
         
     elif reins_type == "OUTWARD":
         if department in "ADMIN":
