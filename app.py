@@ -296,6 +296,25 @@ with tab_upload:
                 if col in df.columns:
                     df[col] = df[col].astype(str).str.strip()
 
+
+            # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
+            # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
+            
+            ACCOUNTING_COLS = [
+                "sum insured", "sum at risk", "reins sum insured", "ced retention", "reins sum at risk",
+                "reins premium", "reins em premium", "reins er premium", "reins oth. premium", "reins total premium",
+                "reins comm", "reins em comm", "reins er comm", "reins oth. comm", "reins profit share", "reins overriding", "reins broker fee", 
+                "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium",
+                "sum insured idr", "sum reinsured idr", "amount of claim idr", "reins claim idr", "marein share idr"
+            ]
+
+            for col in ACCOUNTING_COLS:
+                if col in df.columns:
+                    # jika ada format ribuan bergaya string (mis. "1,234.00"), bersihkan dulu
+                    if df[col].dtype == "object":
+                        df[col] = df[col].astype(str).str.replace(",", "", regex=False)
+                    df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
             # ==========================
             # VALIDATION
             # ==========================
@@ -337,45 +356,30 @@ with tab_upload:
             # ==========================
             with st.expander("📊 Preview Data Voucher", expanded=True):
                 if not df.empty:
-                    # 1. Batasi jumlah baris agar aplikasi tetap cepat
                     MAX_PREVIEW = 1000
                     total_rows = len(df)
                     preview_df = df.head(MAX_PREVIEW).copy()
-
                     st.caption(f"Menampilkan {len(preview_df):,} dari {total_rows:,} baris")
 
-                    # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
-                    # Pastikan kolom accounting diformat dengan ribuan dan 2 desimal
-                    
-                    ACCOUNTING_COLS = [
-                        "sum insured", "sum at risk", "reins sum insured", "ced retention", "reins sum at risk",
-                        "reins premium", "reins em premium", "reins er premium", "reins oth. premium", "reins total premium",
-                        "reins comm", "reins em comm", "reins er comm", "reins oth. comm", "reins profit share", "reins overriding", "reins broker fee", 
-                        "reins total comm", "reins tabarru", "reins ujrah", "reins nett premium",
-                        "sum insured idr", "sum reinsured idr", "amount of claim idr", "reins claim idr", "marein share idr"
-                    ]
+                    # Tidak perlu to_numeric lagi di sini — df sudah numerik dari awal.
+                    # format_dict cukup dipakai untuk styling tampilan.
+                    format_dict = {
+                        col: "{:,.2f}"
+                        for col in ACCOUNTING_COLS
+                        if col in preview_df.columns
+                    }
 
-                    # Buat dictionary formatter untuk kolom yang ada saja
-                    format_dict = {}
-                    for col in ACCOUNTING_COLS:
-                        if col in preview_df.columns:
-                            # Pastikan data adalah numerik sebelum diformat
-                            preview_df[col] = pd.to_numeric(preview_df[col], errors='coerce').fillna(0)
-                            format_dict[col] = "{:,.2f}"
-
-                    # 3. RENDER MENGGUNAKAN ST.DATAFRAME (Sama dengan Summary Financial)
                     try:
                         st.dataframe(
                             preview_df.style.format(format_dict),
                             use_container_width=True,
-                            height=450 # Memberikan scrollbar internal jika data banyak
+                            height=450
                         )
                     except Exception as e:
                         st.error(f"Gagal menampilkan preview: {e}")
-                        st.dataframe(preview_df) # Fallback ke tabel mentah jika styling gagal
+                        st.dataframe(preview_df)
                 else:
                     st.info("Belum ada data untuk ditampilkan. Silakan upload file terlebih dahulu.")
-
 
             # ==========================
             # PERIOD & LOG
