@@ -272,7 +272,10 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
 
     for col in NUMERIC_COLUMNS_INWARD:
         if col in df.columns:
-            df[col] = clean_numeric_id(df[col])
+            if df[col].dtype == "object":
+                df[col] = clean_numeric_id(df[col])
+            else:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
     errors = []
 
