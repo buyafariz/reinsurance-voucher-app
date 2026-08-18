@@ -315,20 +315,6 @@ with tab_upload:
                         df[col] = df[col].astype(str).str.replace(",", "", regex=False)
                     df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
-            diff_tab_debug = (
-                df["reins tabarru"]
-                + df["reins ujrah"]
-                - df["reins total comm"]
-                - df["reins nett premium"]
-            ).abs()
-
-            with st.expander("🔍 Debug: Cek Selisih Tabarru + Ujrah", expanded=True):
-                st.write("Jumlah baris gagal:", int((diff_tab_debug >= 0.01).sum()))
-                bad_rows = df.loc[diff_tab_debug >= 0.01, [
-                    "reins tabarru", "reins ujrah", "reins total comm", "reins nett premium"
-                ]].copy()
-                bad_rows["selisih"] = diff_tab_debug[diff_tab_debug >= 0.01]
-                st.dataframe(bad_rows)
 
             # ==========================
             # VALIDATION
