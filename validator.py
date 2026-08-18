@@ -788,8 +788,6 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                     + ", ".join(bad_rows["certificate no"].astype(str).tolist()[:5])
                 )
 
-            print(df[["reins tabarru", "reins ujrah", "reins total comm", "reins nett premium"]].dtypes)
-            
     elif reins_type == "OUTWARD":
         if department in "ADMIN":
             diff_nett = (
