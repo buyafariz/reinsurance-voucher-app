@@ -2238,6 +2238,9 @@ with tab_split:
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
                 df_to_edit[col] = pd.to_numeric(df_to_edit[col], errors="coerce")
 
+            st.write(df_to_edit[cols_numeric].dtypes)
+            st.write(df_to_edit["Total Contribution"].apply(type).value_counts())
+
             edited_df = st.data_editor(
                 df_to_edit,
                 column_config={
