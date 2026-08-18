@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import time
 import st_aggrid
+import numpy as np
 
 
 from datetime import datetime
@@ -1655,14 +1656,13 @@ with tab_split:
             def clean_number(x):
                 if pd.isna(x):
                     return np.nan
+                if isinstance(x, (int, float)):
+                    return x
                 x = str(x).strip()
                 if x.lower() in ("none", "nan", ""):
                     return np.nan
-                # kalau ada dua separator → anggap titik ribuan, koma desimal
-                if "." in x and "," in x:
-                    x = x.replace(".", "").replace(",", ".")
-                else:
-                    x = x.replace(",", "")
+                # Format US/internasional: koma = ribuan, titik = desimal
+                x = x.replace(",", "")
                 return x
 
             for col in cols_numeric:
