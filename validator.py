@@ -387,19 +387,19 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                             f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
                         )
 
-                # 🔹 Refund, Retur, Batal → harus negatif
-                if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
-                    if col in [
-                        "reins total premium",
-                        "reins total comm",
-                        "reins tabarru",
-                        "reins ujrah",
-                        "reins nett premium"
-                    ]:
-                        if (numeric > 0).any():
-                            errors.append(
-                                f"Kolom {col} harus bernilai negatif ({biz_type})"
-                            )
+                # # 🔹 Refund, Retur, Batal → harus negatif
+                # if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
+                #     if col in [
+                #         "reins total premium",
+                #         "reins total comm",
+                #         "reins tabarru",
+                #         "reins ujrah",
+                #         "reins nett premium"
+                #     ]:
+                #         if (numeric > 0).any():
+                #             errors.append(
+                #                 f"Kolom {col} harus bernilai negatif ({biz_type})"
+                #             )
 
                 df[col] = numeric
 
@@ -679,14 +679,14 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # =========================
     # 9. EXPIRED DATE > ISSUE DATE
     # =========================
-    if reins_type == "INWARD":
-        if department in "ADMIN":
-            if not (df["expired date"] > df["issue date"]).all():
-                errors.append("expired date harus lebih besar dari issue date")
+    # if reins_type == "INWARD":
+    #     if department in "ADMIN":
+    #         if not (df["expired date"] > df["issue date"]).all():
+    #             errors.append("expired date harus lebih besar dari issue date")
 
-        elif department in "CLAIM":
-            if not (df["end date policy"] > df["issue date"]).all():
-                errors.append("end date policy harus lebih besar dari issue date")      
+    #     elif department in "CLAIM":
+    #         if not (df["end date policy"] > df["issue date"]).all():
+    #             errors.append("end date policy harus lebih besar dari issue date")      
 
     # elif reins_type == "OUTWARD":
     #     if department in "ADMIN":
