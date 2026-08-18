@@ -2236,6 +2236,7 @@ with tab_split:
                     return pd.to_numeric(x, errors="coerce")
 
                 df_to_edit[col] = df_to_edit[col].apply(clean_number)
+                df_to_edit[col] = pd.to_numeric(df_to_edit[col], errors="coerce")
 
             edited_df = st.data_editor(
                 df_to_edit,
