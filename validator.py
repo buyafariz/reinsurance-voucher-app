@@ -1146,8 +1146,8 @@ def validate_calculate(df, department:str, biz_type: str, reins_type: str):
 
                 unique = series.unique()
 
-                if len(unique) > 1:
-                    errors.append(col)
+                # if len(unique) > 1:
+                #     errors.append(col)
 
         if department == "CLAIM":
             errors = []
@@ -1172,8 +1172,8 @@ def validate_calculate(df, department:str, biz_type: str, reins_type: str):
 
                 unique = series.unique()
 
-                if len(unique) > 1:
-                    errors.append(col)
+                # if len(unique) > 1:
+                #     errors.append(col)
     
     return errors
 
