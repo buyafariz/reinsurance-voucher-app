@@ -680,11 +680,11 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 9. EXPIRED DATE > ISSUE DATE
     # =========================
     if reins_type == "INWARD":
-        if department in "ADMIN":
-            if not (df["expired date"] > df["issue date"]).all():
-                errors.append("expired date harus lebih besar dari issue date")
+        # if department in "ADMIN":
+        #     if not (df["expired date"] > df["issue date"]).all():
+        #         errors.append("expired date harus lebih besar dari issue date")
 
-        elif department in "CLAIM":
+        if department in "CLAIM":
             if not (df["end date policy"] > df["issue date"]).all():
                 errors.append("end date policy harus lebih besar dari issue date")      
 
