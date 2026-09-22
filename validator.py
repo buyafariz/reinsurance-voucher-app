@@ -387,19 +387,19 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
                             f"Kolom {col} tidak boleh bernilai negatif ({biz_type})"
                         )
 
-                # # 🔹 Refund, Retur, Batal → harus negatif
-                # if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
-                #     if col in [
-                #         "reins total premium",
-                #         "reins total comm",
-                #         "reins tabarru",
-                #         "reins ujrah",
-                #         "reins nett premium"
-                #     ]:
-                #         if (numeric > 0).any():
-                #             errors.append(
-                #                 f"Kolom {col} harus bernilai negatif ({biz_type})"
-                #             )
+                # 🔹 Refund, Retur, Batal → harus negatif
+                if biz_type in ["Refund", "Retur", "Batal", "Cancel"]:
+                    if col in [
+                        "reins total premium",
+                        "reins total comm",
+                        "reins tabarru",
+                        "reins ujrah",
+                        "reins nett premium"
+                    ]:
+                        if (numeric > 0).any():
+                            errors.append(
+                                f"Kolom {col} harus bernilai negatif ({biz_type})"
+                            )
 
                 df[col] = numeric
 
@@ -702,20 +702,20 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # 10. REINS VS ORIGINAL LIMIT
     # =========================
     if reins_type == "INWARD":
-        # if department in "ADMIN":
-        #     if not (df["reins sum insured"] <= df["sum insured"]).all():
-        #         errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
+        if department in "ADMIN":
+            if not (df["reins sum insured"] <= df["sum insured"]).all():
+                errors.append("reins sum insured tidak boleh lebih besar dari sum insured")
 
-        #     if not (df["reins sum at risk"] <= df["sum at risk"]).all():
-        #         errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
+            if not (df["reins sum at risk"] <= df["sum at risk"]).all():
+                errors.append("reins sum at risk tidak boleh lebih besar dari sum at risk")
 
-        #     if not (df["sum at risk"] <= df["sum insured"]).all():
-        #         errors.append("sum at risk tidak boleh lebih besar dari sum insured")
+            if not (df["sum at risk"] <= df["sum insured"]).all():
+                errors.append("sum at risk tidak boleh lebih besar dari sum insured")
 
-        #     if not (df["reins sum at risk"] <= df["reins sum insured"]).all():
-        #         errors.append("reins sum at risk tidak boleh lebih besar dari reins sum insured")
+            if not (df["reins sum at risk"] <= df["reins sum insured"]).all():
+                errors.append("reins sum at risk tidak boleh lebih besar dari reins sum insured")
 
-        if department in "CLAIM":
+        elif department in "CLAIM":
             if biz_type not in ["Refund", "Retur", "Batal", "Cancel"]:
                 if not (df["sum insured idr"] >= df["sum reinsured idr"]).all():
                     errors.append("sum reinsured idr tidak boleh lebih besar dari sum insured idr")
