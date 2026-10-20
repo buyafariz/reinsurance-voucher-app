@@ -4829,9 +4829,9 @@ with tab_calc:
 
                             if errors:
 
-                                validation_errors.append(
-                                    f"{row['PML ID']} → {', '.join(errors)} (Kolom Tidak Unik)"
-                                )
+                                # validation_errors.append(
+                                #     f"{row['PML ID']} → {', '.join(errors)} (Kolom Tidak Unik)"
+                                # )
 
                                 continue
 
