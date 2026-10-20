@@ -967,14 +967,14 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
             # KOB Code
             if "kob code" not in df.columns:
                 errors.append("Tambahkan kolom KOB Code")
-            # else:
-            #     kob_series = (df["kob code"].fillna("").astype(str).str.strip())
-            #     if (kob_series == "").any():
-            #         errors.append("KOB Code tidak boleh kosong")
-            #     allowed_kob = {"TTY", "FAC"}
-            #     invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
-            #     if invalid_kob:
-            #         errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
+            else:
+                kob_series = (df["kob code"].fillna("").astype(str).str.strip())
+                if (kob_series == "").any():
+                    errors.append("KOB Code tidak boleh kosong")
+                allowed_kob = {"TTY", "FAC"}
+                invalid_kob = set(kob_series[kob_series != ""].unique()) - allowed_kob
+                if invalid_kob:
+                    errors.append(f"KOB Code harus bernilai salah satu dari: "f"{', '.join(sorted(allowed_kob))}")
 
             # Ced Book Year
             cby_series = (df["ced book year"].fillna("").astype(str).str.strip())
