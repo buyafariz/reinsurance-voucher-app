@@ -1135,7 +1135,7 @@ def validate_calculate(df, department:str, biz_type: str, reins_type: str):
         if department == "ADMIN" and biz_type in ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]:
             errors = []
 
-            for col in ["Retro Type", "Acc With Name", "Ccy Code", "Premium Ccy", "Ced Book Year", "Ced Book Month", "Out Pay Period Type", "COB", "References No"]:
+            for col in ["Retro Type", "Acc With Name", "KOB Code", "Ccy Code", "Premium Ccy", "Ced Book Year", "Ced Book Month", "Out Pay Period Type", "COB", "References No"]:
 
                 if col not in df.columns:
                     errors.append(f"Kolom {col} tidak ditemukan")
