@@ -501,7 +501,7 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     # =========================
     # 4. GENDER
     # =========================
-    if not df["gender"].isin(["M", "F", "U"]).all():
+    if not df["Gender"].isin(["M", "F", "U"]).all():
         errors.append("Kolom gender hanya boleh M, F, atau U")
 
     # =========================
