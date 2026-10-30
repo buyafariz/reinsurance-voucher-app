@@ -281,7 +281,7 @@ with tab_upload:
             "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
             "Balance (IDR)", "Check Balance (IDR)",
             "REMARKS", "PML ID", "STATUS", "CREATED AT", "CREATED BY",
-            "Due Date", "Check Due Date", "Subject Email", "Email Date",
+            "Due Date", "Subject Email", "Email Date",
             "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
         ]
 
@@ -947,7 +947,6 @@ with tab_upload:
             "CREATED AT",
             "CREATED BY",
             "Due Date",
-            "Check Due Date",
             "CANCELED AT",
             "CANCELED BY",
             "CANCEL OF VOUCHER",
@@ -1533,7 +1532,7 @@ with tab_split:
             "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
             "Balance (IDR)", "Check Balance (IDR)",
             "REMARKS", "PML ID", "STATUS", "CREATED AT", "CREATED BY",
-            "Due Date", "Check Due Date", "Subject Email", "Email Date",
+            "Due Date", "Subject Email", "Email Date",
             "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
         ]
 
@@ -2125,7 +2124,6 @@ with tab_split:
             "CREATED AT",
             "CREATED BY",
             "Due Date",
-            "Check Due Date",
             "CANCELED AT",
             "CANCELED BY",
             "CANCEL OF VOUCHER",
@@ -2641,7 +2639,7 @@ with tab_calc:
         "Tabarru (IDR)", "Ujrah (IDR)", "Claim (IDR)",
         "Balance (IDR)", "Check Balance (IDR)",
         "REMARKS", "PML ID", "STATUS", "CREATED AT", "CREATED BY",
-        "Due Date", "Check Due Date", "Subject Email", "Email Date",
+        "Due Date", "Subject Email", "Email Date",
         "CANCELED AT", "CANCELED BY", "CANCEL OF VOUCHER", "CANCEL REASON"
     ]
 
@@ -2824,7 +2822,6 @@ with tab_calc:
         "CREATED AT",
         "CREATED BY",
         "Due Date",
-        "Check Due Date",
         "CANCELED AT",
         "CANCELED BY",
         "CANCEL OF VOUCHER",
@@ -3556,8 +3553,6 @@ with tab_calc:
                                             "CREATED BY": row["PIC"],
                                             "Due Date": due_date,
 
-                                            "Check Due Date": "",
-
                                             "Subject Email": row["Subject Email"],
                                             "Email Date": row["Email Date"],
                                             "CANCELED AT": "-",
@@ -3631,8 +3626,6 @@ with tab_calc:
                                             "CREATED AT": now_wib_naive(),
                                             "CREATED BY": row["PIC"],
                                             "Due Date": due_date,
-
-                                            "Check Due Date": "",
                                             
                                             "Subject Email": row["Subject Email"],
                                             "Email Date": row["Email Date"],
@@ -5009,8 +5002,6 @@ with tab_calc:
                                             "CREATED BY": row["PIC"],
                                             "Due Date": due_date,
 
-                                            "Check Due Date": "",
-
                                             "Subject Email": row["Subject Email"],
                                             "Email Date": row["Email Date"],
                                             "CANCELED AT": "-",
@@ -5086,8 +5077,6 @@ with tab_calc:
                                             "CREATED AT": now_wib_naive(),
                                             "CREATED BY": row["PIC"],
                                             "Due Date": due_date,
-
-                                            "Check Due Date": "",
 
                                             "Subject Email": row["Subject Email"],
                                             "Email Date": row["Email Date"],
