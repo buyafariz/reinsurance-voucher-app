@@ -3339,6 +3339,20 @@ with tab_calc:
                         st.error("❌ File product tidak ditemukan di Drive")
                         st.stop()
 
+                    from googleapiclient.errors import HttpError
+
+                    try:
+                        meta = service.files().get(
+                            fileId=product_file_id,
+                            fields="id,name,mimeType,size",
+                            supportsAllDrives=True
+                        ).execute()
+                        st.write(meta)
+                    except HttpError as e:
+                        st.error(f"Status: {e.resp.status}")
+                        st.code(e.content.decode() if isinstance(e.content, bytes) else str(e.content))
+                        st.stop()
+
                     product_df = pd.read_excel(download_file_from_drive(service, product_file_id))
                     product_df.columns = product_df.columns.str.strip()
 
