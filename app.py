@@ -3350,7 +3350,7 @@ with tab_calc:
                         st.error("❌ File product kosong (tidak ada baris data)")
                         st.stop()
 
-                    required_product_cols = ["Cedant Company", "Ced Product Code", "Ced Coverage Code", "C.O.B Detail"]
+                    required_product_cols = ["Cedant", "Ced Product Code", "Ced Coverage Code", "C.O.B Detail"]
                     missing_product_cols = [c for c in required_product_cols if c not in product_df.columns]
 
                     if missing_product_cols:
