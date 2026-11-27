@@ -1176,3 +1176,42 @@ def download_with_retry(service, file_id, max_retries=3, delay=2):
                 time.sleep(delay * (attempt + 1))  # exponential backoff
                 continue
             raise e
+
+
+import io
+from googleapiclient.http import MediaIoBaseDownload
+
+XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+GSHEET_MIME = "application/vnd.google-apps.spreadsheet"
+SHORTCUT_MIME = "application/vnd.google-apps.shortcut"
+
+
+def download_file_from_drive_shortcut(service, file_id):
+    meta = service.files().get(
+        fileId=file_id,
+        fields="id,mimeType,shortcutDetails(targetId,targetMimeType)",
+        supportsAllDrives=True
+    ).execute()
+
+    # Kalau shortcut, pindah ke file targetnya
+    if meta["mimeType"] == SHORTCUT_MIME:
+        file_id = meta["shortcutDetails"]["targetId"]
+        mime_type = meta["shortcutDetails"]["targetMimeType"]
+    else:
+        mime_type = meta["mimeType"]
+
+    # Google Sheets harus di-export, file biasa di-download
+    if mime_type == GSHEET_MIME:
+        request = service.files().export_media(fileId=file_id, mimeType=XLSX_MIME)
+    else:
+        request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+
+    file_stream = io.BytesIO()
+    downloader = MediaIoBaseDownload(file_stream, request)
+
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+
+    file_stream.seek(0)
+    return file_stream

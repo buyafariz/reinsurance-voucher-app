@@ -10,7 +10,7 @@ import re
 from datetime import datetime
 from validator import validate_product, validate_voucher, validate_calculate
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vou_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive, generate_pml_outward_from_drive, split_upload_with_log, split_upload_with_log_outward, get_last_seq_no, generate_pml_id
-from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_pml_metadata
+from drive_utils import download_file_from_drive_shortcut, upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_pml_metadata
 from lock_utils import acquire_lock, release_lock
 from zoneinfo import ZoneInfo
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, JsCode
@@ -3326,46 +3326,51 @@ with tab_calc:
                             columns=LOG_COLUMNS
                         )
 
-                    # ==========================
-                    # LOAD FILE PRODUCT
-                    # ==========================
-                    product_file_id = find_drive_file(
-                        service=service,
-                        filename="LIST PRD Test.xlsx",          # ← sesuaikan nama file
-                        parent_id=CONFIG_FOLDER_ID           # ← sesuaikan folder tempat file acuan
-                    )
-
-                    if not product_file_id:
-                        st.error("❌ File product tidak ditemukan di Drive")
-                        st.stop()
-
-                    from googleapiclient.errors import HttpError
-
-                    try:
-                        meta = service.files().get(
-                            fileId=product_file_id,
-                            fields="id,name,mimeType,size",
-                            supportsAllDrives=True
-                        ).execute()
-                        st.write(meta)
-                    except HttpError as e:
-                        st.error(f"Status: {e.resp.status}")
-                        st.code(e.content.decode() if isinstance(e.content, bytes) else str(e.content))
-                        st.stop()
-
-                    product_df = pd.read_excel(download_file_from_drive(service, product_file_id))
-                    product_df.columns = product_df.columns.str.strip()
-
-                    with st.expander("🛠 Debug: File Product", expanded=True):
-                        st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
-                        st.write("Kolom:", list(product_df.columns))
-                        st.dataframe(product_df.head(10))
-
-                        # cek apakah cedant yang dipilih ada
-                        st.write(
-                            "Cedant unik di file:",
-                            sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
+                        # ==========================
+                        # LOAD FILE PRODUCT
+                        # ==========================
+                        product_file_id = find_drive_file(
+                            service=service,
+                            filename="LIST PRD Test.xlsx",
+                            parent_id=CONFIG_FOLDER_ID
                         )
+
+                        if not product_file_id:
+                            st.error("❌ File product tidak ditemukan di Drive")
+                            st.stop()
+
+                        try:
+                            product_df = pd.read_excel(download_file_from_drive_shortcut(service, product_file_id))
+                            product_df.columns = product_df.columns.str.strip()
+                        except Exception as e:
+                            st.error(f"❌ File product gagal dibaca: {e}")
+                            st.stop()
+
+                        if product_df.empty:
+                            st.error("❌ File product kosong (tidak ada baris data)")
+                            st.stop()
+
+                        required_product_cols = ["Cedant Company", "Ced Product Code", "Ced Coverage Code", "C.O.B Detail"]
+                        missing_product_cols = [c for c in required_product_cols if c not in product_df.columns]
+
+                        if missing_product_cols:
+                            st.error(
+                                f"❌ Kolom berikut tidak ditemukan di file product: {missing_product_cols}. "
+                                f"Kolom yang terbaca: {list(product_df.columns)}"
+                            )
+                            st.stop()
+
+                        # (Opsional) debug, hapus kalau sudah yakin
+                        DEBUG_PRODUCT = False
+                        if DEBUG_PRODUCT:
+                            with st.expander("🛠 Debug: File Product", expanded=True):
+                                st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
+                                st.write("Kolom:", list(product_df.columns))
+                                st.dataframe(product_df.head(10))
+                                st.write(
+                                    "Cedant unik di file:",
+                                    sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
+                                )
 
                     # ==========================
                     # VALIDATION STAGE
