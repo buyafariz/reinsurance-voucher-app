@@ -1118,7 +1118,7 @@ def validate_product(df, cedant: str, department: str, biz_type: str, reins_type
     # ==========================
     # VALIDASI CEDANT
     # ==========================
-    CEDANT_REF_COL = "Cedant Company"   # ← sesuaikan dengan nama kolom cedant di file acuan
+    CEDANT_REF_COL = "Cedant"   # ← sesuaikan dengan nama kolom cedant di file acuan
 
     if CEDANT_REF_COL not in product_df.columns:
         errors.append(f"Kolom '{CEDANT_REF_COL}' tidak ditemukan di file product")
