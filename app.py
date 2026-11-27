@@ -3331,7 +3331,7 @@ with tab_calc:
                     # ==========================
                     product_file_id = find_drive_file(
                         service=service,
-                        filename="File Acuan.xlsx",          # ← sesuaikan nama file
+                        filename="LIST PRD Test.xlsx",          # ← sesuaikan nama file
                         parent_id=CONFIG_FOLDER_ID           # ← sesuaikan folder tempat file acuan
                     )
 
@@ -3341,6 +3341,17 @@ with tab_calc:
 
                     product_df = pd.read_excel(download_file_from_drive(service, product_file_id))
                     product_df.columns = product_df.columns.str.strip()
+
+                    with st.expander("🛠 Debug: File Product", expanded=True):
+                        st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
+                        st.write("Kolom:", list(product_df.columns))
+                        st.dataframe(product_df.head(10))
+
+                        # cek apakah cedant yang dipilih ada
+                        st.write(
+                            "Cedant unik di file:",
+                            sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
+                        )
 
                     # ==========================
                     # VALIDATION STAGE
