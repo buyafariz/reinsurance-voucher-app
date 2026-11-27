@@ -3355,7 +3355,7 @@ with tab_calc:
                         st.stop()
 
                     try:
-                        product_df = pd.read_excel(download_file_from_drive_shortcut(service, product_file_id))
+                        product_df = pd.read_excel(download_file_from_drive_shortcut(service, product_file_id), dtype={"Ced Product Code": str, "Ced Coverage Code": str})
                         product_df.columns = product_df.columns.str.strip()
                     except Exception as e:
                         st.error(f"❌ File product gagal dibaca: {e}")
@@ -3406,7 +3406,11 @@ with tab_calc:
                                 pml_file_id
                             )
 
-                            df = pd.read_excel(file_stream)
+                            df = pd.read_excel(file_stream, dtype={
+                                    "Ced Product Code": str, "Ced Coverage Code": str,   # ADMIN
+                                    "Product": str, "Coverage Code": str,                # CLAIM
+                                }
+                            )
 
                             # ==========================
                             # VALIDATE
