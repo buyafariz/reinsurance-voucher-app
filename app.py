@@ -3326,51 +3326,51 @@ with tab_calc:
                             columns=LOG_COLUMNS
                         )
 
-                        # ==========================
-                        # LOAD FILE PRODUCT
-                        # ==========================
-                        product_file_id = find_drive_file(
-                            service=service,
-                            filename="LIST PRD Test.xlsx",
-                            parent_id=CONFIG_FOLDER_ID
+                    # ==========================
+                    # LOAD FILE PRODUCT
+                    # ==========================
+                    product_file_id = find_drive_file(
+                        service=service,
+                        filename="LIST PRD Test.xlsx",
+                        parent_id=CONFIG_FOLDER_ID
+                    )
+
+                    if not product_file_id:
+                        st.error("❌ File product tidak ditemukan di Drive")
+                        st.stop()
+
+                    try:
+                        product_df = pd.read_excel(download_file_from_drive_shortcut(service, product_file_id))
+                        product_df.columns = product_df.columns.str.strip()
+                    except Exception as e:
+                        st.error(f"❌ File product gagal dibaca: {e}")
+                        st.stop()
+
+                    if product_df.empty:
+                        st.error("❌ File product kosong (tidak ada baris data)")
+                        st.stop()
+
+                    required_product_cols = ["Cedant Company", "Ced Product Code", "Ced Coverage Code", "C.O.B Detail"]
+                    missing_product_cols = [c for c in required_product_cols if c not in product_df.columns]
+
+                    if missing_product_cols:
+                        st.error(
+                            f"❌ Kolom berikut tidak ditemukan di file product: {missing_product_cols}. "
+                            f"Kolom yang terbaca: {list(product_df.columns)}"
                         )
+                        st.stop()
 
-                        if not product_file_id:
-                            st.error("❌ File product tidak ditemukan di Drive")
-                            st.stop()
-
-                        try:
-                            product_df = pd.read_excel(download_file_from_drive_shortcut(service, product_file_id))
-                            product_df.columns = product_df.columns.str.strip()
-                        except Exception as e:
-                            st.error(f"❌ File product gagal dibaca: {e}")
-                            st.stop()
-
-                        if product_df.empty:
-                            st.error("❌ File product kosong (tidak ada baris data)")
-                            st.stop()
-
-                        required_product_cols = ["Cedant Company", "Ced Product Code", "Ced Coverage Code", "C.O.B Detail"]
-                        missing_product_cols = [c for c in required_product_cols if c not in product_df.columns]
-
-                        if missing_product_cols:
-                            st.error(
-                                f"❌ Kolom berikut tidak ditemukan di file product: {missing_product_cols}. "
-                                f"Kolom yang terbaca: {list(product_df.columns)}"
+                    # (Opsional) debug, hapus kalau sudah yakin
+                    DEBUG_PRODUCT = False
+                    if DEBUG_PRODUCT:
+                        with st.expander("🛠 Debug: File Product", expanded=True):
+                            st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
+                            st.write("Kolom:", list(product_df.columns))
+                            st.dataframe(product_df.head(10))
+                            st.write(
+                                "Cedant unik di file:",
+                                sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
                             )
-                            st.stop()
-
-                        # (Opsional) debug, hapus kalau sudah yakin
-                        DEBUG_PRODUCT = False
-                        if DEBUG_PRODUCT:
-                            with st.expander("🛠 Debug: File Product", expanded=True):
-                                st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
-                                st.write("Kolom:", list(product_df.columns))
-                                st.dataframe(product_df.head(10))
-                                st.write(
-                                    "Cedant unik di file:",
-                                    sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
-                                )
 
                     # ==========================
                     # VALIDATION STAGE
