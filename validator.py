@@ -1165,8 +1165,7 @@ def validate_product(df, cedant: str, department: str, biz_type: str, reins_type
             shown = ", ".join(not_registered[:10])
             extra = f" (+{len(not_registered) - 10} lainnya)" if len(not_registered) > 10 else ""
             errors.append(
-                f"Kolom '{df_col}' dengan isi [{shown}{extra}] belum terdaftar "
-                f"untuk cedant '{cedant}' (kolom acuan '{ref_col}')"
+                f"'{cedant}', Kolom '{df_col}' dengan isi [{shown}{extra}] belum terdaftar"
             )
 
     return errors
