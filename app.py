@@ -8,7 +8,7 @@ import re
 
 
 from datetime import datetime
-from validator import validate_voucher, validate_calculate
+from validator import validate_product, validate_voucher, validate_calculate
 from vin_generator import generate_vin, create_cancel_row, get_log_path, generate_vin_from_drive, generate_vou_from_drive, generate_vin_from_drive_log, create_negative_excel, dataframe_to_excel_bytes, upload_excel_bytes, get_log_filename, get_log_pml_filename, get_log_filename_outward, generate_vou_from_drive, generate_pml_from_drive, generate_pml_outward_from_drive, split_upload_with_log, split_upload_with_log_outward, get_last_seq_no, generate_pml_id
 from drive_utils import upload_or_update_drive_file, get_period_drive_folders, get_or_create_folder, get_or_create_ceding_folders, get_drive_service, find_drive_file, acquire_drive_lock, release_drive_lock, upload_dataframe_to_drive, load_log_from_drive, upload_log_dataframe, load_voucher_excel_from_drive, calculate_due_date, get_exchange_rate, load_log_from_gsheet, update_gsheet, append_gsheet, create_log_gsheet, get_or_create_outward_folders, upload_dataframe_to_drive_outward, init_sheets_service, download_file_from_drive, download_file_csv_from_drive, update_pml_status_to_splitted, update_pml_status_to_calculated, create_review_spreadsheet, get_pml_metadata
 from lock_utils import acquire_lock, release_lock
@@ -3327,6 +3327,22 @@ with tab_calc:
                         )
 
                     # ==========================
+                    # LOAD FILE PRODUCT
+                    # ==========================
+                    product_file_id = find_drive_file(
+                        service=service,
+                        filename="File Acuan.xlsx",          # ← sesuaikan nama file
+                        parent_id=CONFIG_FOLDER_ID           # ← sesuaikan folder tempat file acuan
+                    )
+
+                    if not product_file_id:
+                        st.error("❌ File product tidak ditemukan di Drive")
+                        st.stop()
+
+                    product_df = pd.read_excel(download_file_from_drive(service, product_file_id))
+                    product_df.columns = product_df.columns.str.strip()
+
+                    # ==========================
                     # VALIDATION STAGE
                     # ==========================
                     for _, row in selected_rows.iterrows():
@@ -3374,6 +3390,16 @@ with tab_calc:
                                     f"{row['PML ID']} → {', '.join(errors)} (Kolom Tidak Unik)"
                                 )
 
+                                continue
+
+                            # ✅ VALIDASI TAMBAHAN: cocokkan dengan file acuan
+                            ref_errors = validate_product(
+                                df, row["Cedant Company"],row["Department"], row["Biz Type"], reins_type, product_df
+                            )
+
+                            if ref_errors:
+                                for e in ref_errors:
+                                    validation_errors.append(f"{row['PML ID']} → {e}")
                                 continue
 
                             # ==========================

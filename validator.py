@@ -1076,6 +1076,102 @@ def validate_voucher(df, department: str, biz_type: str, reins_type:str):
     return errors
 
 
+def _norm_value(x):
+    """Normalisasi nilai supaya perbandingan konsisten (spasi, huruf besar, 1.0 vs 1)."""
+    if pd.isna(x):
+        return ""
+    s = str(x).strip().upper()
+    if s.endswith(".0") and s[:-2].isdigit():
+        s = s[:-2]
+    return s
+
+
+def validate_product(df, cedant: str, department: str, biz_type: str, reins_type: str, product_df):
+    """
+    Cek apakah Cedant, Product, Coverage, dan COB terdaftar di file acuan.
+    Product/Coverage/COB dicocokkan hanya pada baris acuan milik cedant tersebut.
+    Return: list error (kosong jika valid).
+    """
+    errors = []
+
+    if reins_type != "INWARD":
+        return errors
+
+    admin_biz_types = ["Kontribusi", "Refund", "Alteration", "Retur", "Revise", "Batal", "Cancel"]
+
+    # (kolom di df, kolom di file acuan)
+    if department == "ADMIN" and biz_type in admin_biz_types:
+        column_map = [
+            ("Ced Product Code",  "Ced Product Code"),
+            ("Ced Coverage Code", "Ced Coverage Code"),
+            ("COB",               "C.O.B Detail"),
+        ]
+    elif department == "CLAIM":
+        column_map = [
+            ("Product",         "Ced Product Code"),
+            ("Coverage Code",   "Ced Coverage Code"),
+            ("ClassOfBusiness", "C.O.B Detail"),
+        ]
+    else:
+        return errors
+
+    # ==========================
+    # VALIDASI CEDANT
+    # ==========================
+    CEDANT_REF_COL = "Cedant Company"   # ← sesuaikan dengan nama kolom cedant di file acuan
+
+    if CEDANT_REF_COL not in product_df.columns:
+        errors.append(f"Kolom '{CEDANT_REF_COL}' tidak ditemukan di file product")
+        return errors
+
+    cedant_norm = _norm_value(cedant)
+
+    if cedant_norm == "":
+        errors.append("Cedant Company kosong")
+        return errors
+
+    cedant_mask = product_df[CEDANT_REF_COL].map(_norm_value) == cedant_norm
+    cedant_ref_df = product_df[cedant_mask]
+
+    if cedant_ref_df.empty:
+        errors.append(
+            f"Cedant '{cedant}' belum terdaftar di file product (kolom '{CEDANT_REF_COL}')"
+        )
+        return errors   # tidak lanjut, karena product/coverage/COB tidak bisa dicek
+
+    # ==========================
+    # VALIDASI PRODUCT / COVERAGE / COB (khusus cedant ini)
+    # ==========================
+    for df_col, ref_col in column_map:
+
+        if df_col not in df.columns:
+            errors.append(f"Kolom '{df_col}' tidak ditemukan di file PML")
+            continue
+
+        if ref_col not in cedant_ref_df.columns:
+            errors.append(f"Kolom '{ref_col}' tidak ditemukan di file product")
+            continue
+
+        ref_values = set(cedant_ref_df[ref_col].map(_norm_value)) - {""}
+        df_values = {_norm_value(v) for v in df[df_col].unique()}
+
+        if "" in df_values:
+            errors.append(f"Kolom '{df_col}' terdapat data kosong")
+            df_values.discard("")
+
+        not_registered = sorted(df_values - ref_values)
+
+        if not_registered:
+            shown = ", ".join(not_registered[:10])
+            extra = f" (+{len(not_registered) - 10} lainnya)" if len(not_registered) > 10 else ""
+            errors.append(
+                f"Kolom '{df_col}' dengan isi [{shown}{extra}] belum terdaftar "
+                f"untuk cedant '{cedant}' (kolom acuan '{ref_col}')"
+            )
+
+    return errors
+
+
 def validate_calculate(df, department:str, biz_type: str, reins_type: str):
 
     if reins_type == "INWARD":
