@@ -287,16 +287,31 @@ with tab_upload:
 
 
         if uploaded_file:
-            # ==========================
-            # READ FILE
-            # ==========================
-            df = pd.read_excel(uploaded_file)
+
+            CODE_COLS = {
+                "ced product code", "ced coverage code",   # ADMIN
+                "product", "coverage code",                # CLAIM
+                "certificate no", "main pol no", "pol holder no"
+            }
+
+            # 1️⃣ Baca header saja untuk memetakan kolom kode
+            uploaded_file.seek(0)
+            header_df = pd.read_excel(uploaded_file, nrows=0)
+            dtype_map = {
+                c: str for c in header_df.columns
+                if str(c).strip().lower() in CODE_COLS
+            }
+
+            # 2️⃣ Baca ulang dengan dtype string
+            uploaded_file.seek(0)
+            df = pd.read_excel(uploaded_file, dtype=dtype_map)
+
             original_columns = df.columns.tolist()
             df.columns = df.columns.str.strip().str.lower()
 
-            for col in ["certificate no", "main pol no", "pol holder no"]:
+            for col in CODE_COLS:
                 if col in df.columns:
-                    df[col] = df[col].astype(str).str.strip()
+                    df[col] = df[col].astype(str).str.strip().replace({"nan": "", "None": ""})
 
 
             # 2. SANITIZE & FORMATTING (Sama seperti cara Summary Financial)
@@ -3360,17 +3375,6 @@ with tab_calc:
                         )
                         st.stop()
 
-                    # (Opsional) debug, hapus kalau sudah yakin
-                    DEBUG_PRODUCT = False
-                    if DEBUG_PRODUCT:
-                        with st.expander("🛠 Debug: File Product", expanded=True):
-                            st.write(f"Jumlah baris: {len(product_df)}, jumlah kolom: {len(product_df.columns)}")
-                            st.write("Kolom:", list(product_df.columns))
-                            st.dataframe(product_df.head(10))
-                            st.write(
-                                "Cedant unik di file:",
-                                sorted(product_df["Cedant Company"].dropna().astype(str).unique().tolist())
-                            )
 
                     # ==========================
                     # VALIDATION STAGE
